@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useCampaign } from "../campaign";
 import { buildLinkEdges } from "../graph";
+import { layoutPolaroidPositions } from "../graphLayout";
 import { profileHasAnyNew } from "../newBadges";
 
 type PolaroidData = {
@@ -64,39 +65,20 @@ function PolaroidNode({ data }: NodeProps<PolaroidNodeType>) {
 
 const nodeTypes: NodeTypes = { polaroid: PolaroidNode };
 
-/** Evenly space node centers on a circle so adjacent pairs are at least `minChord` px apart (chord length). */
-function circleLayout(
-  count: number,
-  minChord: number
-): { x: number; y: number }[] {
-  if (count === 0) return [];
-  if (count === 1) return [{ x: 0, y: 0 }];
-  const radius = minChord / (2 * Math.sin(Math.PI / count));
-  const out: { x: number; y: number }[] = [];
-  for (let i = 0; i < count; i++) {
-    const a = (2 * Math.PI * i) / count - Math.PI / 2;
-    out.push({
-      x: radius * Math.cos(a),
-      y: radius * Math.sin(a),
-    });
-  }
-  return out;
-}
-
-function FitViewOnLoad() {
+function FitViewOnLoad({ layoutKey }: { layoutKey: string }) {
   const { fitView } = useReactFlow();
   useEffect(() => {
     const t = requestAnimationFrame(() =>
-      fitView({ padding: 0.25, duration: 200 })
+      fitView({ padding: 0.2, duration: 200 })
     );
     return () => cancelAnimationFrame(t);
-  }, [fitView]);
+  }, [fitView, layoutKey]);
   return null;
 }
 
 function EvidenceBoardIntro() {
   const { isAdmin } = useAuth();
-  const { data, ack, refresh, resetToSeed, saveFullCampaign } = useCampaign();
+  const { data, refresh, resetToSeed, saveFullCampaign } = useCampaign();
   const importRef = useRef<HTMLInputElement>(null);
 
   function exportJson() {
@@ -215,28 +197,47 @@ function EvidenceBoardFlow() {
     [data.profiles, isAdmin]
   );
 
-  const computedEdges: Edge[] = useMemo(() => {
+  const linkEdgesForLayout = useMemo(() => {
     const raw = buildLinkEdges(data.profiles, {
       includeUnrevealedEntries: isAdmin,
     });
     const ids = new Set(profiles.map((p) => p.id));
-    return raw
-      .filter((e) => ids.has(e.source) && ids.has(e.target))
-      .map((e, i) => ({
+    return raw.filter((e) => ids.has(e.source) && ids.has(e.target));
+  }, [data.profiles, isAdmin, profiles]);
+
+  const computedEdges: Edge[] = useMemo(
+    () =>
+      linkEdgesForLayout.map((e, i) => ({
         id: `e-${i}-${e.source}-${e.target}`,
         source: e.source,
         target: e.target,
         type: "straight" as const,
         style: { stroke: "#b91c1c", strokeWidth: 2.5 },
         zIndex: 0,
-      }));
-  }, [data.profiles, isAdmin, profiles]);
+      })),
+    [linkEdgesForLayout]
+  );
+
+  const positionById = useMemo(
+    () =>
+      layoutPolaroidPositions(
+        profiles.map((p) => p.id),
+        linkEdgesForLayout
+      ),
+    [profiles, linkEdgesForLayout]
+  );
+
+  const layoutKey = useMemo(() => {
+    const ids = profiles.map((p) => p.id).join(",");
+    const ef = linkEdgesForLayout
+      .map((e) => `${e.source}__${e.target}`)
+      .sort()
+      .join("|");
+    return `${ids}#${ef}`;
+  }, [profiles, linkEdgesForLayout]);
 
   const computedNodes: PolaroidNodeType[] = useMemo(() => {
-    /** Minimum straight-line distance between centers of neighboring polaroids on the ring. */
-    const minChord = 300;
-    const pos = circleLayout(profiles.length, minChord);
-    return profiles.map((p, i) => {
+    return profiles.map((p) => {
       const label =
         p.profileRevealed && p.nameRevealed
           ? p.name
@@ -256,7 +257,7 @@ function EvidenceBoardFlow() {
       return {
         id: p.id,
         type: "polaroid",
-        position: pos[i] ?? { x: 0, y: 0 },
+        position: positionById.get(p.id) ?? { x: 0, y: 0 },
         data: {
           image,
           label,
@@ -266,7 +267,7 @@ function EvidenceBoardFlow() {
         draggable: false,
       };
     });
-  }, [profiles, isAdmin, ack]);
+  }, [profiles, isAdmin, ack, positionById]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<PolaroidNodeType>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -302,7 +303,7 @@ function EvidenceBoardFlow() {
           minZoom={0.25}
           maxZoom={1.5}
         >
-          <FitViewOnLoad />
+          <FitViewOnLoad layoutKey={layoutKey} />
           <Background color="#3d2e22" gap={24} />
           <Controls showInteractive={false} />
           <MiniMap
