@@ -167,7 +167,6 @@ export function ProfilePage() {
 
       {showEntriesSection ? (
         <section style={{ marginTop: "1.25rem" }}>
-          <h2 style={{ fontSize: "1.1rem" }}>Entries</h2>
           {entriesToShow.map((e) => {
             const showNew =
               !isAdmin &&
