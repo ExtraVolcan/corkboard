@@ -167,8 +167,9 @@ export function AdminCampaign() {
       <h1>Edit campaign</h1>
       <p className="muted">
         Add or change dossiers and notes. Save to update the database. Uploaded images
-        are stored on the server under <code>/uploads/</code> (they can be lost on some
-        hosts without persistent disk—keep backups or use image URLs instead).
+        are stored in the database when using PostgreSQL, or on disk under{" "}
+        <code>/uploads/</code> when using file-only storage (ephemeral on some hosts—use
+        external image URLs if you are not on Postgres).
       </p>
 
       {error ? <p className="error">{error}</p> : null}

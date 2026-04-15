@@ -14,8 +14,10 @@ import multer from "multer";
 import pg from "pg";
 import {
   getCampaignRelational,
+  getUploadedImage,
   initRelationalCampaign,
   replaceCampaignRelational,
+  saveUploadedImage,
 } from "./campaign-persist.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -23,12 +25,21 @@ const root = path.join(__dirname, "..");
 const dist = path.join(root, "dist");
 const seedPath = path.join(root, "src", "data", "seed.json");
 const defaultFileDb = path.join(__dirname, "data", "campaign.json");
-/** Uploaded profile images (served at /uploads/...). Ephemeral on hosts without a disk. */
-const uploadsDir = path.join(root, "server", "uploads");
+/** Uploaded profile images (served at /uploads/...). Lost on redeploy unless this dir is on persistent storage — set UPLOADS_DIR. */
+const uploadsDir = process.env.UPLOADS_DIR
+  ? path.resolve(process.env.UPLOADS_DIR)
+  : path.join(root, "server", "uploads");
 
 const { Pool } = pg;
 
-const upload = multer({
+const uploadLimits = { fileSize: 5 * 1024 * 1024 };
+const uploadFilter = (_req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) cb(null, true);
+  else cb(new Error("Only image files are allowed"));
+};
+
+/** Used when campaign is file-backed (no DATABASE_URL). */
+const uploadDisk = multer({
   storage: multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, uploadsDir),
     filename: (_req, file, cb) => {
@@ -36,12 +47,20 @@ const upload = multer({
       cb(null, `${randomUUID()}${ext}`);
     },
   }),
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) cb(null, true);
-    else cb(new Error("Only image files are allowed"));
-  },
+  limits: uploadLimits,
+  fileFilter: uploadFilter,
 });
+
+/** Used when PostgreSQL stores image bytes in uploaded_images. */
+const uploadMemory = multer({
+  storage: multer.memoryStorage(),
+  limits: uploadLimits,
+  fileFilter: uploadFilter,
+});
+
+/** Loose UUID hex pattern for route param validation. */
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const app = express();
 app.use(express.json({ limit: "4mb" }));
 
@@ -249,15 +268,51 @@ app.post("/api/campaign/reset", authMiddleware, async (req, res) => {
 });
 
 app.post("/api/admin/upload", authMiddleware, (req, res) => {
-  upload.single("image")(req, res, (err) => {
+  const uploader = pool ? uploadMemory : uploadDisk;
+  uploader.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: String(err.message || err) });
     }
     if (!req.file) {
       return res.status(400).json({ error: "No image file" });
     }
+    if (pool) {
+      try {
+        const id = randomUUID();
+        const buf = req.file.buffer;
+        const mime = req.file.mimetype || "application/octet-stream";
+        await saveUploadedImage(pool, id, buf, mime);
+        return res.json({ url: `/api/media/${id}` });
+      } catch (e) {
+        console.error(e);
+        return res.status(500).json({ error: "Failed to store image" });
+      }
+    }
     res.json({ url: `/uploads/${req.file.filename}` });
   });
+});
+
+/** Public image bytes when using PostgreSQL (profile.image may be `/api/media/<uuid>`). */
+app.get("/api/media/:id", async (req, res) => {
+  if (!pool) {
+    return res.status(404).type("text/plain").send("Not found");
+  }
+  const { id } = req.params;
+  if (!UUID_RE.test(id)) {
+    return res.status(400).type("text/plain").send("Bad id");
+  }
+  try {
+    const row = await getUploadedImage(pool, id);
+    if (!row) {
+      return res.status(404).type("text/plain").send("Not found");
+    }
+    res.set("Content-Type", row.mimeType);
+    res.set("Cache-Control", "public, max-age=31536000, immutable");
+    res.send(row.data);
+  } catch (e) {
+    console.error(e);
+    res.status(500).type("text/plain").send("Error");
+  }
 });
 
 app.use("/uploads", express.static(uploadsDir));
@@ -303,5 +358,9 @@ app.listen(PORT, () => {
     `Corkboard server on port ${PORT} (${pool ? "PostgreSQL" : `file ${CAMPAIGN_FILE}`})`
   );
   console.log(`[corkboard] Serving static from ${dist}`);
-  console.log(`[corkboard] Profile image uploads -> ${uploadsDir}`);
+  console.log(
+    `[corkboard] Profile image uploads -> ${
+      pool ? "PostgreSQL (uploaded_images BYTEA)" : uploadsDir
+    }`
+  );
 });

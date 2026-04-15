@@ -88,7 +88,7 @@ export async function meRequest(token: string): Promise<boolean> {
   return j.admin === true;
 }
 
-/** Upload an image; returns URL path e.g. `/uploads/uuid.jpg` */
+/** Upload an image; returns a path to use as profile image (e.g. `/api/media/<uuid>` with Postgres, or `/uploads/...` with file-backed campaign). */
 export async function uploadProfileImage(
   token: string,
   file: File

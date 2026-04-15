@@ -33,6 +33,41 @@ export async function ensureCampaignTables(pool) {
       PRIMARY KEY (profile_id, id)
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS uploaded_images (
+      id uuid PRIMARY KEY,
+      data bytea NOT NULL,
+      mime_type text NOT NULL DEFAULT 'application/octet-stream',
+      created_at timestamptz NOT NULL DEFAULT now()
+    )
+  `);
+}
+
+/**
+ * @param {import('pg').Pool} pool
+ * @param {string} id uuid
+ * @param {Buffer} buffer
+ * @param {string} mimeType
+ */
+export async function saveUploadedImage(pool, id, buffer, mimeType) {
+  await pool.query(
+    `INSERT INTO uploaded_images (id, data, mime_type) VALUES ($1, $2, $3)`,
+    [id, buffer, mimeType || "application/octet-stream"]
+  );
+}
+
+/**
+ * @param {import('pg').Pool} pool
+ * @param {string} id uuid
+ * @returns {Promise<{ data: Buffer; mimeType: string } | null>}
+ */
+export async function getUploadedImage(pool, id) {
+  const { rows } = await pool.query(
+    `SELECT data, mime_type FROM uploaded_images WHERE id = $1`,
+    [id]
+  );
+  if (!rows[0]) return null;
+  return { data: rows[0].data, mimeType: rows[0].mime_type };
 }
 
 /** @param {import('pg').Pool} pool */
