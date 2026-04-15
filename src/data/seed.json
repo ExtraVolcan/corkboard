@@ -1,0 +1,54 @@
+{
+  "profiles": [
+    {
+      "id": "sarah-chen",
+      "name": "Sarah Chen",
+      "image": "https://picsum.photos/seed/sarah/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "e1",
+          "text": "Last seen near the old library. She knew [[marcus-veil]] from university.",
+          "revealed": false
+        },
+        {
+          "id": "e2",
+          "text": "Witness reports mention a silver locket.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "marcus-veil",
+      "name": "Marcus Veil",
+      "image": "https://picsum.photos/seed/marcus/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "e1",
+          "text": "Teaches night classes. Refuses to discuss [[sarah-chen]].",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "the-archivist",
+      "name": "The Archivist",
+      "image": "https://picsum.photos/seed/archive/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "e1",
+          "text": "Anonymous tip: follow the thread from [[marcus-veil]] to the cellar.",
+          "revealed": false
+        }
+      ]
+    }
+  ]
+}
