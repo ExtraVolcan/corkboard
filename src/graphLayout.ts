@@ -12,10 +12,12 @@ type Pt = { x: number; y: number };
 const NODE_W = 140;
 const NODE_H = 230;
 
-const CLUSTER_PAD = 72;
-const CLUSTER_GAP = 96;
+/** Extra padding around each cluster’s bounding box (used when packing clusters on the grid). */
+const CLUSTER_PAD = 110;
+/** Minimum gap between adjacent cluster cells on the grid. */
+const CLUSTER_GAP = 180;
 /** Minimum half-extent for a single isolated polaroid so grid cells don't collapse. */
-const MIN_HALF_EXTENT = 78;
+const MIN_HALF_EXTENT = 96;
 
 function connectedComponents(ids: string[], edges: LinkEdge[]): string[][] {
   const adj = new Map<string, Set<string>>();
@@ -66,7 +68,7 @@ function forceLayoutCluster(
     return pos;
   }
 
-  const initR = 40 + n * 10;
+  const initR = 90 + n * 22;
   ids.forEach((id, i) => {
     const a = (2 * Math.PI * i) / n - Math.PI / 2;
     pos.set(id, {
@@ -76,9 +78,11 @@ function forceLayoutCluster(
   });
 
   const internal = edgesWithin(new Set(ids), edges);
-  const LINK_LEN = 270;
-  const TARGET_MIN = 280;
-  const ITER = 140;
+  /** Preferred center-to-center distance along an edge (linked pair). */
+  const LINK_LEN = 360;
+  /** Minimum center-to-center distance between any two polaroids in the cluster. */
+  const TARGET_MIN = 380;
+  const ITER = 160;
 
   for (let iter = 0; iter < ITER; iter++) {
     const cool = 1 - (iter / ITER) * 0.9;
