@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -33,9 +34,15 @@ const CampaignContext = createContext<CampaignContextValue | null>(null);
 
 export function CampaignProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<CampaignData>({ profiles: [] });
+  /** Latest campaign for admin saves (avoids a stale React batch missing entry toggles). */
+  const dataRef = useRef<CampaignData>({ profiles: [] });
   const [ready, setReady] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [ack, setAck] = useState<AckState>(() => loadAck());
+
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
 
   const refresh = useCallback(async (silent?: boolean) => {
     if (!silent) {
@@ -59,11 +66,14 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     void refresh();
   }, [refresh]);
 
-  /** Pick up admin (or other) changes on other devices without a full reload. */
+  /**
+   * Pick up server changes (e.g. admin reveals) for everyone — no login required.
+   * Refetch while the tab is visible; also when the tab gains focus again.
+   */
   useEffect(() => {
     const pollMs = Math.max(
-      3000,
-      Number(import.meta.env.VITE_CAMPAIGN_POLL_MS) || 8000
+      2000,
+      Number(import.meta.env.VITE_CAMPAIGN_POLL_MS) || 3500
     );
     const tick = () => {
       if (document.visibilityState === "visible") void refresh(true);
@@ -84,29 +94,27 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
 
   const setProfile = useCallback(
     (profileId: string, updater: (p: Profile) => Profile) => {
-      let nextData: CampaignData | null = null;
-      setData((prev) => {
-        const idx = prev.profiles.findIndex((p) => p.id === profileId);
-        if (idx < 0) return prev;
-        nextData = {
-          ...prev,
-          profiles: prev.profiles.map((p) =>
-            p.id === profileId ? updater(p) : p
-          ),
-        };
-        return nextData;
-      });
-
-      if (!nextData) return;
+      const prev = dataRef.current;
+      const idx = prev.profiles.findIndex((p) => p.id === profileId);
+      if (idx < 0) return;
+      const nextData: CampaignData = {
+        ...prev,
+        profiles: prev.profiles.map((p) =>
+          p.id === profileId ? updater(p) : p
+        ),
+      };
+      dataRef.current = nextData;
+      setData(nextData);
 
       const t = getToken();
       if (!t) return;
 
       void (async () => {
         try {
-          await putCampaign(nextData!, t);
+          await putCampaign(nextData, t);
+          await refresh(true);
         } catch {
-          await refresh();
+          await refresh(true);
           alert(
             "Could not save changes. If you are admin, sign in again and retry."
           );
@@ -128,6 +136,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       const t = getToken();
       if (!t) throw new Error("Not signed in");
       await putCampaign(next, t);
+      dataRef.current = next;
       setData(next);
     },
     []

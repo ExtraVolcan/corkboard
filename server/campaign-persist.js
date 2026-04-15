@@ -71,12 +71,12 @@ export async function replaceCampaignRelational(pool, data) {
           id, name, image, name_revealed, image_revealed, profile_revealed, sort_order
         ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
-          p.id,
-          p.name,
-          p.image,
-          !!p.nameRevealed,
-          !!p.imageRevealed,
-          !!p.profileRevealed,
+          String(p.id),
+          String(p.name ?? ""),
+          String(p.image ?? ""),
+          Boolean(p.nameRevealed),
+          Boolean(p.imageRevealed),
+          Boolean(p.profileRevealed),
           pOrder++,
         ]
       );
@@ -85,7 +85,13 @@ export async function replaceCampaignRelational(pool, data) {
         await client.query(
           `INSERT INTO entries (profile_id, id, text, revealed, sort_order)
            VALUES ($1, $2, $3, $4, $5)`,
-          [p.id, e.id, e.text, !!e.revealed, eOrder++]
+          [
+            String(p.id),
+            String(e.id),
+            String(e.text ?? ""),
+            e.revealed === true,
+            eOrder++,
+          ]
         );
       }
     }

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** Milliseconds between silent campaign refetches (default 8000). Min 3000. */
+  /** Milliseconds between silent campaign refetches (default 3500). Min 2000. */
   readonly VITE_CAMPAIGN_POLL_MS?: string;
 }
 

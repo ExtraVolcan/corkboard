@@ -20,7 +20,14 @@ export function setStoredToken(token: string | null): void {
 }
 
 export async function fetchCampaign(): Promise<CampaignData> {
-  const r = await fetch("/api/campaign", { cache: "no-store" });
+  const url = `/api/campaign?_=${Date.now()}`;
+  const r = await fetch(url, {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    },
+  });
   if (!r.ok) {
     if (r.status === 404) {
       throw new Error(

@@ -32,15 +32,53 @@ const JWT_SECRET = process.env.JWT_SECRET ?? "dev-only-change-me";
 const DATABASE_URL = process.env.DATABASE_URL;
 const CAMPAIGN_FILE = process.env.CAMPAIGN_FILE || defaultFileDb;
 
+/**
+ * Supabase "Transaction" pooler (port 6543): node-pg + PgBouncer transaction mode
+ * can misbehave with prepared statements / connection reuse. We append
+ * pgbouncer=true (libpq hint) and recycle connections often via maxUses: 1.
+ * Prefer Session mode or direct :5432 when possible.
+ */
+function isSupabaseTransactionPoolerUrl(raw) {
+  if (!raw || typeof raw !== "string") return false;
+  return (
+    /pooler\.supabase\.com:6543\b/i.test(raw) ||
+    (/supabase\.com/i.test(raw) && /:6543(\/|\?|$)/.test(raw))
+  );
+}
+
+function normalizeDatabaseUrl(raw) {
+  if (!raw || typeof raw !== "string") return raw;
+  if (/[?&]pgbouncer=true\b/i.test(raw)) return raw;
+  if (isSupabaseTransactionPoolerUrl(raw)) {
+    const sep = raw.includes("?") ? "&" : "?";
+    console.log(
+      "[corkboard] DATABASE_URL: appended pgbouncer=true for Supabase transaction pooler"
+    );
+    return `${raw}${sep}pgbouncer=true`;
+  }
+  return raw;
+}
+
 let pool = null;
 if (DATABASE_URL) {
+  const conn = normalizeDatabaseUrl(DATABASE_URL);
   pool = new Pool({
-    connectionString: DATABASE_URL,
+    connectionString: conn,
     ssl:
       process.env.PGSSLMODE === "disable"
         ? false
         : { rejectUnauthorized: false },
+    ...(isSupabaseTransactionPoolerUrl(conn)
+      ? {
+          maxUses: 1,
+        }
+      : {}),
   });
+  if (isSupabaseTransactionPoolerUrl(conn)) {
+    console.log(
+      "[corkboard] Pool maxUses=1 for Supabase transaction pooler (avoid stale reads)"
+    );
+  }
 }
 
 async function readSeed() {
@@ -156,7 +194,10 @@ app.get("/api/auth/me", (req, res) => {
 app.get("/api/campaign", async (req, res) => {
   try {
     const data = await getCampaign();
-    res.set("Cache-Control", "private, no-store, must-revalidate");
+    res.set("Cache-Control", "private, no-store, no-cache, must-revalidate, max-age=0");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
+    res.set("Surrogate-Control", "no-store");
     res.json(data);
   } catch (e) {
     console.error(e);
