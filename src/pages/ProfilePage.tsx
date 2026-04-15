@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useCampaign } from "../campaign";
@@ -35,6 +35,17 @@ export function ProfilePage() {
     if (isAdmin) return profile.entries.length > 0;
     return profile.entries.some((e) => e.revealed);
   }, [profile, isAdmin]);
+
+  const entryLinkLabel = useCallback(
+    (profileId: string) => {
+      const t = data.profiles.find((p) => p.id === profileId);
+      if (!t) return profileId;
+      if (isAdmin) return t.name?.trim() || profileId;
+      if (t.profileRevealed && t.nameRevealed) return t.name.trim();
+      return "?";
+    },
+    [data.profiles, isAdmin]
+  );
 
   useEffect(() => {
     if (!profile || !id) return;
@@ -165,29 +176,47 @@ export function ProfilePage() {
 
             return (
               <article key={e.id} className="entry-block">
-                <div className="entry-head">
-                  <span className="muted">Note #{e.id}</span>
-                  <span>
-                    {showNew ? <span className="badge-new">NEW</span> : null}
+                {isAdmin || showNew ? (
+                  <div className="entry-head">
                     {isAdmin ? (
-                      <button
-                        type="button"
-                        className="btn btn-small"
-                        onClick={() =>
-                          setProfile(profile.id, (p) => ({
-                            ...p,
-                            entries: p.entries.map((x) =>
-                              x.id === e.id ? { ...x, revealed: !x.revealed } : x
-                            ),
-                          }))
-                        }
+                      <>
+                        <span className="muted">Note #{e.id}</span>
+                        <span>
+                          {showNew ? <span className="badge-new">NEW</span> : null}
+                          <button
+                            type="button"
+                            className="btn btn-small"
+                            onClick={() =>
+                              setProfile(profile.id, (p) => ({
+                                ...p,
+                                entries: p.entries.map((x) =>
+                                  x.id === e.id ? { ...x, revealed: !x.revealed } : x
+                                ),
+                              }))
+                            }
+                          >
+                            {e.revealed ? "Un-reveal" : "Reveal publicly"}
+                          </button>
+                        </span>
+                      </>
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          width: "100%",
+                        }}
                       >
-                        {e.revealed ? "Un-reveal" : "Reveal publicly"}
-                      </button>
-                    ) : null}
-                  </span>
-                </div>
-                <EntryText text={e.text} knownProfileIds={knownIds} />
+                        <span className="badge-new">NEW</span>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+                <EntryText
+                  text={e.text}
+                  knownProfileIds={knownIds}
+                  linkLabel={entryLinkLabel}
+                />
               </article>
             );
           })}

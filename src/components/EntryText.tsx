@@ -4,15 +4,18 @@ import { parseEntryText } from "../links";
 type Props = {
   text: string;
   knownProfileIds: Set<string>;
+  /** When set, link text uses this (e.g. profile display name) instead of the raw [[id]]. */
+  linkLabel?: (profileId: string) => string;
 };
 
-export function EntryText({ text, knownProfileIds }: Props) {
+export function EntryText({ text, knownProfileIds, linkLabel }: Props) {
   const segments = parseEntryText(text);
   return (
     <p className="entry-text">
       {segments.map((seg, i) => {
         if (seg.type === "text") return <span key={i}>{seg.value}</span>;
         const known = knownProfileIds.has(seg.profileId);
+        const display = linkLabel ? linkLabel(seg.profileId) : seg.label;
         return (
           <Link
             key={i}
@@ -22,7 +25,7 @@ export function EntryText({ text, knownProfileIds }: Props) {
               opacity: known ? 1 : 0.55,
             }}
           >
-            {known ? seg.label : `${seg.label}?`}
+            {known ? display : `${display}?`}
           </Link>
         );
       })}
