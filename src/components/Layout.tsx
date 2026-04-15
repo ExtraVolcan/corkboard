@@ -13,7 +13,7 @@ export function Layout() {
     <div className="app-shell">
       <header className="top-nav">
         <NavLink to="/" className="brand" end>
-          Mystery — Corkboard
+          Corkboard
         </NavLink>
         <nav className="tabs">
           {isAdmin ? (
