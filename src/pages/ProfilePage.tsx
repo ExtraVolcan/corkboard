@@ -25,6 +25,17 @@ export function ProfilePage() {
     [data.profiles]
   );
 
+  const entriesToShow = useMemo(() => {
+    if (isAdmin) return profile?.entries ?? [];
+    return (profile?.entries ?? []).filter((e) => e.revealed);
+  }, [profile?.entries, isAdmin]);
+
+  const showEntriesSection = useMemo(() => {
+    if (!profile) return false;
+    if (isAdmin) return profile.entries.length > 0;
+    return profile.entries.some((e) => e.revealed);
+  }, [profile, isAdmin]);
+
   useEffect(() => {
     if (!profile || !id) return;
     return () => {
@@ -143,50 +154,45 @@ export function ProfilePage() {
         </div>
       </div>
 
-      <section style={{ marginTop: "1.25rem" }}>
-        <h2 style={{ fontSize: "1.1rem" }}>Entries</h2>
-        {profile.entries.map((e) => {
-          const canSee = isAdmin || (profile.profileRevealed && e.revealed);
-          const showNew =
-            !isAdmin &&
-            profile.profileRevealed &&
-            isEntryNew(profile.id, e.id, e.revealed, ack);
+      {showEntriesSection ? (
+        <section style={{ marginTop: "1.25rem" }}>
+          <h2 style={{ fontSize: "1.1rem" }}>Entries</h2>
+          {entriesToShow.map((e) => {
+            const showNew =
+              !isAdmin &&
+              profile.profileRevealed &&
+              isEntryNew(profile.id, e.id, e.revealed, ack);
 
-          return (
-            <article key={e.id} className="entry-block">
-              <div className="entry-head">
-                <span className="muted">Note #{e.id}</span>
-                <span>
-                  {showNew ? <span className="badge-new">NEW</span> : null}
-                  {isAdmin ? (
-                    <button
-                      type="button"
-                      className="btn btn-small"
-                      onClick={() =>
-                        setProfile(profile.id, (p) => ({
-                          ...p,
-                          entries: p.entries.map((x) =>
-                            x.id === e.id ? { ...x, revealed: !x.revealed } : x
-                          ),
-                        }))
-                      }
-                    >
-                      {e.revealed ? "Un-reveal" : "Reveal publicly"}
-                    </button>
-                  ) : null}
-                </span>
-              </div>
-              {canSee ? (
+            return (
+              <article key={e.id} className="entry-block">
+                <div className="entry-head">
+                  <span className="muted">Note #{e.id}</span>
+                  <span>
+                    {showNew ? <span className="badge-new">NEW</span> : null}
+                    {isAdmin ? (
+                      <button
+                        type="button"
+                        className="btn btn-small"
+                        onClick={() =>
+                          setProfile(profile.id, (p) => ({
+                            ...p,
+                            entries: p.entries.map((x) =>
+                              x.id === e.id ? { ...x, revealed: !x.revealed } : x
+                            ),
+                          }))
+                        }
+                      >
+                        {e.revealed ? "Un-reveal" : "Reveal publicly"}
+                      </button>
+                    ) : null}
+                  </span>
+                </div>
                 <EntryText text={e.text} knownProfileIds={knownIds} />
-              ) : (
-                <p className="muted" style={{ fontStyle: "italic" }}>
-                  Redacted.
-                </p>
-              )}
-            </article>
-          );
-        })}
-      </section>
+              </article>
+            );
+          })}
+        </section>
+      ) : null}
 
       {isAdmin ? (
         <p className="muted" style={{ marginTop: "1.5rem", fontSize: "0.85rem" }}>

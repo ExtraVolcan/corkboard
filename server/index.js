@@ -3,12 +3,14 @@
  * Storage: PostgreSQL when DATABASE_URL is set, else JSON file (local dev).
  */
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import express from "express";
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import jwt from "jsonwebtoken";
+import multer from "multer";
 import pg from "pg";
 import {
   getCampaignRelational,
@@ -21,8 +23,25 @@ const root = path.join(__dirname, "..");
 const dist = path.join(root, "dist");
 const seedPath = path.join(root, "src", "data", "seed.json");
 const defaultFileDb = path.join(__dirname, "data", "campaign.json");
+/** Uploaded profile images (served at /uploads/...). Ephemeral on hosts without a disk. */
+const uploadsDir = path.join(root, "server", "uploads");
 
 const { Pool } = pg;
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, uploadsDir),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname || "").slice(0, 12) || ".jpg";
+      cb(null, `${randomUUID()}${ext}`);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) cb(null, true);
+    else cb(new Error("Only image files are allowed"));
+  },
+});
 const app = express();
 app.use(express.json({ limit: "4mb" }));
 
@@ -229,6 +248,26 @@ app.post("/api/campaign/reset", authMiddleware, async (req, res) => {
   }
 });
 
+app.post("/api/admin/upload", authMiddleware, (req, res) => {
+  upload.single("image")(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: String(err.message || err) });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: "No image file" });
+    }
+    res.json({ url: `/uploads/${req.file.filename}` });
+  });
+});
+
+app.use("/uploads", express.static(uploadsDir));
+app.use((req, res, next) => {
+  if (req.path.startsWith("/uploads")) {
+    return res.status(404).type("text/plain").send("Not found");
+  }
+  next();
+});
+
 app.use(express.static(dist, { index: "index.html", fallthrough: true }));
 
 /**
@@ -241,6 +280,7 @@ app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
   if (req.path.startsWith("/api")) return next();
   if (req.path.startsWith("/assets/")) return next();
+  if (req.path.startsWith("/uploads")) return next();
   const indexHtml = path.join(dist, "index.html");
   res.sendFile(indexHtml, (err) => {
     if (err) next(err);
@@ -255,6 +295,7 @@ if (!existsSync(indexHtmlPath)) {
   process.exit(1);
 }
 
+await fs.mkdir(uploadsDir, { recursive: true });
 await initDb();
 
 app.listen(PORT, () => {
@@ -262,4 +303,5 @@ app.listen(PORT, () => {
     `Corkboard server on port ${PORT} (${pool ? "PostgreSQL" : `file ${CAMPAIGN_FILE}`})`
   );
   console.log(`[corkboard] Serving static from ${dist}`);
+  console.log(`[corkboard] Profile image uploads -> ${uploadsDir}`);
 });

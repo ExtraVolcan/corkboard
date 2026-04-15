@@ -87,3 +87,24 @@ export async function meRequest(token: string): Promise<boolean> {
   const j = (await r.json()) as { admin?: boolean };
   return j.admin === true;
 }
+
+/** Upload an image; returns URL path e.g. `/uploads/uuid.jpg` */
+export async function uploadProfileImage(
+  token: string,
+  file: File
+): Promise<string> {
+  const fd = new FormData();
+  fd.append("image", file);
+  const r = await fetch("/api/admin/upload", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: fd,
+  });
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error(t || `Upload failed (${r.status})`);
+  }
+  const j = (await r.json()) as { url?: string };
+  if (!j.url) throw new Error("No URL in response");
+  return j.url;
+}

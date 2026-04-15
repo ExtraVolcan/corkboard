@@ -153,6 +153,9 @@ function EvidenceBoardIntro() {
           same reveals. This device only stores which items you have dismissed as
           “NEW” (in <code>localStorage</code>).
           <div className="admin-controls" style={{ marginTop: "0.5rem" }}>
+            <Link to="/admin" className="btn btn-small" style={{ display: "inline-block" }}>
+              Edit profiles & entries
+            </Link>
             <button type="button" className="btn btn-small" onClick={exportJson}>
               Export JSON backup
             </button>

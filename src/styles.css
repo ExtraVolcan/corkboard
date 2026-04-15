@@ -377,3 +377,100 @@ a {
   color: #1a1510;
   min-height: 2.5em;
 }
+
+/* Admin campaign editor */
+.admin-campaign-page .admin-campaign-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.admin-campaign-page .admin-add-profile {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--paper-edge);
+}
+
+.admin-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.admin-form-row label,
+.admin-label-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.admin-form-row input,
+.admin-label-block input,
+.admin-label-block textarea {
+  font: inherit;
+  min-width: min(100%, 18rem);
+}
+
+.admin-label-block textarea {
+  width: 100%;
+  max-width: 40rem;
+}
+
+.admin-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.admin-thumb {
+  width: 72px;
+  height: 90px;
+  object-fit: cover;
+  border: 2px solid var(--paper-edge);
+}
+
+.admin-check-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+}
+
+.admin-profile-block {
+  padding: 0.75rem 1rem !important;
+}
+
+.admin-profile-body {
+  margin-top: 0.75rem;
+}
+
+.admin-profile-body h3 {
+  font-size: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.admin-entry-card {
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed var(--paper-edge);
+  margin-bottom: 0.5rem;
+}
+
+.admin-checkbox-inline {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.admin-entry-actions,
+.admin-profile-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}

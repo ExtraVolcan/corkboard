@@ -4,7 +4,10 @@ import { useAuth } from "../auth";
 export function Layout() {
   const { isAdmin, logout } = useAuth();
   const { pathname } = useLocation();
-  const wide = pathname === "/" || pathname.startsWith("/evidence");
+  const wide =
+    pathname === "/" ||
+    pathname.startsWith("/evidence") ||
+    pathname.startsWith("/admin");
 
   return (
     <div className="app-shell">
@@ -13,7 +16,14 @@ export function Layout() {
           Mystery — Corkboard
         </NavLink>
         <nav className="tabs">
-          {!isAdmin && (
+          {isAdmin ? (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Edit campaign
+            </NavLink>
+          ) : (
             <NavLink
               to="/login"
               className={({ isActive }) => (isActive ? "active" : "")}
