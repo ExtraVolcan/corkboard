@@ -64,11 +64,14 @@ function PolaroidNode({ data }: NodeProps<PolaroidNodeType>) {
 
 const nodeTypes: NodeTypes = { polaroid: PolaroidNode };
 
+/** Evenly space node centers on a circle so adjacent pairs are at least `minChord` px apart (chord length). */
 function circleLayout(
   count: number,
-  radius: number
+  minChord: number
 ): { x: number; y: number }[] {
   if (count === 0) return [];
+  if (count === 1) return [{ x: 0, y: 0 }];
+  const radius = minChord / (2 * Math.sin(Math.PI / count));
   const out: { x: number; y: number }[] = [];
   for (let i = 0; i < count; i++) {
     const a = (2 * Math.PI * i) / count - Math.PI / 2;
@@ -137,8 +140,7 @@ function EvidenceBoardIntro() {
         {isAdmin
           ? "Open a polaroid for the full dossier. Reveal profiles and entries from each dossier page."
           : "Persons of interest and how they connect. New intel is marked until you leave that dossier."}{" "}
-        Red strings follow mentions in notes (<code>[[profile-id]]</code>). Drag
-        photos to rearrange.
+        Red strings follow mentions in notes (<code>[[profile-id]]</code>).
       </p>
       {isAdmin ? (
         <div
@@ -231,8 +233,9 @@ function EvidenceBoardFlow() {
   }, [data.profiles, isAdmin, profiles]);
 
   const computedNodes: PolaroidNodeType[] = useMemo(() => {
-    const r = Math.max(220, profiles.length * 36);
-    const pos = circleLayout(profiles.length, r);
+    /** Minimum straight-line distance between centers of neighboring polaroids on the ring. */
+    const minChord = 300;
+    const pos = circleLayout(profiles.length, minChord);
     return profiles.map((p, i) => {
       const label =
         p.profileRevealed && p.nameRevealed
@@ -260,7 +263,7 @@ function EvidenceBoardFlow() {
           profileId: p.id,
           showNew,
         },
-        draggable: true,
+        draggable: false,
       };
     });
   }, [profiles, isAdmin, ack]);
@@ -294,6 +297,7 @@ function EvidenceBoardFlow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
+          nodesDraggable={false}
           fitView
           minZoom={0.25}
           maxZoom={1.5}
