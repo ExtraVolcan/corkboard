@@ -21,7 +21,16 @@ export function setStoredToken(token: string | null): void {
 
 export async function fetchCampaign(): Promise<CampaignData> {
   const r = await fetch("/api/campaign");
-  if (!r.ok) throw new Error(`Failed to load campaign (${r.status})`);
+  if (!r.ok) {
+    if (r.status === 404) {
+      throw new Error(
+        "Failed to load campaign (404): /api/campaign was not found. " +
+          "The UI is probably being served without the Node API (e.g. only the dist folder on static hosting, or `vite preview`). " +
+          "Use `npm run dev` for local work, or on Render deploy one Web Service that runs `npm start` after `npm run build`."
+      );
+    }
+    throw new Error(`Failed to load campaign (${r.status})`);
+  }
   return r.json() as Promise<CampaignData>;
 }
 

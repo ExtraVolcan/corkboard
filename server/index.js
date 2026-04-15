@@ -5,6 +5,7 @@
 import "dotenv/config";
 import express from "express";
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import jwt from "jsonwebtoken";
@@ -205,14 +206,31 @@ app.post("/api/campaign/reset", authMiddleware, async (req, res) => {
   }
 });
 
-app.use(express.static(dist));
+app.use(express.static(dist, { index: "index.html", fallthrough: true }));
 
-app.get("*", (req, res, next) => {
+/**
+ * SPA fallback: send index.html for client routes (React Router).
+ * Must run AFTER express.static so /assets/* is never replaced with HTML
+ * (which would break CSS/JS and look like "no styling").
+ * Avoid app.get('*', …) — path-to-regexp can treat '*' oddly in Express 4.21+.
+ */
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
   if (req.path.startsWith("/api")) return next();
-  res.sendFile(path.join(dist, "index.html"), (err) => {
+  if (req.path.startsWith("/assets/")) return next();
+  const indexHtml = path.join(dist, "index.html");
+  res.sendFile(indexHtml, (err) => {
     if (err) next(err);
   });
 });
+
+const indexHtmlPath = path.join(dist, "index.html");
+if (!existsSync(indexHtmlPath)) {
+  console.error(
+    `[corkboard] FATAL: ${indexHtmlPath} not found. Run "npm run build" before "npm start", and set Render Root Directory to the corkboard folder.`
+  );
+  process.exit(1);
+}
 
 await initDb();
 
@@ -220,4 +238,5 @@ app.listen(PORT, () => {
   console.log(
     `Corkboard server on port ${PORT} (${pool ? "PostgreSQL" : `file ${CAMPAIGN_FILE}`})`
   );
+  console.log(`[corkboard] Serving static from ${dist}`);
 });
