@@ -31,13 +31,31 @@ type PolaroidData = {
 };
 type PolaroidNodeType = Node<PolaroidData, "polaroid">;
 
+/** Single connection point at node center so red strings read as center-to-center. */
+const HANDLE_CENTER_STYLE = {
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  border: "none",
+  background: "transparent",
+  opacity: 0,
+} as const;
+
 function PolaroidNode({ data }: NodeProps<PolaroidNodeType>) {
   return (
     <div className="polaroid-node">
-      <Handle type="target" position={Position.Left} id="L" />
-      <Handle type="target" position={Position.Top} id="T" />
-      <Handle type="source" position={Position.Right} id="R" />
-      <Handle type="source" position={Position.Bottom} id="B" />
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="c-tgt"
+        style={HANDLE_CENTER_STYLE}
+      />
+      <Handle
+        type="source"
+        position={Position.Top}
+        id="c-src"
+        style={HANDLE_CENTER_STYLE}
+      />
       <Link to={`/profile/${data.profileId}`} className="polaroid-link">
         <div className="polaroid-frame">
           {data.showNew ? (
@@ -211,6 +229,8 @@ function EvidenceBoardFlow() {
         id: `e-${i}-${e.source}-${e.target}`,
         source: e.source,
         target: e.target,
+        sourceHandle: "c-src",
+        targetHandle: "c-tgt",
         type: "straight" as const,
         style: { stroke: "#b91c1c", strokeWidth: 2.5 },
         zIndex: 0,
