@@ -140,7 +140,7 @@ function EvidenceBoardIntro() {
         {isAdmin
           ? "Open a polaroid for the full dossier. Reveal profiles and entries from each dossier page."
           : "Persons of interest and how they connect. New intel is marked until you leave that dossier."}{" "}
-        Red strings follow mentions in notes (<code>[[profile-id]]</code>).
+        Red strings follow mentions in notes.
       </p>
       {isAdmin ? (
         <div
