@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, type ChangeEvent } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -20,8 +20,14 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useCampaign } from "../campaign";
 import { buildLinkEdges } from "../graph";
+import { profileHasAnyNew } from "../newBadges";
 
-type PolaroidData = { image: string; label: string; profileId: string };
+type PolaroidData = {
+  image: string;
+  label: string;
+  profileId: string;
+  showNew?: boolean;
+};
 type PolaroidNodeType = Node<PolaroidData, "polaroid">;
 
 function PolaroidNode({ data }: NodeProps<PolaroidNodeType>) {
@@ -33,6 +39,19 @@ function PolaroidNode({ data }: NodeProps<PolaroidNodeType>) {
       <Handle type="source" position={Position.Bottom} id="B" />
       <Link to={`/profile/${data.profileId}`} className="polaroid-link">
         <div className="polaroid-frame">
+          {data.showNew ? (
+            <span
+              className="badge-new"
+              style={{
+                position: "absolute",
+                top: 6,
+                right: 6,
+                zIndex: 2,
+              }}
+            >
+              NEW
+            </span>
+          ) : null}
           <div className="polaroid-photo-wrap">
             <img src={data.image} alt="" draggable={false} />
           </div>
@@ -72,9 +91,116 @@ function FitViewOnLoad() {
   return null;
 }
 
+function EvidenceBoardIntro() {
+  const { isAdmin } = useAuth();
+  const { data, ack, refresh, resetToSeed, saveFullCampaign } = useCampaign();
+  const importRef = useRef<HTMLInputElement>(null);
+
+  function exportJson() {
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "mystery-campaign.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function onImportFile(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      void (async () => {
+        try {
+          const parsed = JSON.parse(String(reader.result));
+          if (!parsed?.profiles || !Array.isArray(parsed.profiles)) {
+            alert("Invalid file: expected { profiles: [...] }");
+            return;
+          }
+          await saveFullCampaign(parsed);
+        } catch {
+          alert("Could not import (check JSON and admin session).");
+        }
+        await refresh();
+      })();
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  }
+
+  return (
+    <div className="paper" style={{ marginBottom: "1rem" }}>
+      <h1 style={{ marginTop: 0 }}>Corkboard</h1>
+      <p className="muted" style={{ marginBottom: 0 }}>
+        {isAdmin
+          ? "Open a polaroid for the full dossier. Reveal profiles and entries from each dossier page."
+          : "Persons of interest and how they connect. New intel is marked until you leave that dossier."}{" "}
+        Red strings follow mentions in notes (<code>[[profile-id]]</code>). Drag
+        photos to rearrange.
+      </p>
+      {isAdmin ? (
+        <div
+          className="admin-strip"
+          style={{
+            marginTop: "0.75rem",
+            background: "#e0f2fe",
+            borderColor: "#7dd3fc",
+          }}
+        >
+          <strong>Campaign data</strong> — lives on the server. Everyone sees the
+          same reveals. This device only stores which items you have dismissed as
+          “NEW” (in <code>localStorage</code>).
+          <div className="admin-controls" style={{ marginTop: "0.5rem" }}>
+            <button type="button" className="btn btn-small" onClick={exportJson}>
+              Export JSON backup
+            </button>
+            <button
+              type="button"
+              className="btn btn-small"
+              onClick={() => importRef.current?.click()}
+            >
+              Import JSON…
+            </button>
+            <button
+              type="button"
+              className="btn btn-small"
+              onClick={() => {
+                if (
+                  confirm(
+                    "Reset campaign on the server to the bundled sample from src/data/seed.json?"
+                  )
+                ) {
+                  void (async () => {
+                    try {
+                      await resetToSeed();
+                    } catch {
+                      alert("Reset failed. Sign in as admin and try again.");
+                    }
+                  })();
+                }
+              }}
+            >
+              Reset server to sample
+            </button>
+            <input
+              ref={importRef}
+              type="file"
+              accept="application/json,.json"
+              hidden
+              onChange={onImportFile}
+            />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function EvidenceBoardFlow() {
   const { isAdmin } = useAuth();
-  const { data } = useCampaign();
+  const { data, ack } = useCampaign();
 
   const profiles = useMemo(
     () =>
@@ -120,6 +246,7 @@ function EvidenceBoardFlow() {
               encodeURIComponent(
                 `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"><rect fill="%23ddd" width="120" height="150"/><text x="60" y="85" font-size="48" text-anchor="middle" fill="%23999">?</text></svg>`
               );
+      const showNew = profileHasAnyNew(p, ack, isAdmin);
       return {
         id: p.id,
         type: "polaroid",
@@ -128,11 +255,12 @@ function EvidenceBoardFlow() {
           image,
           label,
           profileId: p.id,
+          showNew,
         },
         draggable: true,
       };
     });
-  }, [profiles, isAdmin]);
+  }, [profiles, isAdmin, ack]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<PolaroidNodeType>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -145,18 +273,17 @@ function EvidenceBoardFlow() {
     setEdges(computedEdges);
   }, [computedEdges, setEdges]);
 
-  return (
-    <div>
-      <div className="paper" style={{ marginBottom: "1rem" }}>
-        <h1 style={{ marginTop: 0 }}>Evidence board</h1>
-        <p className="muted" style={{ marginBottom: 0 }}>
-          Links come from mentions in dossier notes (<code>[[profile-id]]</code>
-          ). Red strings connect related profiles. Drag photos to rearrange.
-        </p>
-      </div>
+  if (profiles.length === 0) {
+    return (
       <p className="graph-note">
-        Click a polaroid to open that dossier.
+        Nothing published on the board yet. Check back later.
       </p>
+    );
+  }
+
+  return (
+    <>
+      <p className="graph-note">Click a polaroid to open that dossier.</p>
       <div className="graph-wrap">
         <ReactFlow
           nodes={nodes}
@@ -178,14 +305,17 @@ function EvidenceBoardFlow() {
           />
         </ReactFlow>
       </div>
-    </div>
+    </>
   );
 }
 
 export function EvidenceBoard() {
   return (
-    <ReactFlowProvider>
-      <EvidenceBoardFlow />
-    </ReactFlowProvider>
+    <>
+      <EvidenceBoardIntro />
+      <ReactFlowProvider>
+        <EvidenceBoardFlow />
+      </ReactFlowProvider>
+    </>
   );
 }

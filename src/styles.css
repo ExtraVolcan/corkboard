@@ -336,6 +336,7 @@ a {
 }
 
 .polaroid-frame {
+  position: relative;
   background: #fff;
   padding: 10px 10px 28px;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45),

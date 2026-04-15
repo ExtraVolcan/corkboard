@@ -36,7 +36,7 @@ export function ProfilePage() {
     return (
       <div className="paper">
         <p>Profile not found.</p>
-        <Link to="/">← Back</Link>
+        <Link to="/">← Corkboard</Link>
       </div>
     );
   }
@@ -54,7 +54,7 @@ export function ProfilePage() {
     <div className="paper">
       <p>
         <Link to="/" className="muted">
-          ← All profiles
+          ← Corkboard
         </Link>
       </p>
       <div className="profile-header">
