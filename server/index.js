@@ -10,6 +10,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import jwt from "jsonwebtoken";
 import pg from "pg";
+import {
+  getCampaignRelational,
+  initRelationalCampaign,
+  replaceCampaignRelational,
+} from "./campaign-persist.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
@@ -45,23 +50,7 @@ async function readSeed() {
 
 async function initDb() {
   if (pool) {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS campaign_state (
-        id smallint PRIMARY KEY CHECK (id = 1),
-        data jsonb NOT NULL,
-        updated_at timestamptz NOT NULL DEFAULT now()
-      )
-    `);
-    const { rowCount } = await pool.query(
-      "SELECT 1 FROM campaign_state WHERE id = 1"
-    );
-    if (rowCount === 0) {
-      const seed = await readSeed();
-      await pool.query(
-        "INSERT INTO campaign_state (id, data) VALUES (1, $1::jsonb)",
-        [JSON.stringify(seed)]
-      );
-    }
+    await initRelationalCampaign(pool, readSeed);
     return;
   }
 
@@ -75,25 +64,17 @@ async function initDb() {
 }
 
 async function getCampaignFromDb() {
-  const { rows } = await pool.query(
-    "SELECT data FROM campaign_state WHERE id = 1"
-  );
-  if (!rows[0]) {
+  const data = await getCampaignRelational(pool);
+  if (data.profiles.length === 0) {
     const seed = await readSeed();
-    await pool.query(
-      "INSERT INTO campaign_state (id, data) VALUES (1, $1::jsonb)",
-      [JSON.stringify(seed)]
-    );
+    await replaceCampaignRelational(pool, seed);
     return seed;
   }
-  return rows[0].data;
+  return data;
 }
 
 async function setCampaignInDb(data) {
-  await pool.query(
-    `UPDATE campaign_state SET data = $1::jsonb, updated_at = now() WHERE id = 1`,
-    [JSON.stringify(data)]
-  );
+  await replaceCampaignRelational(pool, data);
 }
 
 async function getCampaignFromFile() {
@@ -175,6 +156,7 @@ app.get("/api/auth/me", (req, res) => {
 app.get("/api/campaign", async (req, res) => {
   try {
     const data = await getCampaign();
+    res.set("Cache-Control", "private, no-store, must-revalidate");
     res.json(data);
   } catch (e) {
     console.error(e);

@@ -59,6 +59,29 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     void refresh();
   }, [refresh]);
 
+  /** Pick up admin (or other) changes on other devices without a full reload. */
+  useEffect(() => {
+    const pollMs = Math.max(
+      3000,
+      Number(import.meta.env.VITE_CAMPAIGN_POLL_MS) || 8000
+    );
+    const tick = () => {
+      if (document.visibilityState === "visible") void refresh(true);
+    };
+    const id = window.setInterval(tick, pollMs);
+    const onVis = () => {
+      if (document.visibilityState === "visible") void refresh(true);
+    };
+    const onFocus = () => void refresh(true);
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [refresh]);
+
   const setProfile = useCallback(
     (profileId: string, updater: (p: Profile) => Profile) => {
       let nextData: CampaignData | null = null;
