@@ -15,7 +15,7 @@ const NODE_W = 140;
 const NODE_H = 230;
 
 /** Extra padding around each cluster’s bounding box (used when packing clusters on the grid). */
-const CLUSTER_PAD = 110;
+const CLUSTER_PAD = 330;
 /**
  * Minimum gap between cluster footprints on the grid (after frame-centered bounds).
  * Increase this to push whole clusters apart; it now takes effect correctly (see centerClusterOnFrameBBox).
