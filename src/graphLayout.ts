@@ -1,7 +1,9 @@
 /**
- * Layout polaroids for the evidence board: linked profiles stay near each other
- * in clusters; separate clusters are packed on a grid so edges mostly stay inside
- * groups and don't pass through unrelated polaroids as often as on one big circle.
+ * Layout polaroids for the evidence board:
+ * - Within a linked component: layered BFS from a peripheral vertex (prefer a leaf) so
+ *   chains A–B–C read left-to-right (BFS depth = column), branches stack vertically.
+ * - Disconnected components are packed on a loose grid with large gaps, then a global
+ *   refinement pass reduces overlaps and keeps nodes off unrelated red strings.
  */
 
 export type LinkEdge = { source: string; target: string };
@@ -14,8 +16,8 @@ const NODE_H = 230;
 
 /** Extra padding around each cluster’s bounding box (used when packing clusters on the grid). */
 const CLUSTER_PAD = 110;
-/** Minimum gap between adjacent cluster cells on the grid. */
-const CLUSTER_GAP = 180;
+/** Minimum gap between cluster bounding boxes on the grid (prefer generous separation). */
+const CLUSTER_GAP = 360;
 /** Minimum half-extent for a single isolated polaroid so grid cells don't collapse. */
 const MIN_HALF_EXTENT = 96;
 
@@ -66,9 +68,19 @@ function edgesWithin(ids: Set<string>, edges: LinkEdge[]): LinkEdge[] {
 }
 
 /**
- * Force-like layout: springs on edges, repulsion between all pairs in the component.
+ * Horizontal spacing between BFS layers (neighbor step along the discovery tree ≈ one column).
+ * Kept near GLOBAL_MIN_CENTER_DIST so linked steps stay visually tight after refinement.
  */
-function forceLayoutCluster(
+const LAYER_COL_WIDTH = 400;
+/** Vertical spacing between nodes that share the same BFS layer (siblings / convergence). */
+const LAYER_ROW_HEIGHT = 460;
+
+/**
+ * Layered BFS layout from a peripheral start (lexicographically smallest leaf when possible).
+ * Shortest-path distance from start becomes the column index → paths read left-to-right.
+ * Nodes in the same layer are stacked vertically and ordered by parent’s position to reduce crossings.
+ */
+function layoutComponentLayeredBFS(
   ids: string[],
   edges: LinkEdge[]
 ): Map<string, Pt> {
@@ -80,74 +92,74 @@ function forceLayoutCluster(
     return pos;
   }
 
-  const initR = 90 + n * 22;
-  ids.forEach((id, i) => {
-    const a = (2 * Math.PI * i) / n - Math.PI / 2;
-    pos.set(id, {
-      x: initR * Math.cos(a),
-      y: initR * Math.sin(a),
-    });
-  });
-
+  const adj = new Map<string, Set<string>>();
+  for (const id of ids) adj.set(id, new Set());
   const internal = edgesWithin(new Set(ids), edges);
-  /** Preferred center-to-center distance along an edge (linked pair). */
-  const LINK_LEN = 380;
-  /** Minimum center-to-center distance between any two polaroids in the cluster. */
-  const TARGET_MIN = 400;
-  const ITER = 180;
+  for (const e of internal) {
+    adj.get(e.source)!.add(e.target);
+    adj.get(e.target)!.add(e.source);
+  }
 
-  for (let iter = 0; iter < ITER; iter++) {
-    const cool = 1 - (iter / ITER) * 0.9;
+  const deg = (v: string) => adj.get(v)!.size;
+  const leaves = ids.filter((v) => deg(v) === 1);
+  const start =
+    leaves.length > 0
+      ? leaves.reduce((a, b) => (a < b ? a : b))
+      : ids.reduce((a, b) => (a < b ? a : b));
 
-    const fx = new Map<string, number>(ids.map((id) => [id, 0]));
-    const fy = new Map<string, number>(ids.map((id) => [id, 0]));
+  const depth = new Map<string, number>();
+  const parent = new Map<string, string>();
+  const queue: string[] = [start];
+  depth.set(start, 0);
 
-    for (let i = 0; i < ids.length; i++) {
-      for (let j = i + 1; j < ids.length; j++) {
-        const ia = ids[i];
-        const ib = ids[j];
-        const pa = pos.get(ia)!;
-        const pb = pos.get(ib)!;
-        let ox = pb.x - pa.x;
-        let oy = pb.y - pa.y;
-        let dist = Math.hypot(ox, oy) || 0.01;
-        let mag = 0;
-        if (dist < TARGET_MIN) {
-          mag = ((TARGET_MIN - dist) / dist) * 3.2 * cool;
-        } else {
-          mag = (15000 / (dist * dist)) * cool;
-        }
-        ox = (ox / dist) * mag;
-        oy = (oy / dist) * mag;
-        fx.set(ia, fx.get(ia)! - ox);
-        fy.set(ia, fy.get(ia)! - oy);
-        fx.set(ib, fx.get(ib)! + ox);
-        fy.set(ib, fy.get(ib)! + oy);
+  let qi = 0;
+  while (qi < queue.length) {
+    const u = queue[qi++]!;
+    for (const w of adj.get(u)!) {
+      if (!depth.has(w)) {
+        depth.set(w, depth.get(u)! + 1);
+        parent.set(w, u);
+        queue.push(w);
       }
     }
+  }
 
-    for (const e of internal) {
-      const pa = pos.get(e.source);
-      const pb = pos.get(e.target);
-      if (!pa || !pb) continue;
-      let ox = pb.x - pa.x;
-      let oy = pb.y - pa.y;
-      const dist = Math.hypot(ox, oy) || 0.01;
-      const delta = (dist - LINK_LEN) * 0.14 * cool;
-      ox = (ox / dist) * delta;
-      oy = (oy / dist) * delta;
-      fx.set(e.source, fx.get(e.source)! + ox);
-      fy.set(e.source, fy.get(e.source)! + oy);
-      fx.set(e.target, fx.get(e.target)! - ox);
-      fy.set(e.target, fy.get(e.target)! - oy);
-    }
+  for (const id of ids) {
+    if (!depth.has(id)) depth.set(id, 0);
+  }
 
-    for (const id of ids) {
-      const p = pos.get(id)!;
-      pos.set(id, {
-        x: p.x + fx.get(id)!,
-        y: p.y + fy.get(id)!,
-      });
+  const maxD = Math.max(...ids.map((id) => depth.get(id)!));
+  const layers: string[][] = Array.from({ length: maxD + 1 }, () => []);
+
+  for (const id of ids) {
+    layers[depth.get(id)!].push(id);
+  }
+
+  for (let d = 1; d <= maxD; d++) {
+    const prev = layers[d - 1]!;
+    const prevIdx = new Map<string, number>();
+    prev.forEach((v, i) => prevIdx.set(v, i));
+
+    layers[d]!.sort((a, b) => {
+      const pa = parent.get(a);
+      const pb = parent.get(b);
+      const ia =
+        pa !== undefined && prevIdx.has(pa) ? prevIdx.get(pa)! : 9999;
+      const ib =
+        pb !== undefined && prevIdx.has(pb) ? prevIdx.get(pb)! : 9999;
+      if (ia !== ib) return ia - ib;
+      return a.localeCompare(b);
+    });
+  }
+
+  for (let d = 0; d <= maxD; d++) {
+    const layer = layers[d]!;
+    const nL = layer.length;
+    for (let i = 0; i < nL; i++) {
+      const id = layer[i]!;
+      const y = (i - (nL - 1) / 2) * LAYER_ROW_HEIGHT;
+      const x = d * LAYER_COL_WIDTH;
+      pos.set(id, { x, y });
     }
   }
 
@@ -324,7 +336,7 @@ export function layoutPolaroidPositions(
   const packed: Packed[] = [];
 
   for (const ids of comps) {
-    const pos = forceLayoutCluster(ids, linkEdges);
+    const pos = layoutComponentLayeredBFS(ids, linkEdges);
     centerBBox(pos);
     const { halfW, halfH } = bboxMetrics(pos);
     packed.push({ ids, pos, halfW, halfH });
