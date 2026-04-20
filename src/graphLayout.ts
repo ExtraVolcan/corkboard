@@ -15,7 +15,7 @@ const NODE_W = 140;
 const NODE_H = 230;
 
 /** Extra padding around each cluster’s bounding box (used when packing clusters on the grid). */
-const CLUSTER_PAD = 110;
+const CLUSTER_PAD = 330;
 /** Minimum gap between cluster frame bounding boxes when packing on the grid. */
 const CLUSTER_GAP = 640;
 /** Minimum half-extent for a single isolated polaroid so grid cells don't collapse. */
