@@ -15,9 +15,12 @@ const NODE_W = 140;
 const NODE_H = 230;
 
 /** Extra padding around each cluster’s bounding box (used when packing clusters on the grid). */
-const CLUSTER_PAD = 330;
-/** Minimum gap between cluster frame bounding boxes when packing on the grid. */
-const CLUSTER_GAP = 640;
+const CLUSTER_PAD = 110;
+/**
+ * Minimum gap between cluster footprints on the grid (after frame-centered bounds).
+ * Increase this to push whole clusters apart; it now takes effect correctly (see centerClusterOnFrameBBox).
+ */
+const CLUSTER_GAP = 320;
 /** Minimum half-extent for a single isolated polaroid so grid cells don't collapse. */
 const MIN_HALF_EXTENT = 96;
 
@@ -164,17 +167,23 @@ function bboxMetrics(pos: Map<string, Pt>): { halfW: number; halfH: number } {
   return { halfW, halfH };
 }
 
-/** Shift positions so bbox center is at origin. */
-function centerBBox(pos: Map<string, Pt>): void {
+/**
+ * Shift the cluster so the **axis-aligned bounding box of polaroid frames** is centered at the origin.
+ * (Centering on node centers only is wrong for asymmetric layouts and made grid spacing underestimate
+ * the real footprint — CLUSTER_PAD / CLUSTER_GAP looked ineffective.)
+ */
+function centerClusterOnFrameBBox(pos: Map<string, Pt>): void {
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;
   let maxY = -Infinity;
+  const hw = NODE_W / 2;
+  const hh = NODE_H / 2;
   for (const p of pos.values()) {
-    minX = Math.min(minX, p.x);
-    maxX = Math.max(maxX, p.x);
-    minY = Math.min(minY, p.y);
-    maxY = Math.max(maxY, p.y);
+    minX = Math.min(minX, p.x - hw);
+    maxX = Math.max(maxX, p.x + hw);
+    minY = Math.min(minY, p.y - hh);
+    maxY = Math.max(maxY, p.y + hh);
   }
   const cx = (minX + maxX) / 2;
   const cy = (minY + maxY) / 2;
@@ -206,7 +215,7 @@ export function layoutPolaroidPositions(
 
   for (const ids of comps) {
     const pos = forceLayoutCluster(ids, linkEdges);
-    centerBBox(pos);
+    centerClusterOnFrameBBox(pos);
     const { halfW, halfH } = bboxMetrics(pos);
     packed.push({ ids, pos, halfW, halfH });
   }
@@ -218,8 +227,14 @@ export function layoutPolaroidPositions(
     maxHalfH = Math.max(maxHalfH, p.halfH);
   }
 
-  const cellW = 2 * maxHalfW + CLUSTER_GAP;
-  const cellH = 2 * maxHalfH + CLUSTER_GAP;
+  /**
+   * Square cells from the larger half-axis so diagonal neighbors on the grid
+   * (same row+1 col+1) don’t corner-overlap when clusters are wider than tall or vice versa.
+   */
+  const maxExtent = Math.max(maxHalfW, maxHalfH);
+  const cellSize = 2 * maxExtent + CLUSTER_GAP;
+  const cellW = cellSize;
+  const cellH = cellSize;
   const n = packed.length;
   const cols = Math.max(1, Math.ceil(Math.sqrt(n)));
   const rows = Math.ceil(n / cols);
