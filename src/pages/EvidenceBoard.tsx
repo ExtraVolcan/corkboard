@@ -83,11 +83,23 @@ function PolaroidNode({ data }: NodeProps<PolaroidNodeType>) {
 
 const nodeTypes: NodeTypes = { polaroid: PolaroidNode };
 
+/**
+ * Centers the graph once per layout, but does **not** zoom out without limit to fit the
+ * whole board in the panel. That behavior made extra CLUSTER_PAD / CLUSTER_GAP invisible:
+ * the view always shrank so everything fit, so on-screen spacing looked the same.
+ * With a minZoom floor, large boards extend past the viewport — pan / zoom to explore.
+ */
 function FitViewOnLoad({ layoutKey }: { layoutKey: string }) {
   const { fitView } = useReactFlow();
   useEffect(() => {
     const t = requestAnimationFrame(() =>
-      fitView({ padding: 0.2, duration: 200 })
+      fitView({
+        padding: 0.12,
+        /** Don’t zoom out past this to “show everything” — keeps layout spacing readable. */
+        minZoom: 0.52,
+        maxZoom: 1.35,
+        duration: 220,
+      })
     );
     return () => cancelAnimationFrame(t);
   }, [fitView, layoutKey]);
@@ -311,6 +323,10 @@ function EvidenceBoardFlow() {
   return (
     <>
       <p className="graph-note">Click a polaroid to open that dossier.</p>
+      <p className="muted graph-note" style={{ fontSize: "0.88rem", marginTop: "-0.35rem" }}>
+        Drag to pan; zoom with the corner controls. The graph is not forced to shrink and fit
+        the panel, so extra spacing stays visible—zoom out to see the full board.
+      </p>
       <div className="graph-wrap">
         <ReactFlow
           nodes={nodes}
@@ -319,9 +335,9 @@ function EvidenceBoardFlow() {
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
           nodesDraggable={false}
-          fitView
-          minZoom={0.25}
-          maxZoom={1.5}
+          fitView={false}
+          minZoom={0.2}
+          maxZoom={1.75}
         >
           <FitViewOnLoad layoutKey={layoutKey} />
           <Background color="#3d2e22" gap={24} />
