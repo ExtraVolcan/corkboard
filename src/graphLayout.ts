@@ -14,13 +14,16 @@ type Pt = { x: number; y: number };
 const NODE_W = 140;
 const NODE_H = 230;
 
-/** Extra padding around each cluster’s bounding box (used when packing clusters on the grid). */
-const CLUSTER_PAD = 330;
+/**
+ * Extra padding around each cluster’s bounding box (used when packing clusters on the grid).
+ * Exported so React consumers can depend on it and re-run layout when tuning spacing.
+ */
+export const CLUSTER_PAD = 110;
 /**
  * Minimum gap between cluster footprints on the grid (after frame-centered bounds).
- * Increase this to push whole clusters apart; it now takes effect correctly (see centerClusterOnFrameBBox).
+ * Exported for the same reason as CLUSTER_PAD.
  */
-const CLUSTER_GAP = 320;
+export const CLUSTER_GAP = 320;
 /** Minimum half-extent for a single isolated polaroid so grid cells don't collapse. */
 const MIN_HALF_EXTENT = 96;
 

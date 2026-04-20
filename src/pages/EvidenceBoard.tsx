@@ -20,7 +20,11 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useCampaign } from "../campaign";
 import { buildLinkEdges } from "../graph";
-import { layoutPolaroidPositions } from "../graphLayout";
+import {
+  CLUSTER_GAP,
+  CLUSTER_PAD,
+  layoutPolaroidPositions,
+} from "../graphLayout";
 import { profileHasAnyNew } from "../newBadges";
 
 type PolaroidData = {
@@ -256,7 +260,8 @@ function EvidenceBoardFlow() {
         profiles.map((p) => p.id),
         linkEdgesForLayout
       ),
-    [profiles, linkEdgesForLayout]
+    // CLUSTER_* must be listed or React keeps stale positions when only graphLayout.ts changes.
+    [profiles, linkEdgesForLayout, CLUSTER_PAD, CLUSTER_GAP]
   );
 
   const layoutKey = useMemo(() => {
@@ -265,8 +270,8 @@ function EvidenceBoardFlow() {
       .map((e) => `${e.source}__${e.target}`)
       .sort()
       .join("|");
-    return `${ids}#${ef}`;
-  }, [profiles, linkEdgesForLayout]);
+    return `${ids}#${ef}#p${CLUSTER_PAD}#g${CLUSTER_GAP}`;
+  }, [profiles, linkEdgesForLayout, CLUSTER_PAD, CLUSTER_GAP]);
 
   const computedNodes: PolaroidNodeType[] = useMemo(() => {
     return profiles.map((p) => {
