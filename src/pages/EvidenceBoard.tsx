@@ -23,6 +23,7 @@ import { buildLinkEdges } from "../graph";
 import {
   CLUSTER_GAP,
   CLUSTER_PAD,
+  INTRA_CLUSTER_SPREAD,
   layoutPolaroidPositions,
 } from "../graphLayout";
 import { profileHasAnyNew } from "../newBadges";
@@ -260,8 +261,8 @@ function EvidenceBoardFlow() {
         profiles.map((p) => p.id),
         linkEdgesForLayout
       ),
-    // CLUSTER_* must be listed or React keeps stale positions when only graphLayout.ts changes.
-    [profiles, linkEdgesForLayout, CLUSTER_PAD, CLUSTER_GAP]
+    // Layout constants must be listed or React keeps stale positions when only graphLayout.ts changes.
+    [profiles, linkEdgesForLayout, CLUSTER_PAD, CLUSTER_GAP, INTRA_CLUSTER_SPREAD]
   );
 
   const layoutKey = useMemo(() => {
@@ -270,8 +271,8 @@ function EvidenceBoardFlow() {
       .map((e) => `${e.source}__${e.target}`)
       .sort()
       .join("|");
-    return `${ids}#${ef}#p${CLUSTER_PAD}#g${CLUSTER_GAP}`;
-  }, [profiles, linkEdgesForLayout, CLUSTER_PAD, CLUSTER_GAP]);
+    return `${ids}#${ef}#p${CLUSTER_PAD}#g${CLUSTER_GAP}#s${INTRA_CLUSTER_SPREAD}`;
+  }, [profiles, linkEdgesForLayout, CLUSTER_PAD, CLUSTER_GAP, INTRA_CLUSTER_SPREAD]);
 
   const computedNodes: PolaroidNodeType[] = useMemo(() => {
     return profiles.map((p) => {

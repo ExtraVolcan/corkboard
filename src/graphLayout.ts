@@ -1,9 +1,9 @@
 /**
  * Layout polaroids for the evidence board:
- * - Each connected component is laid out with a local force simulation (cluster).
- * - Components are packed on a grid using frame-inclusive bounding boxes + gap so
- *   different clusters cannot overlap; we do not run a global refinement that would
- *   move polaroids across cluster boundaries.
+ * - Each **connected component** of the link graph is one “cluster” for layout (force sim).
+ * - **CLUSTER_GAP / grid packing** only apply when there are **2+ disconnected** components.
+ *   Typical campaigns are one connected piece — spacing there comes from the force sim and
+ *   {@link INTRA_CLUSTER_SPREAD}, not from CLUSTER_GAP.
  */
 
 export type LinkEdge = { source: string; target: string };
@@ -24,6 +24,12 @@ export const CLUSTER_PAD = 110;
  * Exported for the same reason as CLUSTER_PAD.
  */
 export const CLUSTER_GAP = 320;
+/**
+ * Multiplies node positions after the force step (before frame centering). Use this to
+ * spread polaroids apart when the graph is **one** connected component — CLUSTER_GAP does
+ * nothing in that case. Re-exported for EvidenceBoard useMemo deps.
+ */
+export const INTRA_CLUSTER_SPREAD = 1.55;
 /** Minimum half-extent for a single isolated polaroid so grid cells don't collapse. */
 const MIN_HALF_EXTENT = 96;
 
@@ -86,9 +92,9 @@ function forceLayoutCluster(
   });
 
   const internal = edgesWithin(new Set(ids), edges);
-  const LINK_LEN = 380;
-  const TARGET_MIN = 400;
-  const ITER = 180;
+  const LINK_LEN = 460;
+  const TARGET_MIN = 500;
+  const ITER = 200;
 
   for (let iter = 0; iter < ITER; iter++) {
     const cool = 1 - (iter / ITER) * 0.9;
@@ -218,6 +224,13 @@ export function layoutPolaroidPositions(
 
   for (const ids of comps) {
     const pos = forceLayoutCluster(ids, linkEdges);
+    for (const id of ids) {
+      const p = pos.get(id)!;
+      pos.set(id, {
+        x: p.x * INTRA_CLUSTER_SPREAD,
+        y: p.y * INTRA_CLUSTER_SPREAD,
+      });
+    }
     centerClusterOnFrameBBox(pos);
     const { halfW, halfH } = bboxMetrics(pos);
     packed.push({ ids, pos, halfW, halfH });
