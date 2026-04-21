@@ -18,12 +18,12 @@ const NODE_H = 230;
  * Extra padding around each cluster’s bounding box (used when packing clusters on the grid).
  * Exported so React consumers can depend on it and re-run layout when tuning spacing.
  */
-export const CLUSTER_PAD = 110;
+export const CLUSTER_PAD = 220;
 /**
  * Minimum gap between cluster footprints on the grid (after frame-centered bounds).
  * Exported for the same reason as CLUSTER_PAD.
  */
-export const CLUSTER_GAP = 320;
+export const CLUSTER_GAP = 480;
 /**
  * Multiplies node positions after the force step (before frame centering). Use this to
  * spread polaroids apart when the graph is **one** connected component — CLUSTER_GAP does
