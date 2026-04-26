@@ -9,11 +9,13 @@ import {
   isNameNew,
   visibleTokensAfterVisit,
 } from "../newBadges";
+import { useVn } from "../vn/state";
 
 export function ProfilePage() {
   const { id } = useParams<{ id: string }>();
   const { isAdmin } = useAuth();
   const { data, ack, setProfile, mergeAck } = useCampaign();
+  const { isProfileVisible, isNameVisible, isImageVisible, isEntryVisible } = useVn();
 
   const profile = useMemo(
     () => data.profiles.find((p) => p.id === id),
@@ -27,32 +29,44 @@ export function ProfilePage() {
 
   const entriesToShow = useMemo(() => {
     if (isAdmin) return profile?.entries ?? [];
-    return (profile?.entries ?? []).filter((e) => e.revealed);
-  }, [profile?.entries, isAdmin]);
+    return (profile?.entries ?? []).filter(
+      (e) => e.revealed || isEntryVisible(profile?.id ?? "", e.id)
+    );
+  }, [profile?.entries, profile?.id, isAdmin, isEntryVisible]);
 
   const showEntriesSection = useMemo(() => {
     if (!profile) return false;
     if (isAdmin) return profile.entries.length > 0;
-    return profile.entries.some((e) => e.revealed);
-  }, [profile, isAdmin]);
+    return profile.entries.some((e) => e.revealed || isEntryVisible(profile.id, e.id));
+  }, [profile, isAdmin, isEntryVisible]);
 
   const entryLinkLabel = useCallback(
     (profileId: string) => {
       const t = data.profiles.find((p) => p.id === profileId);
       if (!t) return profileId;
       if (isAdmin) return t.name?.trim() || profileId;
-      if (t.profileRevealed && t.nameRevealed) return t.name.trim();
+      if ((t.profileRevealed || isProfileVisible(t.id)) && (t.nameRevealed || isNameVisible(t.id))) {
+        return t.name.trim();
+      }
       return "?";
     },
-    [data.profiles, isAdmin]
+    [data.profiles, isAdmin, isProfileVisible, isNameVisible]
   );
 
   useEffect(() => {
     if (!profile || !id) return;
     return () => {
-      mergeAck(id, visibleTokensAfterVisit(profile, isAdmin));
+      const tokens = new Set(visibleTokensAfterVisit(profile, isAdmin));
+      if (!isAdmin) {
+        if (isNameVisible(profile.id)) tokens.add("__name__");
+        if (isImageVisible(profile.id)) tokens.add("__image__");
+        for (const e of profile.entries) {
+          if (isEntryVisible(profile.id, e.id)) tokens.add(e.id);
+        }
+      }
+      mergeAck(id, [...tokens]);
     };
-  }, [id, profile, isAdmin, mergeAck]);
+  }, [id, profile, isAdmin, mergeAck, isNameVisible, isImageVisible, isEntryVisible]);
 
   if (!profile) {
     return (
@@ -63,14 +77,18 @@ export function ProfilePage() {
     );
   }
 
-  if (!profile.profileRevealed && !isAdmin) {
+  const effectiveProfileRevealed = profile.profileRevealed || isProfileVisible(profile.id);
+  const effectiveNameRevealed = profile.nameRevealed || isNameVisible(profile.id);
+  const effectiveImageRevealed = profile.imageRevealed || isImageVisible(profile.id);
+
+  if (!effectiveProfileRevealed && !isAdmin) {
     return <Navigate to="/corkboard" replace />;
   }
 
   const showName =
-    isAdmin || (profile.profileRevealed && profile.nameRevealed);
+    isAdmin || (effectiveProfileRevealed && effectiveNameRevealed);
   const showImage =
-    isAdmin || (profile.profileRevealed && profile.imageRevealed);
+    isAdmin || (effectiveProfileRevealed && effectiveImageRevealed);
 
   return (
     <div className="paper">
@@ -170,8 +188,13 @@ export function ProfilePage() {
           {entriesToShow.map((e) => {
             const showNew =
               !isAdmin &&
-              profile.profileRevealed &&
-              isEntryNew(profile.id, e.id, e.revealed, ack);
+              effectiveProfileRevealed &&
+              isEntryNew(
+                profile.id,
+                e.id,
+                e.revealed || isEntryVisible(profile.id, e.id),
+                ack
+              );
 
             return (
               <article key={e.id} className="entry-block">

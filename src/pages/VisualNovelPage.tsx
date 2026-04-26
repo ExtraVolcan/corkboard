@@ -1,14 +1,51 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useCampaign } from "../campaign";
 import { useVn } from "../vn/state";
 
 export function VisualNovelPage() {
-  const { state, currentScene, currentLine, dispatch, reset, getSpeaker } = useVn();
+  const { data } = useCampaign();
+  const {
+    state,
+    currentScene,
+    currentLine,
+    dispatch,
+    reset,
+    getSpeaker,
+    isProfileVisible,
+    isNameVisible,
+    isImageVisible,
+  } = useVn();
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   const speaker = getSpeaker(currentLine?.speakerId);
-  const hasChoices = Boolean(currentLine?.choices?.length);
+  const visibleChoices =
+    currentLine?.choices?.filter(
+      (c) => !c.requireFlags?.length || c.requireFlags.every((f) => state.flags[f])
+    ) ?? [];
+  const hasChoices = visibleChoices.length > 0;
+  const interaction = currentLine?.interaction;
+  const interactionLineKey = `${currentScene.id}::${state.lineIndex}`;
+  const selectedOptionIds =
+    state.interaction.lineKey === interactionLineKey
+      ? state.interaction.selectedOptionIds ?? []
+      : [];
+  const selectedProfileId =
+    state.interaction.lineKey === interactionLineKey
+      ? state.interaction.selectedProfileId
+      : undefined;
+
+  const accuseCandidates = useMemo(
+    () =>
+      data.profiles.filter((p) => {
+        const profileOpen = p.profileRevealed || isProfileVisible(p.id);
+        const nameOpen = p.nameRevealed || isNameVisible(p.id);
+        return profileOpen && nameOpen;
+      }),
+    [data.profiles, isNameVisible, isProfileVisible]
+  );
+  const selectedAccused = accuseCandidates.find((p) => p.id === selectedProfileId);
 
   const sceneProgress = useMemo(() => {
     if (!currentScene.lines.length) return 0;
@@ -33,6 +70,7 @@ export function VisualNovelPage() {
         <div className="vn-hud-left">
           <strong>{currentScene.title}</strong>
           <span className="muted">Scene progress {sceneProgress}%</span>
+          <span className="muted">Flags: {Object.keys(state.flags).length}</span>
         </div>
         <div className="vn-hud-right">
           <button
@@ -124,7 +162,7 @@ export function VisualNovelPage() {
 
         {hasChoices ? (
           <div className="vn-choices">
-            {currentLine?.choices?.map((choice) => (
+            {visibleChoices.map((choice) => (
               <button
                 key={choice.id}
                 type="button"
@@ -134,6 +172,101 @@ export function VisualNovelPage() {
                 {choice.label}
               </button>
             ))}
+          </div>
+        ) : interaction?.kind === "mcq" ? (
+          <div className="vn-interaction-box">
+            <p className="vn-interaction-prompt">{interaction.prompt}</p>
+            <div className="vn-choices">
+              {interaction.options.map((option) => {
+                const tried = selectedOptionIds.includes(option.id);
+                const disabled =
+                  interaction.redoable ? tried : selectedOptionIds.length > 0;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className="btn"
+                    disabled={disabled}
+                    style={tried ? { opacity: 0.5 } : undefined}
+                    onClick={() =>
+                      dispatch({ type: "selectInteractionOption", optionId: option.id })
+                    }
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={!selectedOptionIds.length}
+              onClick={() => dispatch({ type: "submitInteraction" })}
+            >
+              Submit answer
+            </button>
+          </div>
+        ) : interaction?.kind === "accuse" ? (
+          <div className="vn-interaction-box">
+            <p className="vn-interaction-prompt vn-interaction-prompt-strong">
+              {interaction.prompt}
+            </p>
+            <div className="vn-accuse-grid">
+              {accuseCandidates.map((p) => {
+                const imageOpen = p.imageRevealed || isImageVisible(p.id);
+                const isSelected = selectedProfileId === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`vn-accuse-chip${isSelected ? " selected" : ""}`}
+                    onClick={() =>
+                      dispatch({ type: "selectAccusedProfile", profileId: p.id })
+                    }
+                  >
+                    <img
+                      src={
+                        imageOpen
+                          ? p.image
+                          : "data:image/svg+xml," +
+                            encodeURIComponent(
+                              `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='150'><rect fill='%23ddd' width='120' height='150'/><text x='60' y='84' font-size='48' text-anchor='middle' fill='%23999'>?</text></svg>`
+                            )
+                      }
+                      alt=""
+                    />
+                    <span>{p.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {selectedAccused ? (
+              <div className="vn-accuse-preview">
+                <p className="muted" style={{ margin: "0 0 0.45rem" }}>
+                  Selected:
+                </p>
+                <img
+                  src={
+                    selectedAccused.imageRevealed || isImageVisible(selectedAccused.id)
+                      ? selectedAccused.image
+                      : "data:image/svg+xml," +
+                        encodeURIComponent(
+                          `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='150'><rect fill='%23ddd' width='120' height='150'/><text x='60' y='84' font-size='48' text-anchor='middle' fill='%23999'>?</text></svg>`
+                        )
+                  }
+                  alt=""
+                />
+                <div>{selectedAccused.name}</div>
+              </div>
+            ) : null}
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={!selectedProfileId}
+              onClick={() => dispatch({ type: "submitInteraction" })}
+            >
+              {interaction.submitLabel ?? "It's you!"}
+            </button>
           </div>
         ) : (
           <button

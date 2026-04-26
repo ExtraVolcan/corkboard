@@ -27,6 +27,7 @@ import {
   layoutPolaroidPositions,
 } from "../graphLayout";
 import { profileHasAnyNew } from "../newBadges";
+import { useVn } from "../vn/state";
 
 type PolaroidData = {
   image: string;
@@ -223,13 +224,14 @@ function EvidenceBoardIntro() {
 function EvidenceBoardFlow() {
   const { isAdmin } = useAuth();
   const { data, ack } = useCampaign();
+  const { isProfileVisible, isNameVisible, isImageVisible } = useVn();
 
   const profiles = useMemo(
     () =>
       isAdmin
         ? data.profiles
-        : data.profiles.filter((p) => p.profileRevealed),
-    [data.profiles, isAdmin]
+        : data.profiles.filter((p) => p.profileRevealed || isProfileVisible(p.id)),
+    [data.profiles, isAdmin, isProfileVisible]
   );
 
   const linkEdgesForLayout = useMemo(() => {
@@ -276,16 +278,19 @@ function EvidenceBoardFlow() {
 
   const computedNodes: PolaroidNodeType[] = useMemo(() => {
     return profiles.map((p) => {
+      const effectiveProfileRevealed = p.profileRevealed || isProfileVisible(p.id);
+      const effectiveNameRevealed = p.nameRevealed || isNameVisible(p.id);
+      const effectiveImageRevealed = p.imageRevealed || isImageVisible(p.id);
       const label =
-        p.profileRevealed && p.nameRevealed
+        effectiveProfileRevealed && effectiveNameRevealed
           ? p.name
-          : isAdmin && p.nameRevealed
+          : isAdmin && effectiveNameRevealed
             ? p.name
             : "?";
       const image =
-        p.profileRevealed && p.imageRevealed
+        effectiveProfileRevealed && effectiveImageRevealed
           ? p.image
-          : isAdmin && p.imageRevealed
+          : isAdmin && effectiveImageRevealed
             ? p.image
             : "data:image/svg+xml," +
               encodeURIComponent(
@@ -305,7 +310,15 @@ function EvidenceBoardFlow() {
         draggable: false,
       };
     });
-  }, [profiles, isAdmin, ack, positionById]);
+  }, [
+    profiles,
+    isAdmin,
+    ack,
+    positionById,
+    isProfileVisible,
+    isNameVisible,
+    isImageVisible,
+  ]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<PolaroidNodeType>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
