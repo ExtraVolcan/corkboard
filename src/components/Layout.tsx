@@ -5,9 +5,11 @@ export function Layout() {
   const { isAdmin, logout } = useAuth();
   const { pathname } = useLocation();
   const wide =
+    pathname === "/" ||
     pathname === "/corkboard" ||
     pathname.startsWith("/evidence") ||
     pathname.startsWith("/admin");
+  const flushVn = pathname === "/";
 
   return (
     <div className="app-shell">
@@ -61,7 +63,11 @@ export function Layout() {
           ) : null}
         </div>
       </header>
-      <main className={`main-pad${wide ? " wide" : ""}`}>
+      <main
+        className={`main-pad${wide ? " wide" : ""}${
+          flushVn ? " main-pad--vn" : ""
+        }`}
+      >
         <Outlet />
       </main>
     </div>

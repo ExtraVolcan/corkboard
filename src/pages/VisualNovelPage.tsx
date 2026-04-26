@@ -1,7 +1,51 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCampaign } from "../campaign";
 import { useVn } from "../vn/state";
+
+function IconHistory() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M3 3v5h5" />
+      <path d="M3.05 13A9 9 0 1 0 6.5 6.5L3 10" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+}
+
+function IconCorkboard() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="3" y="3" width="7" height="9" rx="1" />
+      <rect x="14" y="3" width="7" height="5" rx="1" />
+      <rect x="14" y="11" width="7" height="10" rx="1" />
+      <rect x="3" y="15" width="7" height="6" rx="1" />
+    </svg>
+  );
+}
+
+function IconGear() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.4l.1.1a2 2 0 0 1-2.5 2.5l-.1-.1a1.7 1.7 0 0 0-1.4-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.4.3h-.1a2 2 0 0 1-2.5-2.5l.1-.1a1.7 1.7 0 0 0 .3-1.4 1.7 1.7 0 0 0-1.6-1H3a2 2 0 0 1 0-4h.1A1.7 1.7 0 0 0 4.7 7h.1a2 2 0 0 1 2.5-2.5h.1a1.7 1.7 0 0 0 1.4.3 1.7 1.7 0 0 0 1-1.6V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.4-.3h.1a2 2 0 0 1 2.5 2.5l-.1.1a1.7 1.7 0 0 0-.3 1.4 1.7 1.7 0 0 0 1.6 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z" />
+    </svg>
+  );
+}
+
+function IconClose() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+      <path d="M18 6L6 18" />
+      <path d="M6 6l12 12" />
+    </svg>
+  );
+}
+
+function placeholderArt(letter: string, accent: string): string {
+  const body = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="480" viewBox="0 0 360 480"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a2018"/><stop offset="100%" stop-color="#0f0c0a"/></linearGradient></defs><rect width="360" height="480" fill="url(#g)" rx="20" stroke="rgba(255,255,255,0.08)"/><text x="180" y="268" text-anchor="middle" font-size="120" font-family="Georgia,serif" fill="${accent}">${letter}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(body)}`;
+}
 
 export function VisualNovelPage() {
   const { data } = useCampaign();
@@ -18,6 +62,18 @@ export function VisualNovelPage() {
   } = useVn();
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+
+  useEffect(() => {
+    if (!showHistory && !showSettings) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowHistory(false);
+        setShowSettings(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showHistory, showSettings]);
 
   const speaker = getSpeaker(currentLine?.speakerId);
   const visibleChoices =
@@ -55,229 +111,324 @@ export function VisualNovelPage() {
     );
   }, [currentScene.lines.length, state.lineIndex]);
 
-  return (
-    <div className="vn-shell paper">
-      <div className="vn-stage" style={{ background: currentScene.background }}>
-        <div className="vn-char-card">
-          <div className="vn-char-label">Character Visual Slot</div>
-          <p className="muted" style={{ marginTop: "0.45rem", marginBottom: 0 }}>
-            Replace with sprite layers/Live2D/art later.
-          </p>
-        </div>
-      </div>
+  const speakerId = currentLine?.speakerId;
+  const profileMatch = useMemo(
+    () => (speakerId ? data.profiles.find((p) => p.id === speakerId) : undefined),
+    [data.profiles, speakerId]
+  );
+  const portraitImage =
+    profileMatch && (isImageVisible(profileMatch.id) || profileMatch.imageRevealed)
+      ? profileMatch.image
+      : null;
+  const placeholderLetter = (speaker?.name?.trim()?.[0] ?? "?").toUpperCase();
+  const accent = speaker?.accent || "#a8a29e";
 
-      <div className="vn-hud">
-        <div className="vn-hud-left">
-          <strong>{currentScene.title}</strong>
-          <span className="muted">Scene progress {sceneProgress}%</span>
-          <span className="muted">Flags: {Object.keys(state.flags).length}</span>
+  const canAdvanceByClick = Boolean(
+    currentLine && !hasChoices && !interaction
+  );
+
+  return (
+    <div className="vn-shell">
+      <div
+        className="vn-scene"
+        style={{ background: currentScene.background }}
+      >
+        <div className="vn-scene-hud" aria-hidden={false}>
+          <div className="vn-scene-title">
+            {currentScene.title}
+            <span className="vn-scene-progress">Scene {sceneProgress}%</span>
+          </div>
+          <div className="vn-scene-hud-btns">
+            <button
+              type="button"
+              className="vn-icon-btn"
+              onClick={() => setShowHistory((v) => !v)}
+              title="Dialogue history"
+              aria-label="Open dialogue history"
+            >
+              <IconHistory />
+            </button>
+            <Link
+              className="vn-icon-btn"
+              to="/corkboard"
+              title="Corkboard"
+              aria-label="Open corkboard"
+            >
+              <IconCorkboard />
+            </Link>
+            <button
+              type="button"
+              className="vn-icon-btn"
+              onClick={() => setShowSettings((v) => !v)}
+              title="Settings"
+              aria-label="Open settings"
+            >
+              <IconGear />
+            </button>
+          </div>
         </div>
-        <div className="vn-hud-right">
-          <button
-            type="button"
-            className="btn btn-small"
-            onClick={() => setShowHistory((v) => !v)}
-          >
-            History
-          </button>
-          <Link className="btn btn-small" to="/corkboard">
-            Open Corkboard
-          </Link>
-          <button
-            type="button"
-            className="btn btn-small"
-            onClick={() => setShowSettings((v) => !v)}
-          >
-            ⚙ Settings
-          </button>
+
+        <div className="vn-scene-body">
+          <div className="vn-portrait-area">
+            {portraitImage ? (
+              <img
+                className="vn-portrait"
+                src={portraitImage}
+                alt={speaker?.name ? `${speaker.name} portrait` : ""}
+              />
+            ) : (
+              <img
+                className="vn-portrait"
+                src={placeholderArt(placeholderLetter, accent)}
+                alt=""
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="vn-dialogue-outer">
+          {canAdvanceByClick ? (
+            <button
+              type="button"
+              className="vn-dialogue-frame vn-dialogue-frame--advance"
+              onClick={() => dispatch({ type: "advanceDialogue" })}
+            >
+              <div
+                className="vn-speaker"
+                style={{ color: speaker?.accent || "rgba(253, 230, 200, 0.95)" }}
+              >
+                {speaker?.name ?? "Narrator"}
+              </div>
+              <p className="vn-line">{currentLine?.text ?? "No dialogue loaded."}</p>
+              <span className="vn-continue-hint">Click to continue</span>
+            </button>
+          ) : (
+            <div
+              className="vn-dialogue-frame vn-dialogue-frame--static"
+              style={{ color: "inherit" }}
+            >
+              <div
+                className="vn-speaker"
+                style={{ color: speaker?.accent || "rgba(253, 230, 200, 0.95)" }}
+              >
+                {speaker?.name ?? "Narrator"}
+              </div>
+              <p className="vn-line">{currentLine?.text ?? "No dialogue loaded."}</p>
+
+              {hasChoices ? (
+                <div className="vn-choices">
+                  {visibleChoices.map((choice) => (
+                    <button
+                      key={choice.id}
+                      type="button"
+                      className="vn-pill"
+                      onClick={() =>
+                        dispatch({ type: "chooseOption", optionId: choice.id })
+                      }
+                    >
+                      {choice.label}
+                    </button>
+                  ))}
+                </div>
+              ) : interaction?.kind === "mcq" ? (
+                <div className="vn-interaction-box">
+                  <p className="vn-interaction-prompt">{interaction.prompt}</p>
+                  <div className="vn-choices">
+                    {interaction.options.map((option) => {
+                      const tried = selectedOptionIds.includes(option.id);
+                      const disabled =
+                        interaction.redoable ? tried : selectedOptionIds.length > 0;
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          className="vn-pill"
+                          disabled={disabled}
+                          style={tried ? { opacity: 0.45 } : undefined}
+                          onClick={() =>
+                            dispatch({
+                              type: "selectInteractionOption",
+                              optionId: option.id,
+                            })
+                          }
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="button"
+                    className="vn-pill vn-pill--primary"
+                    disabled={!selectedOptionIds.length}
+                    onClick={() => dispatch({ type: "submitInteraction" })}
+                  >
+                    Submit answer
+                  </button>
+                </div>
+              ) : interaction?.kind === "accuse" ? (
+                <div className="vn-interaction-box">
+                  <p className="vn-interaction-prompt vn-interaction-prompt-strong">
+                    {interaction.prompt}
+                  </p>
+                  <div className="vn-accuse-grid">
+                    {accuseCandidates.map((p) => {
+                      const imageOpen = p.imageRevealed || isImageVisible(p.id);
+                      const isSelected = selectedProfileId === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          className={`vn-accuse-chip${isSelected ? " selected" : ""}`}
+                          onClick={() =>
+                            dispatch({ type: "selectAccusedProfile", profileId: p.id })
+                          }
+                        >
+                          <img
+                            src={
+                              imageOpen
+                                ? p.image
+                                : "data:image/svg+xml," +
+                                  encodeURIComponent(
+                                    `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='150'><rect fill='%23292420' width='120' height='150'/><text x='60' y='84' font-size='48' text-anchor='middle' fill='%23575551'>?</text></svg>`
+                                  )
+                            }
+                            alt=""
+                          />
+                          <span>{p.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selectedAccused ? (
+                    <div className="vn-accuse-preview">
+                      <p className="muted" style={{ margin: "0 0 0.45rem" }}>
+                        Selected:
+                      </p>
+                      <img
+                        src={
+                          selectedAccused.imageRevealed ||
+                          isImageVisible(selectedAccused.id)
+                            ? selectedAccused.image
+                            : "data:image/svg+xml," +
+                              encodeURIComponent(
+                                `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='150'><rect fill='%23292420' width='120' height='150'/><text x='60' y='84' font-size='48' text-anchor='middle' fill='%23575551'>?</text></svg>`
+                              )
+                        }
+                        alt=""
+                      />
+                      <div>{selectedAccused.name}</div>
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="vn-pill vn-pill--primary"
+                    disabled={!selectedProfileId}
+                    onClick={() => dispatch({ type: "submitInteraction" })}
+                  >
+                    {interaction.submitLabel ?? "It's you!"}
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
       </div>
 
       {showHistory ? (
-        <section className="vn-panel">
-          <div className="vn-panel-head">
-            <h3>Dialogue history</h3>
-            <button type="button" className="btn btn-small" onClick={() => setShowHistory(false)}>
-              Close
-            </button>
-          </div>
-          {state.history.length ? (
-            <div className="vn-history-list">
-              {state.history
-                .slice()
-                .reverse()
-                .map((h) => (
-                  <p key={`${h.atMs}-${h.text}`}>
-                    <strong>{h.speakerName}:</strong> {h.text}
-                  </p>
-                ))}
+        <div
+          className="vn-modal-overlay"
+          onClick={() => setShowHistory(false)}
+          role="presentation"
+        >
+          <div
+            className="vn-panel"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-label="Dialogue history"
+          >
+            <div className="vn-panel-head">
+              <h3>Dialogue history</h3>
+              <button
+                type="button"
+                className="vn-icon-btn"
+                onClick={() => setShowHistory(false)}
+                title="Close"
+                aria-label="Close history"
+              >
+                <IconClose />
+              </button>
             </div>
-          ) : (
-            <p className="muted">No dialogue has been logged yet.</p>
-          )}
-        </section>
+            {state.history.length ? (
+              <div className="vn-history-list">
+                {state.history
+                  .slice()
+                  .reverse()
+                  .map((h) => (
+                    <p key={`${h.atMs}-${h.text}`}>
+                      <strong>{h.speakerName}:</strong> {h.text}
+                    </p>
+                  ))}
+              </div>
+            ) : (
+              <p className="muted">No dialogue has been logged yet.</p>
+            )}
+          </div>
+        </div>
       ) : null}
 
       {showSettings ? (
-        <section className="vn-panel">
-          <div className="vn-panel-head">
-            <h3>Settings</h3>
-            <button type="button" className="btn btn-small" onClick={() => setShowSettings(false)}>
-              Close
-            </button>
-          </div>
-          <label className="vn-setting-row">
-            <span>Text speed: {state.settings.textSpeed}</span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={state.settings.textSpeed}
-              onChange={(e) =>
-                dispatch({ type: "setTextSpeed", value: Number(e.target.value) })
-              }
-            />
-          </label>
-          <label className="vn-setting-row">
-            <input
-              type="checkbox"
-              checked={state.settings.autoAdvance}
-              onChange={(e) =>
-                dispatch({ type: "setAutoAdvance", value: e.target.checked })
-              }
-            />
-            <span>Auto-advance (placeholder)</span>
-          </label>
-          <button type="button" className="btn btn-small" onClick={reset}>
-            Reset VN demo state
-          </button>
-        </section>
-      ) : null}
-
-      <section className="vn-dialogue-box">
-        <div className="vn-speaker" style={{ color: speaker?.accent || undefined }}>
-          {speaker?.name ?? "Narrator"}
-        </div>
-        <p className="vn-line">{currentLine?.text ?? "No dialogue loaded."}</p>
-
-        {hasChoices ? (
-          <div className="vn-choices">
-            {visibleChoices.map((choice) => (
-              <button
-                key={choice.id}
-                type="button"
-                className="btn"
-                onClick={() => dispatch({ type: "chooseOption", optionId: choice.id })}
-              >
-                {choice.label}
-              </button>
-            ))}
-          </div>
-        ) : interaction?.kind === "mcq" ? (
-          <div className="vn-interaction-box">
-            <p className="vn-interaction-prompt">{interaction.prompt}</p>
-            <div className="vn-choices">
-              {interaction.options.map((option) => {
-                const tried = selectedOptionIds.includes(option.id);
-                const disabled =
-                  interaction.redoable ? tried : selectedOptionIds.length > 0;
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    className="btn"
-                    disabled={disabled}
-                    style={tried ? { opacity: 0.5 } : undefined}
-                    onClick={() =>
-                      dispatch({ type: "selectInteractionOption", optionId: option.id })
-                    }
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-            <button
-              type="button"
-              className="btn btn-primary"
-              disabled={!selectedOptionIds.length}
-              onClick={() => dispatch({ type: "submitInteraction" })}
-            >
-              Submit answer
-            </button>
-          </div>
-        ) : interaction?.kind === "accuse" ? (
-          <div className="vn-interaction-box">
-            <p className="vn-interaction-prompt vn-interaction-prompt-strong">
-              {interaction.prompt}
-            </p>
-            <div className="vn-accuse-grid">
-              {accuseCandidates.map((p) => {
-                const imageOpen = p.imageRevealed || isImageVisible(p.id);
-                const isSelected = selectedProfileId === p.id;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    className={`vn-accuse-chip${isSelected ? " selected" : ""}`}
-                    onClick={() =>
-                      dispatch({ type: "selectAccusedProfile", profileId: p.id })
-                    }
-                  >
-                    <img
-                      src={
-                        imageOpen
-                          ? p.image
-                          : "data:image/svg+xml," +
-                            encodeURIComponent(
-                              `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='150'><rect fill='%23ddd' width='120' height='150'/><text x='60' y='84' font-size='48' text-anchor='middle' fill='%23999'>?</text></svg>`
-                            )
-                      }
-                      alt=""
-                    />
-                    <span>{p.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-            {selectedAccused ? (
-              <div className="vn-accuse-preview">
-                <p className="muted" style={{ margin: "0 0 0.45rem" }}>
-                  Selected:
-                </p>
-                <img
-                  src={
-                    selectedAccused.imageRevealed || isImageVisible(selectedAccused.id)
-                      ? selectedAccused.image
-                      : "data:image/svg+xml," +
-                        encodeURIComponent(
-                          `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='150'><rect fill='%23ddd' width='120' height='150'/><text x='60' y='84' font-size='48' text-anchor='middle' fill='%23999'>?</text></svg>`
-                        )
-                  }
-                  alt=""
-                />
-                <div>{selectedAccused.name}</div>
-              </div>
-            ) : null}
-            <button
-              type="button"
-              className="btn btn-primary"
-              disabled={!selectedProfileId}
-              onClick={() => dispatch({ type: "submitInteraction" })}
-            >
-              {interaction.submitLabel ?? "It's you!"}
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => dispatch({ type: "advanceDialogue" })}
+        <div
+          className="vn-modal-overlay"
+          onClick={() => setShowSettings(false)}
+          role="presentation"
+        >
+          <div
+            className="vn-panel"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-label="Settings"
           >
-            Continue
-          </button>
-        )}
-      </section>
+            <div className="vn-panel-head">
+              <h3>Settings</h3>
+              <button
+                type="button"
+                className="vn-icon-btn"
+                onClick={() => setShowSettings(false)}
+                title="Close"
+                aria-label="Close settings"
+              >
+                <IconClose />
+              </button>
+            </div>
+            <label className="vn-setting-row">
+              <span>Text speed: {state.settings.textSpeed}</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={state.settings.textSpeed}
+                onChange={(e) =>
+                  dispatch({ type: "setTextSpeed", value: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label className="vn-setting-row">
+              <input
+                type="checkbox"
+                checked={state.settings.autoAdvance}
+                onChange={(e) =>
+                  dispatch({ type: "setAutoAdvance", value: e.target.checked })
+                }
+              />
+              <span>Auto-advance (placeholder)</span>
+            </label>
+            <button type="button" className="vn-text-btn" onClick={reset}>
+              Reset VN play state
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
