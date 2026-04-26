@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -14,34 +15,15 @@ import type {
   VnScene,
   VnState,
 } from "./types";
-import { VN_CHARACTERS, VN_SCENES } from "./scenes";
+import { loadStoryBundle, STORY_RELOAD_EVENT } from "./storySource";
 
 const SAVE_KEY = "mystery-vn-state-v1";
 
-const CHARACTERS: VnCharacter[] = VN_CHARACTERS;
-const SCENES: VnScene[] = VN_SCENES;
-
-const SCENES_BY_ID = new Map(SCENES.map((s) => [s.id, s]));
-const CHAR_BY_ID = new Map(CHARACTERS.map((c) => [c.id, c]));
-const OPENING_LINE = SCENES_BY_ID.get("opening")?.lines[0];
-
-const INITIAL_REVEALS = applyRevealActions(
-  {},
-  OPENING_LINE?.unlocks
-);
-const INITIAL_FLAGS = withSetFlags({}, OPENING_LINE?.setFlags);
-
-const INITIAL_STATE: VnState = {
-  currentSceneId: "opening",
-  lineIndex: 0,
-  history: [],
-  settings: {
-    textSpeed: 40,
-    autoAdvance: false,
-  },
-  flags: INITIAL_FLAGS,
-  reveals: INITIAL_REVEALS,
-  interaction: interactionStateForLine("opening", 0),
+const EMPTY_SCENE: VnScene = {
+  id: "_empty",
+  title: "Empty",
+  background: "#0f172a",
+  lines: [{ text: "No scenes in bundle.", setFlags: [] }],
 };
 
 type VnContextValue = {
@@ -61,25 +43,86 @@ type VnContextValue = {
 
 const VnContext = createContext<VnContextValue | null>(null);
 
+function interactionKey(sceneId: string, lineIndex: number): string {
+  return `${sceneId}::${lineIndex}`;
+}
+
+function lineAt(
+  sceneId: string,
+  lineIndex: number,
+  scenesById: Map<string, VnScene>
+) {
+  const s = scenesById.get(sceneId);
+  return s?.lines[lineIndex] ?? null;
+}
+
+function interactionStateForLine(
+  sceneId: string,
+  lineIndex: number,
+  scenesById: Map<string, VnScene>
+): VnState["interaction"] {
+  const line = lineAt(sceneId, lineIndex, scenesById);
+  if (!line?.interaction) return {};
+  return {
+    lineKey: interactionKey(sceneId, lineIndex),
+    selectedOptionIds: [],
+    selectedProfileId: undefined,
+  };
+}
+
+function getInitialVnState(
+  scenes: VnScene[],
+  scenesById: Map<string, VnScene>
+): VnState {
+  const first = scenes[0];
+  if (!first?.lines.length) {
+    return {
+      currentSceneId: "",
+      lineIndex: 0,
+      history: [],
+      settings: { textSpeed: 40, autoAdvance: false },
+      flags: {},
+      reveals: {},
+      interaction: {},
+    };
+  }
+  const firstLine = first.lines[0]!;
+  const initialReveals = applyRevealActions({}, firstLine.unlocks);
+  const initialFlags = withSetFlags({}, firstLine.setFlags);
+  return {
+    currentSceneId: first.id,
+    lineIndex: 0,
+    history: [],
+    settings: { textSpeed: 40, autoAdvance: false },
+    flags: initialFlags,
+    reveals: initialReveals,
+    interaction: interactionStateForLine(first.id, 0, scenesById),
+  };
+}
+
 function loadState(): VnState {
+  const { scenes } = loadStoryBundle();
+  const scenesById = new Map(scenes.map((s) => [s.id, s]));
+  const base = getInitialVnState(scenes, scenesById);
+  if (!scenes.length) return base;
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return INITIAL_STATE;
+    if (!raw) return base;
     const parsed = JSON.parse(raw) as Partial<VnState>;
-    if (!parsed.currentSceneId || !SCENES_BY_ID.has(parsed.currentSceneId)) {
-      return INITIAL_STATE;
+    if (!parsed.currentSceneId || !scenesById.has(parsed.currentSceneId)) {
+      return base;
     }
     return {
-      ...INITIAL_STATE,
+      ...base,
       ...parsed,
-      settings: { ...INITIAL_STATE.settings, ...parsed.settings },
-      flags: parsed.flags ?? {},
-      reveals: parsed.reveals ?? INITIAL_STATE.reveals,
-      interaction: parsed.interaction ?? {},
+      settings: { ...base.settings, ...parsed.settings },
+      flags: parsed.flags ?? base.flags,
+      reveals: parsed.reveals ?? base.reveals,
+      interaction: parsed.interaction ?? base.interaction,
       history: parsed.history ?? [],
     };
   } catch {
-    return INITIAL_STATE;
+    return base;
   }
 }
 
@@ -87,7 +130,7 @@ function saveState(state: VnState): void {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   } catch {
-    // ignore persistence errors in constrained environments
+    // ignore persistence errors
   }
 }
 
@@ -165,11 +208,6 @@ function applyRevealActions(
   return changed ? next : reveals;
 }
 
-function lineAt(sceneId: string, lineIndex: number) {
-  const s = SCENES_BY_ID.get(sceneId);
-  return s?.lines[lineIndex] ?? null;
-}
-
 function nextVisibleLineIndex(
   scene: VnScene,
   fromIndex: number,
@@ -181,32 +219,48 @@ function nextVisibleLineIndex(
   return null;
 }
 
-function interactionKey(sceneId: string, lineIndex: number): string {
-  return `${sceneId}::${lineIndex}`;
-}
-
-function interactionStateForLine(sceneId: string, lineIndex: number): VnState["interaction"] {
-  const line = lineAt(sceneId, lineIndex);
-  if (!line?.interaction) return {};
-  return {
-    lineKey: interactionKey(sceneId, lineIndex),
-    selectedOptionIds: [],
-    selectedProfileId: undefined,
-  };
-}
-
 export function VnProvider({ children }: { children: ReactNode }) {
+  const [storyRev, setStoryRev] = useState(0);
   const [state, setState] = useState<VnState>(() => loadState());
 
+  const bundle = useMemo(() => loadStoryBundle(), [storyRev]);
+  const { scenes, characters } = bundle;
+  const scenesById = useMemo(
+    () => new Map(scenes.map((s) => [s.id, s])),
+    [scenes]
+  );
+  const charById = useMemo(
+    () => new Map(characters.map((c) => [c.id, c])),
+    [characters]
+  );
+
+  useEffect(() => {
+    const onReload = () => setStoryRev((r) => r + 1);
+    window.addEventListener(STORY_RELOAD_EVENT, onReload);
+    return () => window.removeEventListener(STORY_RELOAD_EVENT, onReload);
+  }, []);
+
+  useEffect(() => {
+    if (storyRev === 0) return;
+    const b = loadStoryBundle();
+    const m = new Map(b.scenes.map((s) => [s.id, s]));
+    const next = getInitialVnState(b.scenes, m);
+    setState(next);
+    saveState(next);
+  }, [storyRev]);
+
   const getSpeaker = useCallback(
-    (speakerId?: string) => (speakerId ? CHAR_BY_ID.get(speakerId) : undefined),
-    []
+    (speakerId?: string) => (speakerId ? charById.get(speakerId) : undefined),
+    [charById]
   );
 
   const dispatch = useCallback(
     (intent: VnIntent) => {
       setState((prev) => {
-        const scene = SCENES_BY_ID.get(prev.currentSceneId) ?? SCENES[0];
+        const scene = scenesById.get(prev.currentSceneId) ?? scenes[0];
+        if (!scene) {
+          return prev;
+        }
         const line = scene.lines[prev.lineIndex] ?? null;
         let next = prev;
 
@@ -216,7 +270,8 @@ export function VnProvider({ children }: { children: ReactNode }) {
           flags: Record<string, true>,
           reveals: VnState["reveals"]
         ): VnState => {
-          const targetScene = SCENES_BY_ID.get(targetSceneId) ?? SCENES[0];
+          const targetScene =
+            scenesById.get(targetSceneId) ?? scenes[0] ?? EMPTY_SCENE;
           const initialIndex = nextVisibleLineIndex(targetScene, 0, flags) ?? 0;
           return {
             ...base,
@@ -225,9 +280,13 @@ export function VnProvider({ children }: { children: ReactNode }) {
             flags,
             reveals: applyRevealActions(
               reveals,
-              lineAt(targetScene.id, initialIndex)?.unlocks
+              lineAt(targetScene.id, initialIndex, scenesById)?.unlocks
             ),
-            interaction: interactionStateForLine(targetScene.id, initialIndex),
+            interaction: interactionStateForLine(
+              targetScene.id,
+              initialIndex,
+              scenesById
+            ),
           };
         };
 
@@ -251,9 +310,13 @@ export function VnProvider({ children }: { children: ReactNode }) {
             flags,
             reveals: applyRevealActions(
               reveals,
-              lineAt(fromScene.id, nextLineIndex)?.unlocks
+              lineAt(fromScene.id, nextLineIndex, scenesById)?.unlocks
             ),
-            interaction: interactionStateForLine(fromScene.id, nextLineIndex),
+            interaction: interactionStateForLine(
+              fromScene.id,
+              nextLineIndex,
+              scenesById
+            ),
           };
         };
 
@@ -287,7 +350,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 c.id === intent.optionId &&
                 hasRequiredFlags(prev.flags, c.requireFlags)
             );
-            if (!picked || !SCENES_BY_ID.has(picked.nextSceneId)) return prev;
+            if (!picked || !scenesById.has(picked.nextSceneId)) return prev;
             const speaker = getSpeaker(line.speakerId);
             const withChoice = pushHistory(
               prev.history,
@@ -308,11 +371,13 @@ export function VnProvider({ children }: { children: ReactNode }) {
             break;
           }
           case "selectInteractionOption": {
-            if (!line?.interaction || line.interaction.kind !== "mcq") return prev;
+            if (!line?.interaction || line.interaction.kind !== "mcq")
+              return prev;
             const lk = interactionKey(scene.id, prev.lineIndex);
-            const selected = prev.interaction.lineKey === lk
-              ? prev.interaction.selectedOptionIds ?? []
-              : [];
+            const selected =
+              prev.interaction.lineKey === lk
+                ? (prev.interaction.selectedOptionIds ?? [])
+                : [];
             if (line.interaction.redoable) {
               if (selected.includes(intent.optionId)) return prev;
               next = {
@@ -337,7 +402,8 @@ export function VnProvider({ children }: { children: ReactNode }) {
             break;
           }
           case "selectAccusedProfile": {
-            if (!line?.interaction || line.interaction.kind !== "accuse") return prev;
+            if (!line?.interaction || line.interaction.kind !== "accuse")
+              return prev;
             next = {
               ...prev,
               interaction: {
@@ -351,18 +417,22 @@ export function VnProvider({ children }: { children: ReactNode }) {
           case "submitInteraction": {
             if (!line?.interaction) return prev;
             const selectedOptions =
-              prev.interaction.lineKey === interactionKey(scene.id, prev.lineIndex)
-                ? prev.interaction.selectedOptionIds ?? []
+              prev.interaction.lineKey ===
+              interactionKey(scene.id, prev.lineIndex)
+                ? (prev.interaction.selectedOptionIds ?? [])
                 : [];
             const selectedProfile =
-              prev.interaction.lineKey === interactionKey(scene.id, prev.lineIndex)
+              prev.interaction.lineKey ===
+              interactionKey(scene.id, prev.lineIndex)
                 ? prev.interaction.selectedProfileId
                 : undefined;
 
             if (line.interaction.kind === "mcq") {
               const lastSelectedId = selectedOptions[selectedOptions.length - 1];
               if (!lastSelectedId) return prev;
-              const selected = line.interaction.options.find((o) => o.id === lastSelectedId);
+              const selected = line.interaction.options.find(
+                (o) => o.id === lastSelectedId
+              );
               if (!selected) return prev;
               const isCorrect = selected.correct === true;
               const outcome = isCorrect
@@ -378,7 +448,11 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 "Choice",
                 `${line.interaction.prompt} -> ${selected.label}`
               );
-              if (!isCorrect && line.interaction.redoable && !outcome?.nextSceneId) {
+              if (
+                !isCorrect &&
+                line.interaction.redoable &&
+                !outcome?.nextSceneId
+              ) {
                 next = {
                   ...prev,
                   history: withHistory,
@@ -405,7 +479,8 @@ export function VnProvider({ children }: { children: ReactNode }) {
             }
 
             if (!selectedProfile) return prev;
-            const isCorrect = selectedProfile === line.interaction.correctProfileId;
+            const isCorrect =
+              selectedProfile === line.interaction.correctProfileId;
             const outcome = isCorrect
               ? line.interaction.onCorrect
               : line.interaction.onIncorrect;
@@ -437,7 +512,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
             break;
           }
           case "goToScene": {
-            if (!SCENES_BY_ID.has(intent.sceneId)) return prev;
+            if (!scenesById.has(intent.sceneId)) return prev;
             next = goToScene(prev, intent.sceneId, prev.flags, prev.reveals);
             break;
           }
@@ -459,15 +534,18 @@ export function VnProvider({ children }: { children: ReactNode }) {
         return next;
       });
     },
-    [getSpeaker]
+    [getSpeaker, scenes, scenesById]
   );
 
   const reset = useCallback(() => {
-    setState(INITIAL_STATE);
-    saveState(INITIAL_STATE);
+    const b = loadStoryBundle();
+    const m = new Map(b.scenes.map((s) => [s.id, s]));
+    const next = getInitialVnState(b.scenes, m);
+    setState(next);
+    saveState(next);
   }, []);
 
-  const currentScene = SCENES_BY_ID.get(state.currentSceneId) ?? SCENES[0];
+  const currentScene = scenesById.get(state.currentSceneId) ?? scenes[0] ?? EMPTY_SCENE;
   const currentLine = currentScene.lines[state.lineIndex] ?? null;
 
   const isProfileVisible = useCallback(
@@ -490,8 +568,8 @@ export function VnProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<VnContextValue>(
     () => ({
-      scenes: SCENES,
-      characters: CHARACTERS,
+      scenes,
+      characters,
       state,
       currentScene,
       currentLine,
@@ -504,6 +582,8 @@ export function VnProvider({ children }: { children: ReactNode }) {
       isEntryVisible,
     }),
     [
+      scenes,
+      characters,
       state,
       currentScene,
       currentLine,

@@ -26,12 +26,21 @@ export function Layout() {
             Corkboard
           </NavLink>
           {isAdmin ? (
-            <NavLink
-              to="/admin"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Edit campaign
-            </NavLink>
+            <>
+              <NavLink
+                to="/admin"
+                end
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Edit campaign
+              </NavLink>
+              <NavLink
+                to="/admin/story"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Edit story
+              </NavLink>
+            </>
           ) : (
             <NavLink
               to="/login"
