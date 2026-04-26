@@ -473,3 +473,111 @@ a {
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
+
+/* Visual novel shell */
+.vn-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.vn-stage {
+  min-height: min(56vh, 520px);
+  border: 2px solid #2b1d14;
+  border-radius: 2px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.vn-char-card {
+  background: rgba(245, 240, 230, 0.92);
+  border: 1px dashed #9a7f60;
+  border-radius: 3px;
+  width: min(520px, 100%);
+  min-height: 220px;
+  padding: 1rem;
+}
+
+.vn-char-label {
+  font-family: "Special Elite", serif;
+  letter-spacing: 0.04em;
+}
+
+.vn-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vn-hud-left,
+.vn-hud-right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.vn-panel {
+  border: 1px dashed var(--paper-edge);
+  border-radius: 2px;
+  padding: 0.75rem;
+  background: #fcfaf6;
+}
+
+.vn-panel h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.vn-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.vn-history-list {
+  max-height: 240px;
+  overflow: auto;
+  padding-right: 0.4rem;
+}
+
+.vn-history-list p {
+  margin: 0.45rem 0;
+}
+
+.vn-setting-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.vn-dialogue-box {
+  border-top: 2px solid var(--paper-edge);
+  padding-top: 0.75rem;
+}
+
+.vn-speaker {
+  font-family: "Special Elite", serif;
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+}
+
+.vn-line {
+  margin: 0 0 0.8rem;
+  line-height: 1.5;
+}
+
+.vn-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}

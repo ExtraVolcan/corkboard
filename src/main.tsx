@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./auth";
 import { CampaignProvider } from "./campaign";
 import { App } from "./App";
+import { VnProvider } from "./vn/state";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -11,7 +12,9 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <AuthProvider>
         <CampaignProvider>
-          <App />
+          <VnProvider>
+            <App />
+          </VnProvider>
         </CampaignProvider>
       </AuthProvider>
     </BrowserRouter>

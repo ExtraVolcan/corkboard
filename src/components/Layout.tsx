@@ -5,7 +5,7 @@ export function Layout() {
   const { isAdmin, logout } = useAuth();
   const { pathname } = useLocation();
   const wide =
-    pathname === "/" ||
+    pathname === "/corkboard" ||
     pathname.startsWith("/evidence") ||
     pathname.startsWith("/admin");
 
@@ -13,9 +13,18 @@ export function Layout() {
     <div className="app-shell">
       <header className="top-nav">
         <NavLink to="/" className="brand" end>
-          Corkboard
+          Mystery VN
         </NavLink>
         <nav className="tabs">
+          <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")} end>
+            Story
+          </NavLink>
+          <NavLink
+            to="/corkboard"
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            Corkboard
+          </NavLink>
           {isAdmin ? (
             <NavLink
               to="/admin"

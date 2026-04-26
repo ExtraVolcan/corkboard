@@ -58,13 +58,13 @@ export function ProfilePage() {
     return (
       <div className="paper">
         <p>Profile not found.</p>
-        <Link to="/">← Corkboard</Link>
+        <Link to="/corkboard">← Corkboard</Link>
       </div>
     );
   }
 
   if (!profile.profileRevealed && !isAdmin) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/corkboard" replace />;
   }
 
   const showName =
@@ -75,7 +75,7 @@ export function ProfilePage() {
   return (
     <div className="paper">
       <p>
-        <Link to="/" className="muted">
+        <Link to="/corkboard" className="muted">
           ← Corkboard
         </Link>
       </p>
