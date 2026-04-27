@@ -235,16 +235,15 @@ export function VisualNovelPage() {
                   <p className="vn-interaction-prompt">{interaction.prompt}</p>
                   <div className="vn-choices">
                     {interaction.options.map((option) => {
-                      const tried = selectedOptionIds.includes(option.id);
-                      const disabled =
-                        interaction.redoable ? tried : selectedOptionIds.length > 0;
+                      const selected = selectedOptionIds.includes(option.id);
+                      const disabled = interaction.redoable ? selected : false;
                       return (
                         <button
                           key={option.id}
                           type="button"
                           className="vn-pill"
                           disabled={disabled}
-                          style={tried ? { opacity: 0.45 } : undefined}
+                          style={selected ? { opacity: 0.45 } : undefined}
                           onClick={() =>
                             dispatch({
                               type: "selectInteractionOption",

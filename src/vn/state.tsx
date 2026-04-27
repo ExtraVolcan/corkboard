@@ -389,7 +389,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 },
               };
             } else {
-              if (selected.length) return prev;
+              // One-time MCQ: allow changing selection before submit.
               next = {
                 ...prev,
                 interaction: {

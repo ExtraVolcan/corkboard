@@ -101,7 +101,7 @@ export const VN_SCENES: VnScene[] = [
         interaction: {
           kind: "mcq",
           prompt: "Where does the strongest lead point right now?",
-          redoable: true,
+          redoable: false,
           options: [
             { id: "loc-docks", label: "The old docks" },
             {
