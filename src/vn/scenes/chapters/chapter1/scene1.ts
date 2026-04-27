@@ -119,6 +119,7 @@ export const scene1: VnScene = {
     {
       speakerId: "detective",
       text: "Who are you?"
+      //image: caliban pointing
     },
     {
       speakerId: "narrator",

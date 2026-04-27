@@ -588,16 +588,74 @@ a.vn-icon-btn {
 
 .vn-portrait-area {
   flex: 1;
-  min-height: 120px;
+  min-height: min(42vh, 380px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 0.25rem 0 0.5rem;
+  padding: 0.25rem 0 0.35rem;
+  width: 100%;
+}
+
+.vn-portrait-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 56rem;
+  margin: 0 auto;
+  gap: 0.35rem;
+}
+
+.vn-portrait-cluster {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.vn-portrait-cluster--left {
+  justify-content: flex-start;
+  flex: 0 0 auto;
+}
+
+.vn-portrait-cluster--center {
+  flex: 1 1 auto;
+  justify-content: center;
+  min-width: 0;
+}
+
+.vn-portrait-cluster--right {
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
+.vn-portrait-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: min(34vw, 200px);
+}
+
+.vn-portrait-slot--inactive {
+  opacity: 0.47;
+}
+
+.vn-emotion-outline {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 250, 245, 0.55);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  max-width: 100%;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .vn-portrait {
-  max-height: min(48vh, 400px);
-  max-width: min(90%, 360px);
+  max-height: min(40vh, 320px);
+  max-width: 100%;
   width: auto;
   height: auto;
   object-fit: contain;

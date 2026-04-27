@@ -2,12 +2,73 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
 import { useCampaign } from "../campaign";
-import { resolveBackground, resolvePortrait } from "../vn/assets";
+import {
+  resolveBackground,
+  resolveEffectiveSceneBackground,
+  resolvePortraitForSnapshot,
+} from "../vn/assets";
+import { buildPortraitClusters } from "../vn/portraitLayout";
 import {
   resolveSpeakerDisplayLabel,
   resolveSpeakerPlaceholderInitial,
 } from "../vn/speakerLabel";
 import { useVn } from "../vn/state";
+import type { PortraitSlot } from "../vn/portraitLayout";
+import type { SpeakerLabelContext } from "../vn/speakerLabel";
+import type { VnCharacter } from "../vn/types";
+import type { Profile } from "../types";
+
+function PortraitFigure({
+  slot,
+  charById,
+  speakerLabelCtx,
+  campaignProfiles,
+  isImageVisible,
+}: {
+  slot: PortraitSlot;
+  charById: Map<string, VnCharacter>;
+  speakerLabelCtx: SpeakerLabelContext;
+  campaignProfiles: Profile[];
+  isImageVisible: (profileId: string) => boolean;
+}) {
+  const speaker = charById.get(slot.speakerId);
+  const accent = speaker?.accent || "#a8a29e";
+  const letter = resolveSpeakerPlaceholderInitial(
+    slot.speakerId,
+    charById,
+    speakerLabelCtx
+  );
+  const label =
+    resolveSpeakerDisplayLabel(slot.speakerId, charById, speakerLabelCtx) ?? "";
+  const assetUrl = resolvePortraitForSnapshot({
+    speakerId: slot.speakerId,
+    emotion: slot.emotion,
+    portraitId: slot.portraitId,
+  });
+  const profile = campaignProfiles.find((p) => p.id === slot.speakerId);
+  const profileUrl =
+    profile && (profile.imageRevealed || isImageVisible(profile.id))
+      ? profile.image
+      : null;
+  const src = assetUrl ?? profileUrl ?? placeholderArt(letter, accent);
+
+  return (
+    <div
+      className={`vn-portrait-slot${
+        slot.isSpeaking ? "" : " vn-portrait-slot--inactive"
+      }`}
+    >
+      <img
+        className="vn-portrait"
+        src={src}
+        alt={label ? `${label} portrait` : ""}
+      />
+      {slot.emotion ? (
+        <span className="vn-emotion-outline">{slot.emotion}</span>
+      ) : null}
+    </div>
+  );
+}
 
 function IconHistory() {
   return (
@@ -148,26 +209,23 @@ export function VisualNovelPage() {
     );
   }, [currentScene.lines.length, state.lineIndex]);
 
-  const speakerId = currentLine?.speakerId;
-  const profileMatch = useMemo(
-    () => (speakerId ? data.profiles.find((p) => p.id === speakerId) : undefined),
-    [data.profiles, speakerId]
-  );
-  const portraitImage =
-    resolvePortrait(currentLine?.portraitId) ??
-    (profileMatch && (isImageVisible(profileMatch.id) || profileMatch.imageRevealed)
-      ? profileMatch.image
-      : null);
-  const placeholderLetter = useMemo(
+  const portraitClusters = useMemo(
     () =>
-      resolveSpeakerPlaceholderInitial(
-        currentLine?.speakerId,
-        charById,
-        speakerLabelCtx
+      buildPortraitClusters(
+        currentScene,
+        state.lineIndex,
+        currentLine?.speakerId
       ),
-    [currentLine?.speakerId, charById, speakerLabelCtx]
+    [currentScene, state.lineIndex, currentLine?.speakerId]
   );
-  const accent = speaker?.accent || "#a8a29e";
+
+  const effectiveSceneBackground = useMemo(
+    () =>
+      resolveBackground(
+        resolveEffectiveSceneBackground(currentScene, state.lineIndex)
+      ),
+    [currentScene, state.lineIndex]
+  );
 
   const canAdvanceByClick = Boolean(
     currentLine && !hasChoices && !interaction
@@ -180,10 +238,7 @@ export function VisualNovelPage() {
 
   return (
     <div className="vn-shell">
-      <div
-        className="vn-scene"
-        style={{ background: resolveBackground(currentScene.background) }}
-      >
+      <div className="vn-scene" style={{ background: effectiveSceneBackground }}>
         <div className="vn-scene-hud" aria-hidden={false}>
           <div className="vn-scene-title">
             {currentScene.title}
@@ -227,21 +282,44 @@ export function VisualNovelPage() {
 
         <div className="vn-scene-body">
           <div className="vn-portrait-area">
-            {portraitImage ? (
-              <img
-                className="vn-portrait"
-                src={portraitImage}
-                alt={
-                  speakerDisplayLabel ? `${speakerDisplayLabel} portrait` : ""
-                }
-              />
-            ) : (
-              <img
-                className="vn-portrait"
-                src={placeholderArt(placeholderLetter, accent)}
-                alt=""
-              />
-            )}
+            <div className="vn-portrait-row">
+              <div className="vn-portrait-cluster vn-portrait-cluster--left">
+                {portraitClusters.left.map((slot) => (
+                  <PortraitFigure
+                    key={slot.speakerId}
+                    slot={slot}
+                    charById={charById}
+                    speakerLabelCtx={speakerLabelCtx}
+                    campaignProfiles={data.profiles}
+                    isImageVisible={isImageVisible}
+                  />
+                ))}
+              </div>
+              <div className="vn-portrait-cluster vn-portrait-cluster--center">
+                {portraitClusters.center.map((slot) => (
+                  <PortraitFigure
+                    key={slot.speakerId}
+                    slot={slot}
+                    charById={charById}
+                    speakerLabelCtx={speakerLabelCtx}
+                    campaignProfiles={data.profiles}
+                    isImageVisible={isImageVisible}
+                  />
+                ))}
+              </div>
+              <div className="vn-portrait-cluster vn-portrait-cluster--right">
+                {portraitClusters.right.map((slot) => (
+                  <PortraitFigure
+                    key={slot.speakerId}
+                    slot={slot}
+                    charById={charById}
+                    speakerLabelCtx={speakerLabelCtx}
+                    campaignProfiles={data.profiles}
+                    isImageVisible={isImageVisible}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

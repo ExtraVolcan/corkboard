@@ -63,6 +63,13 @@ export type VnLine = {
   speakerId?: string;
   /** Optional author-facing portrait id, e.g. "portrait:detective-default" */
   portraitId?: string;
+  /**
+   * Outline for sprite / expression (e.g. "neutral", "worried").
+   * Resolved as `VN_PORTRAITS["{speakerId}-{emotion}"]` when assets exist.
+   */
+  emotion?: string;
+  /** Overrides scene background from this line onward (same `bg:` ids or raw CSS as scene.background). */
+  background?: string;
   text: string;
   choices?: VnChoice[];
   interaction?: VnLineInteraction;

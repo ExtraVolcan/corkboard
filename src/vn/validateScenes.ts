@@ -54,6 +54,16 @@ export function validateScenes(
     for (let li = 0; li < (scene.lines?.length ?? 0); li++) {
       const line = scene.lines[li]!;
       const lp = `${p}.lines[${li}]`;
+      if (line.background?.startsWith("bg:")) {
+        const bgId = line.background.slice(3);
+        if (!VN_BACKGROUNDS[bgId]) {
+          push(
+            errors,
+            `${lp}.background`,
+            `Unknown background id "${bgId}" (add to VN_BACKGROUNDS)`
+          );
+        }
+      }
       if (line.speakerId && !speakerExists(charSet, line.speakerId)) {
         push(
           errors,
