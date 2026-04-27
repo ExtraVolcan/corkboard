@@ -19,6 +19,9 @@ function nameRevealSatisfied(
   ctx: SpeakerLabelContext,
   opts: { legacyUnknownSuffix: boolean }
 ): boolean {
+  // No masked name → always show `name` (ignore flags).
+  if (c.unknownName === undefined) return true;
+
   const hasMechanism = Boolean(c.nameRevealFlag || c.linkedProfileId);
 
   // Legacy scene ids like `detective-???` stay unknown until a reveal rule exists and passes.

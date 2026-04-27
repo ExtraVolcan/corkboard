@@ -797,6 +797,12 @@ a.vn-icon-btn {
   color: rgba(255, 250, 245, 0.94);
 }
 
+/* Narration / protagonist interior voice (no speaker label) */
+.vn-line.vn-line--narrator {
+  font-style: italic;
+  color: #93c5fd;
+}
+
 /* Sleek choice / action pills (not old rectangular buttons) */
 .vn-choices {
   display: flex;

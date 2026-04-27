@@ -1,4 +1,5 @@
 import type { VnScene } from "../../../types";
+import { characterNameRevealFlag } from "../../../nameReveal";
 
 //synopsis:
 // introduce the protagonist, and a 'dead' body, (pixel-censored by heavily downscaling image)
@@ -40,7 +41,7 @@ export const scene1: VnScene = {
       text: "...the smell of my own body.",
     },
     {
-      speakerId: "detective-???",
+      speakerId: "narrator",
       text: "It must have looked a little funny to see me sniffing my own armpits.",
     },
     {
@@ -60,7 +61,7 @@ export const scene1: VnScene = {
       text: "There's a small puddle of the blue liquid surrounding the body.",
     },
     {
-      speakerId: "detective-???",
+      speakerId: "detective",
       text: "...",
     },
     {
@@ -76,11 +77,11 @@ export const scene1: VnScene = {
       text: "...",
     },
     {
-      speakerId: "detective-???",
+      speakerId: "detective",
       text: "Yeah, no shit, dumbass."
     },
     {
-      speakerId: "detective-???",
+      speakerId: "detective",
       text: "Of course there's blood inside the body."
     },
     {
@@ -97,14 +98,14 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "I turn to look at the body"
+      text: "I turn to look at the body."
     },
     {
-      speakerId: "detective-???",
+      speakerId: "detective",
       text: "Can I get your number?"
     },
     {
-      speakerId: "detective-???",
+      speakerId: "detective",
       text: "..."
     },
     {
@@ -116,7 +117,7 @@ export const scene1: VnScene = {
       text: "Alright, first question: "
     },
     {
-      speakerId: "detective-???",
+      speakerId: "detective",
       text: "Who are you?"
     },
     {
@@ -151,6 +152,43 @@ export const scene1: VnScene = {
     {
       speakerId: "narrator",
       text: "At least I got a face for future reference!",
+    },
+    {
+      speakerId: "narrator",
+      text: "Next I look towards the body's right hand.",
+    },
+    {
+      speakerId: "narrator",
+      text: "The hand is relaxed, with an open palm.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Not too much staining there.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I gently hold the hand, lifting it up a bit with my own right hand.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I change my grip to firmly grasp the hand.",
+    },
+    {
+      speakerId: "detective",
+      text: "I don't know your name, but...",
+    },
+    {
+      speakerId: "detective",
+      text: "My name is Caliban. It's nice to meet you!",
+      setFlags: [characterNameRevealFlag("detective")],
+    },
+    {
+      speakerId: "narrator",
+      text: "Giving the limp hand a little shake, I let it drop back down to the floor.",
+    },
+    {
+      speakerId: "detective",
+      text: "Maybe we can introduce ourselves properly in a few days time.",
     },
     /*
     {

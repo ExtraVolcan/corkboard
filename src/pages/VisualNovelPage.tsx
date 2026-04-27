@@ -265,7 +265,13 @@ export function VisualNovelPage() {
                   {speakerDisplayLabel}
                 </div>
               ) : null}
-              <p className="vn-line">{currentLine?.text ?? "No dialogue loaded."}</p>
+              <p
+                className={`vn-line${
+                  currentLine?.speakerId === "narrator" ? " vn-line--narrator" : ""
+                }`}
+              >
+                {currentLine?.text ?? "No dialogue loaded."}
+              </p>
               <span className="vn-continue-hint">Click to continue</span>
             </button>
           ) : (
@@ -283,7 +289,13 @@ export function VisualNovelPage() {
                   {speakerDisplayLabel}
                 </div>
               ) : null}
-              <p className="vn-line">{currentLine?.text ?? "No dialogue loaded."}</p>
+              <p
+                className={`vn-line${
+                  currentLine?.speakerId === "narrator" ? " vn-line--narrator" : ""
+                }`}
+              >
+                {currentLine?.text ?? "No dialogue loaded."}
+              </p>
 
               {hasChoices ? (
                 <div className="vn-choices">
