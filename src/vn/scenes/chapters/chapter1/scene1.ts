@@ -135,9 +135,22 @@ export const scene1: VnScene = {
       speakerId: "narrator",
       text: "Turning over the body, I get a good look at the face.",
       //TODO: little tutorial about the corkboard here?
+      //TODO: animation / alert for new intel? (NEW label?)
       unlocks: [
        { type: "revealImage", profileId: "cressida" }
       ],
+    },
+    {
+      speakerId: "narrator",
+      text: "I don't know who this is.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Makes sense; I don't know anyone in this place.",
+    },
+    {
+      speakerId: "narrator",
+      text: "At least I got a face for future reference!",
     },
     /*
     {
