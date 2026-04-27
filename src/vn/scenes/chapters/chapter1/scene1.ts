@@ -63,6 +63,7 @@ export const scene1: VnScene = {
     {
       speakerId: "detective",
       text: "...",
+      emotion: "think"
     },
     {
       speakerId: "narrator",
@@ -102,7 +103,8 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "Can I get your number?"
+      text: "Can I get your number?",
+      emotion: "fingerbang"
     },
     {
       speakerId: "detective",
@@ -118,12 +120,13 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "Who are you?"
-      //image: caliban pointing
+      text: "Who are you?",
+      emotion: "point"
     },
     {
       speakerId: "narrator",
       text: "It's easy enough to answer that one.",
+      emotion: "detective-think"
     },
     {
       speakerId: "narrator",

@@ -4,6 +4,9 @@ import { canonicalSpeakerId } from "./speakerLabel";
 /** Caliban / protagonist — always placed in the left cluster above the dialogue box. */
 export const PROTAGONIST_SPEAKER_IDS = new Set<string>(["detective"]);
 
+/** Narrator lines with `emotion` update the detective portrait (inner monologue). */
+export const INNER_MONOLOGUE_PORTRAIT_SPEAKER_ID = "detective";
+
 export type SpeakerPortraitSnapshot = {
   speakerId: string;
   lineIndex: number;
@@ -24,9 +27,26 @@ export type PortraitClusters = {
   right: PortraitSlot[];
 };
 
-function skipPortraitForSpeaker(speakerId: string | undefined): boolean {
-  if (!speakerId) return true;
-  return canonicalSpeakerId(speakerId) === "narrator";
+function skipPortraitForSpeaker(line: VnLine): boolean {
+  const sid = line.speakerId;
+  if (!sid) return true;
+  const base = canonicalSpeakerId(sid);
+  if (base === "narrator") {
+    return !line.emotion?.trim();
+  }
+  return false;
+}
+
+/** Which portrait slot should appear “active” for this line (inner thoughts → detective). */
+export function resolvePortraitHighlightSpeakerId(
+  line: VnLine | undefined
+): string | undefined {
+  if (!line?.speakerId) return undefined;
+  const base = canonicalSpeakerId(line.speakerId);
+  if (base === "narrator") {
+    return line.emotion?.trim() ? INNER_MONOLOGUE_PORTRAIT_SPEAKER_ID : undefined;
+  }
+  return base;
 }
 
 /** Latest emotion/portrait per speaker after scanning lines 0..lineIndex inclusive. */
@@ -39,11 +59,13 @@ export function collectPortraitSnapshots(
   const end = Math.min(lineIndex, lines.length - 1);
   for (let i = 0; i <= end; i++) {
     const line = lines[i]!;
-    const sid = line.speakerId;
-    if (skipPortraitForSpeaker(sid)) continue;
-    const base = canonicalSpeakerId(sid!);
-    map.set(base, {
-      speakerId: base,
+    if (skipPortraitForSpeaker(line)) continue;
+    const sid = line.speakerId!;
+    const base = canonicalSpeakerId(sid);
+    const portraitSpeakerId =
+      base === "narrator" ? INNER_MONOLOGUE_PORTRAIT_SPEAKER_ID : base;
+    map.set(portraitSpeakerId, {
+      speakerId: portraitSpeakerId,
       lineIndex: i,
       emotion: line.emotion,
       portraitId: line.portraitId,
@@ -69,24 +91,15 @@ function sortOthersByAppearance(lines: VnLine[], others: string[]): string[] {
 
 /**
  * Left = protagonist (`detective`) when present.
- * Remaining speakers: middle zone(s) then the last speaker (by appearance order) on the right,
- * matching “between left and right” when there are 3+ visible speakers.
+ * Remaining speakers: middle zone(s) then the last speaker (by appearance order) on the right.
  */
-export function buildPortraitClusters(
+export function buildPortraitLayout(
   scene: VnScene,
   lineIndex: number,
-  currentSpeakerId: string | undefined
+  highlightSpeakerId: string | undefined
 ): PortraitClusters {
   const lines = scene.lines;
   const snaps = collectPortraitSnapshots(lines, lineIndex);
-  const currentBase = currentSpeakerId
-    ? canonicalSpeakerId(currentSpeakerId)
-    : undefined;
-
-  const ids = [...snaps.keys()];
-  const protagonistIds = ids.filter((id) => PROTAGONIST_SPEAKER_IDS.has(id));
-  const othersRaw = ids.filter((id) => !PROTAGONIST_SPEAKER_IDS.has(id));
-  const others = sortOthersByAppearance(lines, othersRaw);
 
   const toSlot = (speakerId: string): PortraitSlot => {
     const s = snaps.get(speakerId)!;
@@ -94,9 +107,14 @@ export function buildPortraitClusters(
       speakerId,
       emotion: s.emotion,
       portraitId: s.portraitId,
-      isSpeaking: currentBase === speakerId,
+      isSpeaking: highlightSpeakerId === speakerId,
     };
   };
+
+  const ids = [...snaps.keys()];
+  const protagonistIds = ids.filter((id) => PROTAGONIST_SPEAKER_IDS.has(id));
+  const othersRaw = ids.filter((id) => !PROTAGONIST_SPEAKER_IDS.has(id));
+  const others = sortOthersByAppearance(lines, othersRaw);
 
   const left: PortraitSlot[] = protagonistIds.map(toSlot);
 
@@ -105,7 +123,11 @@ export function buildPortraitClusters(
   }
 
   if (others.length === 1) {
-    return { left, center: [], right: [toSlot(others[0]!)] };
+    return {
+      left,
+      center: [],
+      right: [toSlot(others[0]!)],
+    };
   }
 
   const middle = others.slice(0, -1).map(toSlot);

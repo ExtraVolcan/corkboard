@@ -3,11 +3,15 @@ import { Link } from "react-router-dom";
 import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
 import { useCampaign } from "../campaign";
 import {
+  portraitRegistryHint,
   resolveBackground,
   resolveEffectiveSceneBackground,
   resolvePortraitForSnapshot,
 } from "../vn/assets";
-import { buildPortraitClusters } from "../vn/portraitLayout";
+import {
+  buildPortraitLayout,
+  resolvePortraitHighlightSpeakerId,
+} from "../vn/portraitLayout";
 import {
   resolveSpeakerDisplayLabel,
   resolveSpeakerPlaceholderInitial,
@@ -50,7 +54,13 @@ function PortraitFigure({
     profile && (profile.imageRevealed || isImageVisible(profile.id))
       ? profile.image
       : null;
-  const src = assetUrl ?? profileUrl ?? placeholderArt(letter, accent);
+  const resolvedArt = assetUrl ?? profileUrl;
+  const src = resolvedArt ?? placeholderArt(letter, accent);
+  const registryHint = portraitRegistryHint({
+    speakerId: slot.speakerId,
+    emotion: slot.emotion,
+  });
+  const showPlaceholderEmotionHint = Boolean(!resolvedArt && registryHint);
 
   return (
     <div
@@ -58,12 +68,19 @@ function PortraitFigure({
         slot.isSpeaking ? "" : " vn-portrait-slot--inactive"
       }`}
     >
-      <img
-        className="vn-portrait"
-        src={src}
-        alt={label ? `${label} portrait` : ""}
-      />
-      {slot.emotion ? (
+      <div className="vn-portrait-figure-wrap">
+        <img
+          className="vn-portrait"
+          src={src}
+          alt={label ? `${label} portrait` : ""}
+        />
+        {showPlaceholderEmotionHint ? (
+          <div className="vn-portrait-emotion-hint" aria-hidden>
+            <span className="vn-portrait-emotion-hint-label">{registryHint}</span>
+          </div>
+        ) : null}
+      </div>
+      {slot.emotion && !showPlaceholderEmotionHint ? (
         <span className="vn-emotion-outline">{slot.emotion}</span>
       ) : null}
     </div>
@@ -209,14 +226,18 @@ export function VisualNovelPage() {
     );
   }, [currentScene.lines.length, state.lineIndex]);
 
-  const portraitClusters = useMemo(
+  const portraitHighlightId = useMemo(
     () =>
-      buildPortraitClusters(
-        currentScene,
-        state.lineIndex,
-        currentLine?.speakerId
+      resolvePortraitHighlightSpeakerId(
+        currentScene.lines[state.lineIndex]
       ),
-    [currentScene, state.lineIndex, currentLine?.speakerId]
+    [currentScene.lines, state.lineIndex]
+  );
+
+  const portraitLayout = useMemo(
+    () =>
+      buildPortraitLayout(currentScene, state.lineIndex, portraitHighlightId),
+    [currentScene, state.lineIndex, portraitHighlightId]
   );
 
   const effectiveSceneBackground = useMemo(
@@ -280,11 +301,11 @@ export function VisualNovelPage() {
           </div>
         </div>
 
-        <div className="vn-scene-body">
+        <div className="vn-portrait-layer">
           <div className="vn-portrait-area">
             <div className="vn-portrait-row">
               <div className="vn-portrait-cluster vn-portrait-cluster--left">
-                {portraitClusters.left.map((slot) => (
+                {portraitLayout.left.map((slot) => (
                   <PortraitFigure
                     key={slot.speakerId}
                     slot={slot}
@@ -296,7 +317,7 @@ export function VisualNovelPage() {
                 ))}
               </div>
               <div className="vn-portrait-cluster vn-portrait-cluster--center">
-                {portraitClusters.center.map((slot) => (
+                {portraitLayout.center.map((slot) => (
                   <PortraitFigure
                     key={slot.speakerId}
                     slot={slot}
@@ -308,7 +329,7 @@ export function VisualNovelPage() {
                 ))}
               </div>
               <div className="vn-portrait-cluster vn-portrait-cluster--right">
-                {portraitClusters.right.map((slot) => (
+                {portraitLayout.right.map((slot) => (
                   <PortraitFigure
                     key={slot.speakerId}
                     slot={slot}
@@ -322,6 +343,8 @@ export function VisualNovelPage() {
             </div>
           </div>
         </div>
+
+        <div className="vn-scene-fill" aria-hidden />
 
         <div className="vn-dialogue-outer">
           {canAdvanceByClick ? (

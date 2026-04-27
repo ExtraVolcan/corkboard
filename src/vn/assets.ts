@@ -8,7 +8,13 @@ import { canonicalSpeakerId } from "./speakerLabel";
  * - scene.background: "bg:office-night"
  * - line.background: optional override per line (persists until another override)
  * - line.portraitId: "portrait:detective-default"
- * - line.emotion + speakerId → lookup key "{canonicalSpeakerId}-{emotion}" e.g. "detective-worried"
+ * - line.emotion + speakerId → "{canonicalSpeakerId}-{emotion}" then bare "{emotion}".
+ *   Narrator lines with emotion apply to the detective portrait (inner monologue).
+ *
+ * `emotion: "think"` is NOT the same token as `emotion: "detective-think"`:
+ * - `"think"` tries VN_PORTRAITS["detective-think"] (composite) then VN_PORTRAITS["think"].
+ * - `"detective-think"` tries VN_PORTRAITS["detective-detective-think"] then VN_PORTRAITS["detective-think"].
+ * Register the URL once under "detective-think" and use either emotion string depending on which fallback you want.
  */
 export const VN_BACKGROUNDS: Record<string, string> = {
   "office-night":
@@ -42,7 +48,7 @@ export function resolvePortrait(portraitId?: string): string | undefined {
   return VN_PORTRAITS[id];
 }
 
-/** Portrait URL from explicit id, else emotion-based key when `emotion` is set. */
+/** Portrait URL from explicit id, else emotion-based registry keys when `emotion` is set. */
 export function resolvePortraitForSnapshot(opts: {
   speakerId: string;
   emotion?: string;
@@ -50,12 +56,26 @@ export function resolvePortraitForSnapshot(opts: {
 }): string | undefined {
   const fromLine = resolvePortrait(opts.portraitId);
   if (fromLine) return fromLine;
-  if (opts.emotion) {
-    const base = canonicalSpeakerId(opts.speakerId);
-    const key = `${base}-${opts.emotion}`;
-    return VN_PORTRAITS[key];
-  }
+  if (!opts.emotion) return undefined;
+  const base = canonicalSpeakerId(opts.speakerId);
+  const composite = `${base}-${opts.emotion}`;
+  const compositeHit = VN_PORTRAITS[composite];
+  if (compositeHit) return compositeHit;
+  const emotionOnly = VN_PORTRAITS[opts.emotion];
+  if (emotionOnly) return emotionOnly;
   return undefined;
+}
+
+/** Human-readable hint for dev / placeholder UI: which registry keys are tried (composite first, then bare emotion). */
+export function portraitRegistryHint(opts: {
+  speakerId: string;
+  emotion?: string;
+}): string | null {
+  if (!opts.emotion?.trim()) return null;
+  const base = canonicalSpeakerId(opts.speakerId);
+  const e = opts.emotion.trim();
+  const composite = `${base}-${e}`;
+  return composite === e ? composite : `${composite} · or "${e}"`;
 }
 
 /** Last `line.background` wins from scene start through `lineIndex`; falls back to `scene.background`. */
