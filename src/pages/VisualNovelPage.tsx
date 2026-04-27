@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
 import { useCampaign } from "../campaign";
 import { useVn } from "../vn/state";
 
@@ -62,6 +63,7 @@ export function VisualNovelPage() {
   } = useVn();
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [sfxPrefs, setSfxPrefs] = useState<SfxPrefs>(() => loadSfxPrefs());
 
   useEffect(() => {
     if (!showHistory && !showSettings) return;
@@ -127,6 +129,11 @@ export function VisualNovelPage() {
     currentLine && !hasChoices && !interaction
   );
 
+  function updateSfxPrefs(next: SfxPrefs) {
+    const saved = saveSfxPrefs(next);
+    setSfxPrefs(saved);
+  }
+
   return (
     <div className="vn-shell">
       <div
@@ -142,7 +149,10 @@ export function VisualNovelPage() {
             <button
               type="button"
               className="vn-icon-btn"
-              onClick={() => setShowHistory((v) => !v)}
+              onClick={() => {
+                playSfx("panel", sfxPrefs);
+                setShowHistory((v) => !v);
+              }}
               title="Dialogue history"
               aria-label="Open dialogue history"
             >
@@ -159,7 +169,10 @@ export function VisualNovelPage() {
             <button
               type="button"
               className="vn-icon-btn"
-              onClick={() => setShowSettings((v) => !v)}
+              onClick={() => {
+                playSfx("panel", sfxPrefs);
+                setShowSettings((v) => !v);
+              }}
               title="Settings"
               aria-label="Open settings"
             >
@@ -191,7 +204,10 @@ export function VisualNovelPage() {
             <button
               type="button"
               className="vn-dialogue-frame vn-dialogue-frame--advance"
-              onClick={() => dispatch({ type: "advanceDialogue" })}
+              onClick={() => {
+                playSfx("advance", sfxPrefs);
+                dispatch({ type: "advanceDialogue" });
+              }}
             >
               <div
                 className="vn-speaker"
@@ -222,9 +238,10 @@ export function VisualNovelPage() {
                       key={choice.id}
                       type="button"
                       className="vn-pill"
-                      onClick={() =>
-                        dispatch({ type: "chooseOption", optionId: choice.id })
-                      }
+                      onClick={() => {
+                        playSfx("select", sfxPrefs);
+                        dispatch({ type: "chooseOption", optionId: choice.id });
+                      }}
                     >
                       {choice.label}
                     </button>
@@ -244,12 +261,13 @@ export function VisualNovelPage() {
                           className="vn-pill"
                           disabled={disabled}
                           style={selected ? { opacity: 0.45 } : undefined}
-                          onClick={() =>
+                          onClick={() => {
+                            playSfx("select", sfxPrefs);
                             dispatch({
                               type: "selectInteractionOption",
                               optionId: option.id,
-                            })
-                          }
+                            });
+                          }}
                         >
                           {option.label}
                         </button>
@@ -260,7 +278,10 @@ export function VisualNovelPage() {
                     type="button"
                     className="vn-pill vn-pill--primary"
                     disabled={!selectedOptionIds.length}
-                    onClick={() => dispatch({ type: "submitInteraction" })}
+                    onClick={() => {
+                      playSfx("submit", sfxPrefs);
+                      dispatch({ type: "submitInteraction" });
+                    }}
                   >
                     Submit answer
                   </button>
@@ -279,9 +300,10 @@ export function VisualNovelPage() {
                           key={p.id}
                           type="button"
                           className={`vn-accuse-chip${isSelected ? " selected" : ""}`}
-                          onClick={() =>
-                            dispatch({ type: "selectAccusedProfile", profileId: p.id })
-                          }
+                          onClick={() => {
+                            playSfx("select", sfxPrefs);
+                            dispatch({ type: "selectAccusedProfile", profileId: p.id });
+                          }}
                         >
                           <img
                             src={
@@ -323,7 +345,10 @@ export function VisualNovelPage() {
                     type="button"
                     className="vn-pill vn-pill--primary"
                     disabled={!selectedProfileId}
-                    onClick={() => dispatch({ type: "submitInteraction" })}
+                    onClick={() => {
+                      playSfx("submit", sfxPrefs);
+                      dispatch({ type: "submitInteraction" });
+                    }}
                   >
                     {interaction.submitLabel ?? "It's you!"}
                   </button>
@@ -351,7 +376,10 @@ export function VisualNovelPage() {
               <button
                 type="button"
                 className="vn-icon-btn"
-                onClick={() => setShowHistory(false)}
+                onClick={() => {
+                  playSfx("panel", sfxPrefs);
+                  setShowHistory(false);
+                }}
                 title="Close"
                 aria-label="Close history"
               >
@@ -393,7 +421,10 @@ export function VisualNovelPage() {
               <button
                 type="button"
                 className="vn-icon-btn"
-                onClick={() => setShowSettings(false)}
+                onClick={() => {
+                  playSfx("panel", sfxPrefs);
+                  setShowSettings(false);
+                }}
                 title="Close"
                 aria-label="Close settings"
               >
@@ -421,6 +452,32 @@ export function VisualNovelPage() {
                 }
               />
               <span>Auto-advance (placeholder)</span>
+            </label>
+            <label className="vn-setting-row">
+              <input
+                type="checkbox"
+                checked={sfxPrefs.enabled}
+                onChange={(e) =>
+                  updateSfxPrefs({ ...sfxPrefs, enabled: e.target.checked })
+                }
+              />
+              <span>Sound effects</span>
+            </label>
+            <label className="vn-setting-row">
+              <span>SFX volume: {Math.round(sfxPrefs.volume * 100)}</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={Math.round(sfxPrefs.volume * 100)}
+                onChange={(e) =>
+                  updateSfxPrefs({
+                    ...sfxPrefs,
+                    volume: Number(e.target.value) / 100,
+                  })
+                }
+                disabled={!sfxPrefs.enabled}
+              />
             </label>
             <button type="button" className="vn-text-btn" onClick={reset}>
               Reset VN play state
