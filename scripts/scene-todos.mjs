@@ -65,6 +65,66 @@ function loadCampaignTargets() {
   return { profileIds, entryByProfile };
 }
 
+/** Mirrors `canonicalSpeakerId` in speakerLabel.ts */
+function canonicalSpeakerId(speakerId) {
+  return speakerId.replace(/-\?\?\?$/, "");
+}
+
+/**
+ * Objects containing `speakerId:` (brace-balanced), with optional `emotion` / `portraitId`.
+ * Skips nested `{` … `}` inside the same walk by matching depth from `{` before `speakerId`.
+ */
+function extractSpeakerLineBlocks(text) {
+  const blocks = [];
+  const re = /\bspeakerId\s*:\s*["']([^"']+)["']/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const speakerId = m[1];
+    const idx = m.index;
+    const blockStart = text.lastIndexOf("{", idx);
+    if (blockStart === -1) continue;
+    let depth = 0;
+    let j = blockStart;
+    for (; j < text.length; j++) {
+      const c = text[j];
+      if (c === "{") depth += 1;
+      else if (c === "}") {
+        depth -= 1;
+        if (depth === 0) break;
+      }
+    }
+    const block = text.slice(blockStart, j + 1);
+    const emotion = /\bemotion\s*:\s*["']([^"']+)["']/.exec(block)?.[1];
+    const portraitId = /\bportraitId\s*:\s*["'](?:portrait:)?([^"']+)["']/.exec(
+      block
+    )?.[1];
+    blocks.push({ speakerId, emotion, portraitId });
+  }
+  return blocks;
+}
+
+/**
+ * If neither explicit portrait nor emotion keys resolve in VN_PORTRAITS, return a hint
+ * string (aligned with resolvePortraitForSnapshot + narrator → detective inner monologue).
+ */
+function describeMissingEmotionPortrait(line, knownPortraits) {
+  const pid = line.portraitId?.replace(/^portrait:/, "") ?? "";
+  if (pid && knownPortraits.has(pid)) return null;
+
+  const em = line.emotion?.trim();
+  if (!em) return null;
+
+  const base = canonicalSpeakerId(line.speakerId);
+  const portraitSpeak =
+    base === "narrator" ? "detective" : base;
+
+  const composite = `${portraitSpeak}-${em}`;
+  if (knownPortraits.has(composite)) return null;
+  if (knownPortraits.has(em)) return null;
+
+  return composite !== em ? `${composite} · or "${em}"` : composite;
+}
+
 function run() {
   const sceneFiles = allSceneFiles();
   const sceneText = sceneFiles.map((f) => read(f)).join("\n");
@@ -86,6 +146,12 @@ function run() {
   const missingPortraits = usedPortraits.filter((id) => !knownPortraits.has(id));
   const missingUnlockProfiles = usedUnlockProfiles.filter((id) => !profileIds.has(id));
 
+  const missingEmotionPortraitHints = unique(
+    extractSpeakerLineBlocks(sceneText)
+      .map((line) => describeMissingEmotionPortrait(line, knownPortraits))
+      .filter(Boolean)
+  );
+
   const missingUnlockEntries = [];
   for (const m of sceneText.matchAll(
     /type\s*:\s*["'`]revealEntry["'`][\s\S]*?profileId\s*:\s*["'`]([\w-]+)["'`][\s\S]*?entryId\s*:\s*["'`]([\w-]+)["'`]/g
@@ -106,6 +172,10 @@ function run() {
   const sections = [
     ["Missing backgrounds (bg:<id>)", missingBackgrounds],
     ["Missing portraits (portrait:<id>)", missingPortraits],
+    [
+      "Missing portrait emotion registry keys (VN_PORTRAITS composite or bare emotion)",
+      missingEmotionPortraitHints,
+    ],
     ["Missing unlock profile targets", missingUnlockProfiles],
     ["Missing unlock entry targets (profile.entry)", unique(missingUnlockEntries)],
   ];

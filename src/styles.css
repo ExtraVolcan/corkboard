@@ -597,23 +597,24 @@ a.vn-icon-btn {
   justify-content: center;
 }
 
+/* Same horizontal band as .vn-dialogue-outer — portraits line up with dialogue left edge */
 .vn-portrait-area {
-  width: 100%;
+  box-sizing: border-box;
+  flex: 0 1 auto;
+  width: min(100%, 40rem);
+  padding: 0 0.25rem 0;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
-  padding: 0 0.75rem 0;
-  box-sizing: border-box;
+  justify-content: flex-start;
 }
 
 .vn-portrait-row {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-start;
+  flex-wrap: wrap;
   width: 100%;
-  max-width: 56rem;
-  margin: 0 auto;
-  gap: 0.35rem;
+  gap: 1rem 1.25rem;
 }
 
 .vn-portrait-cluster {
@@ -630,13 +631,13 @@ a.vn-icon-btn {
 }
 
 .vn-portrait-cluster--center {
-  flex: 1 1 auto;
-  justify-content: center;
+  flex: 0 1 auto;
+  justify-content: flex-start;
   min-width: 0;
 }
 
 .vn-portrait-cluster--right {
-  justify-content: flex-end;
+  justify-content: flex-start;
   flex: 0 0 auto;
 }
 
@@ -645,7 +646,7 @@ a.vn-icon-btn {
   flex-direction: column;
   align-items: center;
   gap: 0.2rem;
-  max-width: min(34vw, 220px);
+  max-width: min(42vw, 280px);
 }
 
 .vn-portrait-figure-wrap {
@@ -654,11 +655,13 @@ a.vn-icon-btn {
   max-width: 100%;
 }
 
+/* Slightly above portrait vertical center (hint box centered on that point) */
 .vn-portrait-emotion-hint {
   position: absolute;
   left: 50%;
-  bottom: 16%;
-  transform: translateX(-50%);
+  top: 38%;
+  bottom: auto;
+  transform: translate(-50%, -50%);
   max-width: 94%;
   padding: 0.4rem 0.55rem;
   border-radius: 0.4rem;
@@ -693,7 +696,7 @@ a.vn-icon-btn {
 }
 
 .vn-portrait {
-  max-height: min(56vh, 480px);
+  max-height: min(62vh, 560px);
   max-width: 100%;
   width: auto;
   height: auto;
