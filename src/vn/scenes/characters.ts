@@ -3,9 +3,9 @@ import type { VnCharacter } from "../types";
 //named after moons of Uranus, which are in turn named from Shakespeare and myth?
 
 export const VN_CHARACTERS: VnCharacter[] = [
-  { id: "narrator", name: "Narrator" }, //TODO: show no name for Narrator
-  { id: "detective", name: "Caliban", accent: "#7c2d12" },
-  { id: "detective-???", name: "???", accent: "#7c2d12" },
+  { id: "narrator", name: "Narrator" }, //TODO: show no name for Narrator, this is the 'internal thoughts' for the protag.
+  { id: "detective", name: "Caliban", accent: "#7c2d12" }, //protagonist detective character
+  { id: "detective-???", name: "???", accent: "#7c2d12" }, // TODO: show ??? until player learns the name
   { id: "assistant", name: "Assistant", accent: "#0f766e" },
   { id: "assistant-???", name: "???", accent: "#0f766e" },
   { id: "ariel", name: "Ariel", accent: "#a0998c" },
