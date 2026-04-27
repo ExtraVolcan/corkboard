@@ -1,4 +1,5 @@
 import type { VnScene } from "./types";
+import { VN_BACKGROUNDS, VN_PORTRAITS } from "./assets";
 
 export type SceneValidationError = { path: string; message: string };
 
@@ -30,6 +31,16 @@ export function validateScenes(
     const scene = scenes[si]!;
     const p = `scenes[${si}](${scene.id})`;
     if (!scene.id) push(errors, `${p}.id`, "Scene id is required");
+    if (scene.background?.startsWith("bg:")) {
+      const bgId = scene.background.slice(3);
+      if (!VN_BACKGROUNDS[bgId]) {
+        push(
+          errors,
+          `${p}.background`,
+          `Unknown background id "${bgId}" (add to VN_BACKGROUNDS)`
+        );
+      }
+    }
     if (!scene.lines?.length) {
       push(errors, `${p}.lines`, "Scene has no lines");
     }
@@ -42,6 +53,18 @@ export function validateScenes(
           `${lp}.speakerId`,
           `Unknown character "${line.speakerId}"`
         );
+      }
+      if (line.portraitId) {
+        const portraitId = line.portraitId.startsWith("portrait:")
+          ? line.portraitId.slice("portrait:".length)
+          : line.portraitId;
+        if (!VN_PORTRAITS[portraitId]) {
+          push(
+            errors,
+            `${lp}.portraitId`,
+            `Unknown portrait id "${portraitId}" (add to VN_PORTRAITS)`
+          );
+        }
       }
       if (line.choices) {
         for (let ci = 0; ci < line.choices.length; ci++) {

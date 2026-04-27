@@ -52,6 +52,8 @@ export type VnRevealAction =
 
 export type VnLine = {
   speakerId?: string;
+  /** Optional author-facing portrait id, e.g. "portrait:detective-default" */
+  portraitId?: string;
   text: string;
   choices?: VnChoice[];
   interaction?: VnLineInteraction;

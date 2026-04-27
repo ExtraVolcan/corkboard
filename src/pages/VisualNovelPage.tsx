@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
 import { useCampaign } from "../campaign";
+import { resolveBackground, resolvePortrait } from "../vn/assets";
 import { useVn } from "../vn/state";
 
 function IconHistory() {
@@ -119,9 +120,10 @@ export function VisualNovelPage() {
     [data.profiles, speakerId]
   );
   const portraitImage =
-    profileMatch && (isImageVisible(profileMatch.id) || profileMatch.imageRevealed)
+    resolvePortrait(currentLine?.portraitId) ??
+    (profileMatch && (isImageVisible(profileMatch.id) || profileMatch.imageRevealed)
       ? profileMatch.image
-      : null;
+      : null);
   const placeholderLetter = (speaker?.name?.trim()?.[0] ?? "?").toUpperCase();
   const accent = speaker?.accent || "#a8a29e";
 
@@ -138,7 +140,7 @@ export function VisualNovelPage() {
     <div className="vn-shell">
       <div
         className="vn-scene"
-        style={{ background: currentScene.background }}
+        style={{ background: resolveBackground(currentScene.background) }}
       >
         <div className="vn-scene-hud" aria-hidden={false}>
           <div className="vn-scene-title">

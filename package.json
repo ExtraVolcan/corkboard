@@ -8,6 +8,7 @@
     "dev:client": "vite",
     "dev:server": "node server/index.js",
     "build": "vite build",
+    "scenes:todo": "node scripts/scene-todos.mjs",
     "start": "node server/index.js",
     "preview": "vite preview"
   },
