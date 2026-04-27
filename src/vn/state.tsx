@@ -16,6 +16,10 @@ import type {
   VnState,
 } from "./types";
 import { loadStoryBundle, STORY_RELOAD_EVENT } from "./storySource";
+import {
+  canonicalSpeakerId,
+  resolveSpeakerDisplayLabel,
+} from "./speakerLabel";
 
 const SAVE_KEY = "mystery-vn-state-v1";
 
@@ -250,7 +254,13 @@ export function VnProvider({ children }: { children: ReactNode }) {
   }, [storyRev]);
 
   const getSpeaker = useCallback(
-    (speakerId?: string) => (speakerId ? charById.get(speakerId) : undefined),
+    (speakerId?: string) => {
+      if (!speakerId) return undefined;
+      return (
+        charById.get(canonicalSpeakerId(speakerId)) ??
+        charById.get(speakerId)
+      );
+    },
     [charById]
   );
 
@@ -326,11 +336,15 @@ export function VnProvider({ children }: { children: ReactNode }) {
             if (line.choices?.length) return prev;
             if (line.interaction) return prev;
 
-            const speaker = getSpeaker(line.speakerId);
+            const historyName =
+              resolveSpeakerDisplayLabel(line.speakerId, charById, {
+                flags: prev.flags,
+                reveals: prev.reveals,
+              }) ?? "";
             const history = pushHistory(
               prev.history,
               scene.id,
-              speaker?.name ?? "Narrator",
+              historyName,
               line.text
             );
 
@@ -351,11 +365,15 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 hasRequiredFlags(prev.flags, c.requireFlags)
             );
             if (!picked || !scenesById.has(picked.nextSceneId)) return prev;
-            const speaker = getSpeaker(line.speakerId);
+            const historyName =
+              resolveSpeakerDisplayLabel(line.speakerId, charById, {
+                flags: prev.flags,
+                reveals: prev.reveals,
+              }) ?? "";
             const withChoice = pushHistory(
               prev.history,
               scene.id,
-              speaker?.name ?? "Narrator",
+              historyName,
               `${line.text} [${picked.label}]`
             );
             const withFlags = withSetFlags(prev.flags, [
@@ -534,7 +552,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
         return next;
       });
     },
-    [getSpeaker, scenes, scenesById]
+    [getSpeaker, scenes, scenesById, charById]
   );
 
   const reset = useCallback(() => {

@@ -1,7 +1,16 @@
 export type VnCharacter = {
   id: string;
+  /** Shown when the character's name is "known" (see flags / linkedProfileId). */
   name: string;
   accent?: string;
+  /** If true, no nameplate is shown (narration / interior monologue). */
+  hideSpeakerLabel?: boolean;
+  /** Nameplate text before the player learns the real name (default "???"; "" shows blank). */
+  unknownName?: string;
+  /** When set, `name` is shown after this flag appears on VN state (via unlock / outcomes). */
+  nameRevealFlag?: string;
+  /** When set, `name` is shown once corkboard profile name or VN name reveal unlocks. */
+  linkedProfileId?: string;
 };
 
 export type VnChoice = {

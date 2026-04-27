@@ -1,5 +1,12 @@
 import type { VnScene } from "./types";
 import { VN_BACKGROUNDS, VN_PORTRAITS } from "./assets";
+import { canonicalSpeakerId } from "./speakerLabel";
+
+function speakerExists(charIds: Set<string>, speakerId: string): boolean {
+  return (
+    charIds.has(speakerId) || charIds.has(canonicalSpeakerId(speakerId))
+  );
+}
 
 export type SceneValidationError = { path: string; message: string };
 
@@ -47,7 +54,7 @@ export function validateScenes(
     for (let li = 0; li < (scene.lines?.length ?? 0); li++) {
       const line = scene.lines[li]!;
       const lp = `${p}.lines[${li}]`;
-      if (line.speakerId && !charSet.has(line.speakerId)) {
+      if (line.speakerId && !speakerExists(charSet, line.speakerId)) {
         push(
           errors,
           `${lp}.speakerId`,

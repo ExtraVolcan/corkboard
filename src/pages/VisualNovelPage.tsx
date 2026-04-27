@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
 import { useCampaign } from "../campaign";
 import { resolveBackground, resolvePortrait } from "../vn/assets";
+import {
+  resolveSpeakerDisplayLabel,
+  resolveSpeakerPlaceholderInitial,
+} from "../vn/speakerLabel";
 import { useVn } from "../vn/state";
 
 function IconHistory() {
@@ -57,6 +61,7 @@ export function VisualNovelPage() {
     currentLine,
     dispatch,
     reset,
+    characters,
     getSpeaker,
     isProfileVisible,
     isNameVisible,
@@ -79,6 +84,35 @@ export function VisualNovelPage() {
   }, [showHistory, showSettings]);
 
   const speaker = getSpeaker(currentLine?.speakerId);
+  const charById = useMemo(
+    () => new Map(characters.map((c) => [c.id, c])),
+    [characters]
+  );
+  const campaignProfileMeta = useMemo(
+    () =>
+      data.profiles.map((p) => ({
+        id: p.id,
+        nameRevealed: p.nameRevealed,
+      })),
+    [data.profiles]
+  );
+  const speakerLabelCtx = useMemo(
+    () => ({
+      flags: state.flags,
+      reveals: state.reveals,
+      campaignProfiles: campaignProfileMeta,
+    }),
+    [state.flags, state.reveals, campaignProfileMeta]
+  );
+  const speakerDisplayLabel = useMemo(
+    () =>
+      resolveSpeakerDisplayLabel(
+        currentLine?.speakerId,
+        charById,
+        speakerLabelCtx
+      ),
+    [currentLine?.speakerId, charById, speakerLabelCtx]
+  );
   const visibleChoices =
     currentLine?.choices?.filter(
       (c) => !c.requireFlags?.length || c.requireFlags.every((f) => state.flags[f])
@@ -124,7 +158,15 @@ export function VisualNovelPage() {
     (profileMatch && (isImageVisible(profileMatch.id) || profileMatch.imageRevealed)
       ? profileMatch.image
       : null);
-  const placeholderLetter = (speaker?.name?.trim()?.[0] ?? "?").toUpperCase();
+  const placeholderLetter = useMemo(
+    () =>
+      resolveSpeakerPlaceholderInitial(
+        currentLine?.speakerId,
+        charById,
+        speakerLabelCtx
+      ),
+    [currentLine?.speakerId, charById, speakerLabelCtx]
+  );
   const accent = speaker?.accent || "#a8a29e";
 
   const canAdvanceByClick = Boolean(
@@ -189,7 +231,9 @@ export function VisualNovelPage() {
               <img
                 className="vn-portrait"
                 src={portraitImage}
-                alt={speaker?.name ? `${speaker.name} portrait` : ""}
+                alt={
+                  speakerDisplayLabel ? `${speakerDisplayLabel} portrait` : ""
+                }
               />
             ) : (
               <img
@@ -211,12 +255,16 @@ export function VisualNovelPage() {
                 dispatch({ type: "advanceDialogue" });
               }}
             >
-              <div
-                className="vn-speaker"
-                style={{ color: speaker?.accent || "rgba(253, 230, 200, 0.95)" }}
-              >
-                {speaker?.name ?? "Narrator"}
-              </div>
+              {speakerDisplayLabel != null ? (
+                <div
+                  className="vn-speaker"
+                  style={{
+                    color: speaker?.accent || "rgba(253, 230, 200, 0.95)",
+                  }}
+                >
+                  {speakerDisplayLabel}
+                </div>
+              ) : null}
               <p className="vn-line">{currentLine?.text ?? "No dialogue loaded."}</p>
               <span className="vn-continue-hint">Click to continue</span>
             </button>
@@ -225,12 +273,16 @@ export function VisualNovelPage() {
               className="vn-dialogue-frame vn-dialogue-frame--static"
               style={{ color: "inherit" }}
             >
-              <div
-                className="vn-speaker"
-                style={{ color: speaker?.accent || "rgba(253, 230, 200, 0.95)" }}
-              >
-                {speaker?.name ?? "Narrator"}
-              </div>
+              {speakerDisplayLabel != null ? (
+                <div
+                  className="vn-speaker"
+                  style={{
+                    color: speaker?.accent || "rgba(253, 230, 200, 0.95)",
+                  }}
+                >
+                  {speakerDisplayLabel}
+                </div>
+              ) : null}
               <p className="vn-line">{currentLine?.text ?? "No dialogue loaded."}</p>
 
               {hasChoices ? (
@@ -395,7 +447,12 @@ export function VisualNovelPage() {
                   .reverse()
                   .map((h) => (
                     <p key={`${h.atMs}-${h.text}`}>
-                      <strong>{h.speakerName}:</strong> {h.text}
+                      {h.speakerName ? (
+                        <>
+                          <strong>{h.speakerName}:</strong>{" "}
+                        </>
+                      ) : null}
+                      {h.text}
                     </p>
                   ))}
               </div>
