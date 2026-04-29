@@ -7,6 +7,10 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 // introduction to the basic game systems like questions & corkboard.
 // the protagonist detective likes old-school detective stuff like corkboards and polaroids. maybe he carries a camera?
 
+//Why did we start from here?
+// Because, the protagonist was 'asleep' during the first day!
+// ^ in the 'maintenance schedule'
+
 //TODO assign an image to each of these lines. Some can have none, like narration? 
 // But we want to show the protag character making faces
 
@@ -213,7 +217,27 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "It wasn't visible when the body was still face-down,",
+      text: "The edges & insides of the hole are coated in blue blood.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Aside from that, nothing else inside.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I figured there'd be more, really.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Like, isn't there supposed to be important stuff inside us?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Anyway,",
+    },
+    {
+      speakerId: "narrator",
+      text: "The hole wasn't visible when the body was still face-down,",
     },
     {
       speakerId: "narrator",
