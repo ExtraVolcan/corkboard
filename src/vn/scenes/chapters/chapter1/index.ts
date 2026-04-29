@@ -5,3 +5,5 @@ import { scene3 } from "./example_scene3";
 
 export const chapter1Scenes: VnScene[] = [scene1, scene2, scene3];
 
+//OUTLINE
+

@@ -51,14 +51,15 @@ export const scene1: VnScene = {
     {
       speakerId: "narrator",
       text: "Because even my armpits smell nicer than the body I'm staring at.",
+      //TODO: change background to show pixelated body
     },
     {
       speakerId: "narrator",
-      text: "It's recent, because the blue liquid is still flowing from the wound.",
+      text: "There's a small puddle of blue liquid surrounding the body.",
     },
     {
       speakerId: "narrator",
-      text: "There's a small puddle of the blue liquid surrounding the body.",
+      text: "It's recent, because the blue liquid is still flowing.",
     },
     {
       speakerId: "detective",
@@ -193,6 +194,37 @@ export const scene1: VnScene = {
     {
       speakerId: "detective",
       text: "Maybe we can introduce ourselves properly in a few days time.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Second question: ",
+    },
+    {
+      speakerId: "detective",
+      text: "How did you die?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Well, there's one very obvious wound.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It's a large hole in the chest.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It wasn't visible when the body was still face-down,",
+    },
+    {
+      speakerId: "narrator",
+      text: "So whatever made this wound didn't penetrate the back.",
+      unlocks: [
+        { type: "revealEntry", profileId: "cressida", entryId: "chestWound" },
+      ]
+    },
+    {
+      speakerId: "narrator",
+      text: "I should remember that.",
     },
     /*
     {
