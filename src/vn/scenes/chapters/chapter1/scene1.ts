@@ -14,6 +14,8 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 //TODO assign an image to each of these lines. Some can have none, like narration? 
 // But we want to show the protag character making faces
 
+    //TODO come up with ability for the first case culprit
+
 export const scene1: VnScene = {
   id: "opening",
   title: "An Unfinished Board",
@@ -84,7 +86,7 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "Yeah, no shit, dumbass."
+      text: "Yeah, obviously, moron."
     },
     {
       speakerId: "detective",
@@ -116,12 +118,17 @@ export const scene1: VnScene = {
       text: "..."
     },
     {
+      speakerId: "detective",
+      text: "Your ID number, that is.",
+      emotion: "think"
+    },
+    /*{
       speakerId: "narrator",
       text: "I. Need. To. Focus."
-    },
+    },*/
     {
       speakerId: "narrator",
-      text: "Alright, first question: "
+      text: "You see, that's my first question: "
     },
     {
       speakerId: "detective",
@@ -189,15 +196,21 @@ export const scene1: VnScene = {
     {
       speakerId: "detective",
       text: "My name is Caliban. It's nice to meet you!",
+      emotion: "fingerbang",
       setFlags: [characterNameRevealFlag("detective")],
     },
     {
       speakerId: "narrator",
       text: "Giving the limp hand a little shake, I let it drop back down to the floor.",
+      emotion: "think"
     },
     {
       speakerId: "detective",
-      text: "Maybe we can introduce ourselves properly in a few days time.",
+      text: "Maybe we can introduce ourselves properly sometime soon.",
+    },
+    {
+      speakerId: "detective",
+      text: "Right after I find who did this to you.",
     },
     {
       speakerId: "narrator",
@@ -250,6 +263,15 @@ export const scene1: VnScene = {
       speakerId: "narrator",
       text: "I should remember that.",
     },
+    {
+      speakerId: "narrator",
+      text: "This is definitely not a normal murder scene.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Could this be the work of a catastrophe?",
+    },//TODO can we have rich text around the word 'catastrophe'?
+    
     /*
     {
       speakerId: "detective",
