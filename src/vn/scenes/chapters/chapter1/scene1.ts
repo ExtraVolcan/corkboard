@@ -283,11 +283,21 @@ export const scene1: VnScene = {
       speakerId: "narrator",
       text: "If I screw this up, I'll be the one with a hole in my chest.",
     },
-    /*
     {
       speakerId: "narrator",
-      text: "Alright, on to my third question: ",
-    },*/
+      text: "So, onto my third question:",
+    },
+    {
+      speakerId: "narrator",
+      text: "Where am I?",
+      choices: [
+        {
+          id: "continue-ship-day2",
+          label: "Continue",
+          nextSceneId: "ship-day2-room",
+        },
+      ],
+    },
 
     /*
     {

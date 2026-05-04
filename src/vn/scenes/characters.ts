@@ -86,6 +86,13 @@ export const VN_CHARACTERS: VnCharacter[] = [
     nameRevealFlag: characterNameRevealFlag("desdemona"),
   },
   {
+    id: "titania",
+    name: "Titania",
+    accent: "#ea580c",
+    unknownName: "???",
+    nameRevealFlag: characterNameRevealFlag("titania"),
+  },
+  {
     id: "stephano",
     name: "Stephano",
     accent: "#1c1c1c",

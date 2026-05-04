@@ -1,6 +1,7 @@
 import type { VnScene } from "../../../types";
 
-export const scene2: VnScene = {
+/** Optional corkboard detour — not on the main chapter timeline unless wired from choices. */
+export const reviewPauseScene: VnScene = {
   id: "review-pause",
   title: "Case Pause",
   background: "bg:office-pause",

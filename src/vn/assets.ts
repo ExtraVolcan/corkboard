@@ -23,6 +23,10 @@ export const VN_BACKGROUNDS: Record<string, string> = {
     "linear-gradient(180deg, rgba(38,25,18,0.96), rgba(25,15,10,0.95))",
   "office-briefing":
     "linear-gradient(180deg, rgba(34,22,18,0.97), rgba(20,12,10,0.96))",
+  "ship-cabin":
+    "linear-gradient(185deg, rgba(28,32,48,0.97), rgba(18,20,32,0.98))",
+  "ship-meeting":
+    "linear-gradient(180deg, rgba(36,28,40,0.96), rgba(22,18,28,0.97))",
 };
 
 export const VN_PORTRAITS: Record<string, string> = {

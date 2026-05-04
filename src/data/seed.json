@@ -49,6 +49,51 @@
           "revealed": false
         }
       ]
+    },
+    {
+      "id": "cressida",
+      "name": "Cressida",
+      "image": "https://picsum.photos/seed/cressida/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "chestWound",
+          "text": "Autopsy note (VN): wound favors frontal penetration—the hole wasn't visible while the body lay face-down, so whatever struck didn't punch cleanly through the back.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "ship-corridor",
+      "name": "Passenger corridor (deck)",
+      "image": "https://picsum.photos/seed/shiphall/360/240",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "noDoorLabels",
+          "text": "No name plaques beside cabins—only anonymous panels and recessed latch lights. Useful if you're hiding proximity.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "maintenance-schedule",
+      "name": "Maintenance & wake rotation",
+      "image": "https://picsum.photos/seed/maintgrid/440/320",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "rotation-columns",
+          "text": "Grid schedule: each column is a ship-day. Highlighted column (Day 2) lists Titania, Stephano, Miranda, Caliban, and Cressida as active—upload windows and re-print slots annotated in the margins.",
+          "revealed": false
+        }
+      ]
     }
   ]
 }
