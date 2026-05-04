@@ -271,7 +271,24 @@ export const scene1: VnScene = {
       speakerId: "narrator",
       text: "Could this be the work of a catastrophe?",
     },//TODO can we have rich text around the word 'catastrophe'?
-    
+    {
+      speakerId: "narrator",
+      text: "If it is...",
+    },
+    {
+      speakerId: "narrator",
+      text: "...then I need to learn everything I can right now.",
+    },
+    {
+      speakerId: "narrator",
+      text: "If I screw this up, I'll be the one with a hole in my chest.",
+    },
+    /*
+    {
+      speakerId: "narrator",
+      text: "Alright, on to my third question: ",
+    },*/
+
     /*
     {
       speakerId: "detective",
