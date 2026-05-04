@@ -486,7 +486,7 @@ export const shipMirandaHubB: VnScene = {
   lines: [
     {
       speakerId: "narrator",
-      text: "Chocolates accounted for—at least her version. There's still the other angle.",
+      text: "Chocolates accounted for, at least her version of events. There's still the other angle.",
     },
     {
       speakerId: "narrator",
@@ -510,7 +510,7 @@ export const shipMirandaHubC: VnScene = {
   lines: [
     {
       speakerId: "narrator",
-      text: "Her mistake story might explain why she swallowed Cressida's temper.",
+      text: "Her mistake story at least explains why she swallowed Cressida's temper.",
     },
     {
       speakerId: "narrator",
@@ -534,11 +534,11 @@ export const shipBranchChocolates: VnScene = {
   lines: [
     {
       speakerId: "detective",
-      text: "Straight question—did you actually hand Cressida those chocolates?",
+      text: "Miranda, did you actually hand Cressida those chocolates?",
     },
     {
       speakerId: "miranda",
-      text: "I… I left them outside her door in a tin. She didn't answer—I wasn't brave enough to knock twice.",
+      text: "I… I left them outside her door. She didn't answer and I wasn't brave enough to knock twice.",
     },
     {
       speakerId: "titania",
@@ -562,16 +562,86 @@ export const shipBranchChocolates: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Plenty of poison loves chocolate—too obvious to ignore later.",
+      text: "Plenty of poison loves chocolate. Is it possible that poison was the actual cause of death?",
       emotion: "detective-think",
     },
     {
       speakerId: "narrator",
-      text: "For now I tuck the detail away—no sense flashing suspicion.",
+      text: "For now I tuck the detail away. No sense flashing suspicion.",
+    },
+    {
+      speakerId: "titania",
+      text: "Why are you so interested in the chocolates anyway, Cal?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Shit. Tread carefully.",
+    },
+    {
+      speakerId: "detective",
+      text: "I...",
+    },
+    {
+      speakerId: "titania",
+      text: "Did you want some?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Titania pulls out some chocolates, neatly wrapped.",
+    },
+    {
+      speakerId: "detective",
+      text: "I... would love some.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Titania hands me the chocolates.",
+      //TODO create profile + entry for chocolates: These are Miranda's chocolates, wrapped & sealed in decorative foil.
+      unlocks: [
+        { type: "revealProfile", profileId: "chocolates" },
+        { type: "revealEntry", profileId: "chocolates", entryId: "chocolates" },
+      ],
+    },
+    {
+      speakerId: "narrator",
+      text: "Dodged that bullet, I hope.",
+    },
+    {
+      speakerId: "miranda",
+      text: "I h-hope you like them. They're the same batch I left outside Cressida's door.",
+    },
+    {
+      speakerId: "detective",
+      text: "Thank you, Miranda, I'll be sure to try them late-",
+    },
+    {
+      speakerId: "narrator",
+      text: "My thoughts interrupt my own sentence.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I didn't clock it earlier, but...",
+      emotion: "detective-think",
+    },
+    {
+      speakerId: "narrator",
+      text: "Miranda left the chocolates outside Cressida's door, huh?",
+    },
+    //TODO here put player choice of having to select the profile & entry that shows why this is suspicious.
+    // ^ the correct entry is the one that says there are no labels on the doors
+    {
+      speakerId: "narrator",
+      text: "How did she know where Cressida's room was?",
+    },
+    //TODO questioning after realizing that Miranda knew where Cressida's room was
+
+    {
+      speakerId: "narrator",
+      text: "Okay, I think I've pulled on that thread enough.",
       choices: [
         {
           id: "leave-choc-hub-b",
-          label: "Step back",
+          label: "Next question",
           nextSceneId: "ship-miranda-hub-b",
           requireFlags: ["path-from-a-choc"],
         },
@@ -593,8 +663,9 @@ export const shipBranchMistake: VnScene = {
   lines: [
     {
       speakerId: "detective",
-      text: "Back up—what mistake did you think you made?",
+      text: "Miranda, what mistake did you think you made?",
     },
+    //TODO change the mistake
     {
       speakerId: "miranda",
       text: "My wording on the galley roster. It looked like I shortened her sleep window on purpose.",
