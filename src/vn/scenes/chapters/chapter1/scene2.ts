@@ -1,6 +1,12 @@
 import type { VnScene } from "../../../types";
 import { characterNameRevealFlag } from "../../../nameReveal";
 
+//TODO add a cat to the scene! ppl will pet it, it'll jump around and meow.
+// BUT a much later reveal is that not only is the cat also a biomaton, but,
+//  the cat can host consciousness, so
+//  The Snatcher had been using it to swap consciousnesses in and out of the cat.
+//  endgame challenge is to plot every swap that The Snatcher made.
+
 /** Picks up immediately after scene1’s closing beat; branches resolve via path flags (see hub scenes). */
 export const shipDay2Room: VnScene = {
   id: "ship-day2-room",
@@ -9,15 +15,15 @@ export const shipDay2Room: VnScene = {
   lines: [
     {
       speakerId: "narrator",
-      text: "I force myself to catalogue the room like evidence—because it is.",
+      text: "I force myself to catalogue the room like evidence, because it is.",
     },
     {
       speakerId: "narrator",
-      text: "One door. It opens onto a corridor—the only way in or out from here.",
+      text: "One door. It opens onto a corridor: the only way in or out from here.",
     },
     {
       speakerId: "narrator",
-      text: "My berth is straight across the hall. First thing I saw when I woke and stepped out was… her.",
+      text: "My room is straight across the hall. First thing I saw when I woke and stepped out was… her.",
     },
     {
       speakerId: "narrator",
@@ -25,29 +31,36 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "She's splayed on the floor like someone dropped a mannequin mid-pose—arms wrong, head rolled aside.",
+      text: "She's splayed on the floor like someone dropped a mannequin mid-pose.",
     },
     {
       speakerId: "narrator",
-      text: "There's a bed pushed against the bulkhead. Crumpled bedding. A torn snack pouch.",
+      text: "But I've already examined her, so focusing on her anymore is just a distraction.",
     },
     {
       speakerId: "narrator",
-      text: "More wrappers than actual food—like whoever stayed here grazed and never cleaned up.",
+      text: "There's a bed pushed against the bulkhead.",
     },
     {
       speakerId: "narrator",
-      text: "Poison flashes through my head uninvited. Some toxins love looking innocent.",
-      emotion: "detective-think",
+      text: "On top of the bed there's crumpled bedding, and a torn snack pouch: I can tell by the decorative foil & stains on the wrapper.",
     },
     {
       speakerId: "narrator",
-      text: "I swallow the thought and step into the hall.",
-      background: "bg:ship-meeting",
+      text: "Actually, there's more of those wrappers scattered around the floor too.",
     },
     {
       speakerId: "narrator",
-      text: "No little plaques. No etched names by the frames. The doors could belong to anyone.",
+      text: "Aside from that, not much. My room was pretty barren too.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I step out the door and into the hall.",
+      background: "bg:ship-hall",
+    },
+    {
+      speakerId: "narrator",
+      text: "No little plaques. No etched names by the frames. There's seriously no way to tell whose room this is?",
       unlocks: [
         { type: "revealProfile", profileId: "ship-corridor" },
         {
@@ -59,7 +72,12 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Down the corridor—voices. Low laughter threaded with tension. Not close enough to make out words.",
+      text: "It's the same for my room. No labels. I guess I just have to remember that this one's mine.",
+    },
+    //TODO talk about how the locks on the doors work; have Cal test his own door.
+    {
+      speakerId: "narrator",
+      text: "Down the corridor: voices. Low chatter threaded with tension. Not close enough to make out words.",
     },
     {
       speakerId: "narrator",
@@ -67,7 +85,7 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "I follow the sound toward what feels like the belly of the ship.",
+      text: "I follow the sound toward what feels like the belly of the ship: a big meeting area.",
       choices: [
         {
           id: "toward-crew",
@@ -86,7 +104,7 @@ export const shipDay2Crew: VnScene = {
   lines: [
     {
       speakerId: "narrator",
-      text: "The corridor spills into a communal wedge—console benches, a scratched table, dim overhead strips pretending to be daylight.",
+      text: "The corridor spills into a communal wedge: console benches, a scratched table, dim overhead strips pretending to be daylight.",
     },
     {
       speakerId: "narrator",
@@ -94,17 +112,17 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "If thrust slips we're compost—not spreadsheets. Tell me alignment holds.",
+      text: "We need results, not spreadsheets. Tell me you did your job.",
       setFlags: [characterNameRevealFlag("titania")],
     },
     {
       speakerId: "stephano",
-      text: "Telemetry says stable—for now. I'm allowed paranoia.",
+      text: "Telemetry says stable, for now. I'm allowed paranoia.",
       setFlags: [characterNameRevealFlag("stephano")],
     },
     {
       speakerId: "miranda",
-      text: "P-please don't fight… we're supposed to be focused on the mission.",
+      text: "P-please don't fight… we're all on the same mission.",
       setFlags: [characterNameRevealFlag("miranda")],
     },
     {
@@ -117,20 +135,25 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "Caliban. Assigned wherever they wedge me. You're?",
+      text: "Caliban. Pretty much just woke up. I hope my hair looks okay. You are?",
     },
     {
       speakerId: "stephano",
-      text: "Stephano. Systems biomata—mostly diagnostics and rebuild telemetry.",
+      text: "Stephano. Systems biomata: mostly diagnostics and rebuild telemetry.",
       setFlags: [characterNameRevealFlag("stephano")],
     },
     {
+      speakerId: "stephano",
+      text: "And your hair will be just fine. It's designed that way.",
+    },
+    {
       speakerId: "titania",
-      text: "Titania. Engine deck when I'm allowed to be honest about it.",
+      text: "Titania. I work the engine deck, when I'm allowed to be honest about it.",
+      setFlags: [characterNameRevealFlag("titania")]
     },
     {
       speakerId: "miranda",
-      text: "Miranda. I—I handle nutrient schedules and food prep rotations.",
+      text: "Miranda. I-I handle nutrient schedules and food prep.",
     },
     {
       speakerId: "narrator",
@@ -146,27 +169,19 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "We have to be. Out here the mission isn't a slogan—it's the reason any of us wake up at all.",
+      text: "We have to be. Out here the mission isn't a slogan, it's the reason any of us wake up at all.",
     },
     {
       speakerId: "stephano",
-      text: "We carry bodies because bodies carry memory. That's the bargain.",
-    },
-    {
-      speakerId: "miranda",
-      text: "These vessels—they're… they're more human than people admit. Hunger. Fatigue. Fear.",
+      text: "Hard to forget when we look like this.",
     },
     {
       speakerId: "detective",
-      text: "Bodies that die?",
+      text: "You mean our bodies?",
     },
     {
       speakerId: "stephano",
-      text: "Die messy, yes. Permanently? Not on this ship—not if maintenance holds.",
-    },
-    {
-      speakerId: "stephano",
-      text: "We're biomata. Skin and nerves behave like baseline humans—until they don't. When we lose one, the system queues a re-print.",
+      text: "We're biomata. Skin and nerves behave like baseline humans, until they don't. When we lose one, the system queues a re-print.",
     },
     {
       speakerId: "stephano",
@@ -716,9 +731,10 @@ export const shipMirandaHubDone: VnScene = {
   title: "Moving on",
   background: "bg:ship-meeting",
   lines: [
+    //TODO continue writing this scene. 
     {
       speakerId: "narrator",
-      text: "Both threads chased—chocolates and shame—without saying what I really saw across the hall.",
+      text: "Okay, now we're getting somewhere. Is it time to tell them about Cressida's death?",
     },
     {
       speakerId: "detective",
