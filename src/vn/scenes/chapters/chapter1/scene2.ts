@@ -1,7 +1,7 @@
 import type { VnScene } from "../../../types";
 import { characterNameRevealFlag } from "../../../nameReveal";
 
-//TODO add a cat to the scene! ppl will pet it, it'll jump around.
+//TODO add a cat "Puck" to the scene! ppl will pet it, it'll jump around.
 // BUT a much later reveal is that not only is the cat also a biomaton, but,
 //  the cat can host consciousness, so
 //  The Snatcher had been using it to swap consciousnesses in and out of the cat.
@@ -97,7 +97,231 @@ export const shipDay2Room: VnScene = {
     },
     //TODO talk about how the locks on the doors work; have Cal test his own door.
     // ^ door can only lock or unlock by fingerscan of the room's inhabitant?
-    
+    {
+      speakerId: "narrator",
+      text: "Come to think of it, I left my door open too.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It didn't close on its own, & it didn't lock.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Stepping towards the doorway, I take a closer look.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Let's recall what I know about my own door.",
+    },
+    {
+      speakerId: "narrator",
+      text: "When I left my room right before discovering the corpse, I didn't push or pull the door open.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I just walked up to it.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It slid into the frame with barely a sound when I did that.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Nifty feature, but I'm not sure I like this new tech.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I prefer old-fashioned physical locks, & this thing doesn't have one.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It doesn't even have a door-handle.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Right now it's just a smooth, seamless entryway to my room.",
+    },
+    {
+      speakerId: "narrator",
+      text: "And directly behind it, the same kind of entryway to the victim's room.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Hmm...",
+    },
+    {
+      speakerId: "narrator",
+      text: "In locked-room mysteries, knowing how the lock works is key.",
+    },
+    {
+      speakerId: "narrator",
+      text: "This is more of an unlocked-room mystery though.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Even so, I still think learning about the lock is important.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I think I can assume that my door & the victim's door are the same design.",
+    },
+    {
+      speakerId: "narrator",
+      text: "So if I test my own door, maybe I can learn something.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Standing in the hallway, I stare at the door to my room.",
+    },
+    {
+      speakerId: "detective",
+      text: "Close sesame.",
+    },
+    {
+      speakerId: "detective",
+      text: "...",
+    },
+    {
+      speakerId: "narrator",
+      text: "So, no voice commands, I guess.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I try waving my hands in front of it.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I feel so stupid right now.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Traditional doors are way easier to use. I would just grab the handle & pull it closed.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Standing in the hallway, I try to close the door with my mind, but it won't budge.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Scrunching my face & focusing doesn't seem to help either.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Stupid new tech...",
+    },
+    {
+      speakerId: "narrator",
+      text: "It must be something simpler.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I walk inside my room.",
+    },
+    {
+      speakerId: "narrator",
+      text: "The door closes behind me, sliding into the frame.",
+    },
+    {
+      speakerId: "detective",
+      text: "The hell? I didn't tell you to do that, door!",
+    },
+    {
+      speakerId: "narrator",
+      text: "Maybe it sensed my presence?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Walking towards the door from inside my room, it opens again, just like when I woke up.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Must be some kind of sensor.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Huh. When I went inside the victim's room, the door didn't close; it's just been open this whole time.",
+    },
+    {
+      speakerId: "narrator",
+      text: "The corpse is definitely not close enough to the door for the sensor to keep the door open for them, I had to get pretty close to my door for it to open.",
+    },
+    {
+      speakerId: "narrator",
+      text: "In other words, I don't think the victim's door is just being polite.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Could it be that the victim's door is just not functioning?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Plausible, but somehow I doubt the ship's systems would break so early in the mission.",
+    },
+    {
+      speakerId: "narrator",
+      text: "And if someone broke it intentionally, I definitely don't see any damage; the doors & hallway are pristine.",
+    },
+    {
+      speakerId: "narrator",
+      text: "There's one more possibility.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I walk down the corridor, around a corner until I find another set of doors.",
+    },
+    {
+      speakerId: "narrator",
+      text: "One of them is closed. The other is open.",
+    },
+    {
+      speakerId: "narrator",
+      text: "And walking up to them doesn't seem to do anything; they don't open or closeat my presence.",
+    },
+    {
+      speakerId: "narrator",
+      text: "So, only my door has responded to me walking up to it.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Maybe they're bound to their own occupants.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I like this theory, but that still doesn't explain why the victim's door is open.",
+    },
+    {
+      speakerId: "narrator",
+      text: "That door being open is what let me discover the body as soon as I walked out of my room.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Surely the culprit would've wanted to cover their tracks.",
+    },
+    {
+      speakerId: "narrator",
+      text: "In a perfect murder scene, the corpse would be locked behind a door, undiscoverable.",
+    },
+    {
+      speakerId: "narrator",
+      text: "And yet, the door is open.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Well, I would love to keep talking about doors more, but...",
+    },
+    {
+      speakerId: "narrator",
+      text: "...I hear something.",
+    },
+    //Doors: 
+    // close when occupant enters, open when occupant leaves.
+    //There is no life-monitoring.
+    //TODO: So, we can make the reveal into a sort of red herring:
+    // The room with the victim is actually Titania's room,
+    // so, this puts suspicion on Titania.
+    // But really she is more caring than she appears, & went to talk to Cressida after her argument with Miranda.
+    // Miranda *thought* that Cressida would return to her own room, but she actually went to Titania's room.
+    // Her 'remote detonation' would have killed Cressida while she was locked inside her own room.
     {
       speakerId: "narrator",
       text: "Down the corridor: voices. Low chatter threaded with tension. Not close enough to make out words.",
@@ -271,7 +495,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "stephano",
-      text: "Then, when you wake up, you'll be in a brand-spanking-new body.",
+      text: "Then, when you wake up in your room, you'll be in a brand-spanking-new body.",
     },
     {
       speakerId: "stephano",
@@ -601,11 +825,16 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "Because knocking would've meant admitting you were crawling back.",
+      text: "Because knocking would've meant admitting your fault to her face.",
     },
     {
       speakerId: "miranda",
       text: "Because I didn't want another scene!",
+    },
+    {
+      speakerId: "narrator",
+      text: "A cookie is an easy poison target. Is it possible that poison was the actual cause of death?",
+      emotion: "detective-think",
     },
     {
       speakerId: "detective",
@@ -617,16 +846,23 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "If she ate them, she didn't brag about it.",
+      text: "She was holding them when I talked to her earlier.",
+    },
+    {
+      speakerId: "detective",
+      text: "When was that?",
+    },
+    {
+      speakerId: "titania",
+      text: "Uh, like 15 minutes ago?",
     },
     {
       speakerId: "narrator",
-      text: "A cookie is a classic poison target. Is it possible that poison was the actual cause of death?",
-      emotion: "detective-think",
+      text: "Wait, did she say...?",
     },
     {
       speakerId: "narrator",
-      text: "For now I tuck the detail away. No sense flashing suspicion.",
+      text: "...15 minutes ago?! Was Titania the last person to see Cressida alive?",
     },
     {
       speakerId: "titania",
@@ -634,7 +870,7 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Shit. Tread carefully.",
+      text: "Shit. I need to tread carefully.",
     },
     {
       speakerId: "detective",
@@ -663,7 +899,11 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Dodged that bullet, I hope.",
+      text: "Dodged that bullet, I think.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I just hope Titania isn't as suspicious of me as I am of her.",
     },
     {
       speakerId: "miranda",
@@ -694,7 +934,42 @@ export const shipBranchcookies: VnScene = {
       text: "How did she know where Cressida's room was?",
     },
     //TODO questioning after realizing that Miranda knew where Cressida's room was
+    //TODO Stephano actually bails Miranda out, saying
+    // "I showed her"
+    // Detective: "Okay, well how did you know, Stephano?"
+    // "It's a funny story, actually."
+    // "Yesterday morning, Cressida & I opened our doors at the same time."
+    // "So the first thing we saw was each other's faces!"
+    // "So you see, Cressida's room is directly across from mine."
+    {
+      speakerId: "narrator",
+      text: "what.",
+    },
+    {
+      speakerId: "narrator",
+      text: "WHAT?!?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Stephano's statement doesn't line up with what I know.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Stephano's room can't be directly across from Cressida's",
+    },
+    {
+      speakerId: "narrator",
+      text: "Because MY room is directly across from Cressida's!",
+    },
+    {
+      speakerId: "narrator",
+      text: "It's impossible for both of those to be true!",
+    },
+    //TODO: player question: 
+    // "I'm sure Stephano is lying."
+    // "I can't be sure that Stephano is lying."
 
+    //-
     {
       speakerId: "narrator",
       text: "Okay, I think I've pulled on that thread enough.",
@@ -777,6 +1052,9 @@ export const shipMirandaHubDone: VnScene = {
   background: "bg:ship-meeting",
   lines: [
     //TODO continue writing this scene. 
+    //TODO: Titania expands on her story about talking to Cressida, 
+    // ^ and taking Cressida to Titania's room!
+    // ^ then Titania left & went back to the meeting room.
     {
       speakerId: "narrator",
       text: "Okay, now we're getting somewhere. Is it time to tell them about Cressida's death?",
