@@ -1,11 +1,13 @@
 import type { VnScene } from "../../../types";
 import { characterNameRevealFlag } from "../../../nameReveal";
 
-//TODO add a cat to the scene! ppl will pet it, it'll jump around and meow.
+//TODO add a cat to the scene! ppl will pet it, it'll jump around.
 // BUT a much later reveal is that not only is the cat also a biomaton, but,
 //  the cat can host consciousness, so
 //  The Snatcher had been using it to swap consciousnesses in and out of the cat.
 //  endgame challenge is to plot every swap that The Snatcher made.
+//  maybe the cat was the original host of the Snatcher's consciousness (and therefore, his catastrophe, because it turns out all catastrophes are physical, requiring the body to be used, which is how The Snatcher used other ppl's catastrophes)
+//TODO: add the cat profile & add to maintenance schedule?
 //TODO: scene where Cal wonders what possible purpose a cat could serve,
 // Titania says that relaxation is an essential for mental healthtoo!
 // But, Cal thinks "No, mental health was not a priority for the ship, and I can prove it"
@@ -18,7 +20,13 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 //TODO: scene where Cal notices roundness of cookies?
 // ^ like, he sees the baking sheet with holes in it & is like "There's no way..."
 
+//TODO: miranda rampancy? maybe she puts a hole in stephano too?
+//TODO: tense scene of gathering and using intel to defeat her catastrophe (Her ability).
 
+//TODO last scene in chapter 1:
+// With Miranda dealt with, only Titania and Cal are left (and the cat?).
+// They have a heart-to-heart for the rest of the day?
+// ^ maybe they come up with nicknames for each other & the others
 
 /** Picks up immediately after scene1’s closing beat; branches resolve via path flags (see hub scenes). */
 export const shipDay2Room: VnScene = {
@@ -89,6 +97,7 @@ export const shipDay2Room: VnScene = {
     },
     //TODO talk about how the locks on the doors work; have Cal test his own door.
     // ^ door can only lock or unlock by fingerscan of the room's inhabitant?
+    
     {
       speakerId: "narrator",
       text: "Down the corridor: voices. Low chatter threaded with tension. Not close enough to make out words.",
@@ -612,7 +621,7 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Plenty of poison loves cookie. Is it possible that poison was the actual cause of death?",
+      text: "A cookie is a classic poison target. Is it possible that poison was the actual cause of death?",
       emotion: "detective-think",
     },
     {
@@ -676,6 +685,7 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "narrator",
       text: "Miranda left the cookies outside Cressida's door, huh?",
+    
     },
     //TODO here put player choice of having to select the profile & entry that shows why this is suspicious.
     // ^ the correct entry is the one that says there are no labels on the doors
