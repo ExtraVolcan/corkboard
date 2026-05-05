@@ -6,6 +6,19 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 //  the cat can host consciousness, so
 //  The Snatcher had been using it to swap consciousnesses in and out of the cat.
 //  endgame challenge is to plot every swap that The Snatcher made.
+//TODO: scene where Cal wonders what possible purpose a cat could serve,
+// Titania says that relaxation is an essential for mental healthtoo!
+// But, Cal thinks "No, mental health was not a priority for the ship, and I can prove it"
+// ^ then the player chooses the proof: the barren room. if they cared about caressing the mental health of the biomata, they would've decorated.
+
+//TODO: introduce "rampancy" like biomata going insane but in actuality it's The Snatcher swapping consciousness.
+
+//TODO: add in suspicion of stephano (for knowing about biomata) & of titania?
+
+//TODO: scene where Cal notices roundness of cookies?
+// ^ like, he sees the baking sheet with holes in it & is like "There's no way..."
+
+
 
 /** Picks up immediately after scene1’s closing beat; branches resolve via path flags (see hub scenes). */
 export const shipDay2Room: VnScene = {
@@ -31,7 +44,7 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "She's splayed on the floor like someone dropped a mannequin mid-pose.",
+      text: "The door was ajar, so I saw her splayed on the floor like someone dropped a mannequin mid-pose.",
     },
     {
       speakerId: "narrator",
@@ -75,13 +88,14 @@ export const shipDay2Room: VnScene = {
       text: "It's the same for my room. No labels. I guess I just have to remember that this one's mine.",
     },
     //TODO talk about how the locks on the doors work; have Cal test his own door.
+    // ^ door can only lock or unlock by fingerscan of the room's inhabitant?
     {
       speakerId: "narrator",
       text: "Down the corridor: voices. Low chatter threaded with tension. Not close enough to make out words.",
     },
     {
       speakerId: "narrator",
-      text: "If I've learned anything from bad mornings, it's that gossip travels faster than truth.",
+      text: "Do they know about this yet?",
     },
     {
       speakerId: "narrator",
@@ -154,14 +168,35 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "miranda",
       text: "Miranda. I-I handle nutrient schedules and food prep.",
+      setFlags: [characterNameRevealFlag("miranda")]
+    },
+    {
+      speakerId: "titania",
+      text: "She cooks lunch. It's pretty good!",
+    },
+    {
+      speakerId: "titania",
+      text: "Dinner, ehhhh, not so much.",
     },
     {
       speakerId: "narrator",
-      text: "Three names. Three familiar postures, like... ",
+      text: "Three names. Three suspects.",
     },
     {
       speakerId: "narrator",
-      text: "...like they're already sick of each other.",
+      text: "Ugh, I hate thinking like that.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It'd be nice if we all got along, but...",
+    },
+    {
+      speakerId: "narrator",
+      text: "It's too likely that one of these people put that hole in the victim.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Someone here is the culprit.",
     },
     {
       speakerId: "detective",
@@ -319,7 +354,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "By this schedule, Cressida was awake yesterday.",
+      text: "According to this schedule, Cressida was awake yesterday.",
     },
     {
       speakerId: "narrator",
@@ -405,7 +440,7 @@ export const shipDay2Crew: VnScene = {
       text: "Figuratively.",
     },
     {
-      speakerId: "narrator",
+      speakerId: "detective",
       text: "...",
     },
     {
@@ -422,11 +457,11 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "miranda",
-      text: "...so I made her chocolates.",
+      text: "...so I made her cookies.",
     },
     {
       speakerId: "detective",
-      text: "You made chocolates for Cressida after she tore into you?",
+      text: "You made cookies for Cressida after she tore into you?",
     },
     {
       speakerId: "titania",
@@ -451,7 +486,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Also, did she ever actually deliver the chocolates?",
+      text: "Also, did she ever actually deliver the cookies?",
       emotion: "detective-think",
     },
     {
@@ -479,8 +514,8 @@ export const shipMirandaHubA: VnScene = {
       choices: [
         {
           id: "hub-a-choc",
-          label: "Did you give her the chocolates?",
-          nextSceneId: "ship-branch-chocolates",
+          label: "Did you give her the cookies?",
+          nextSceneId: "ship-branch-cookies",
           setFlags: ["path-from-a-choc"],
         },
         {
@@ -501,7 +536,7 @@ export const shipMirandaHubB: VnScene = {
   lines: [
     {
       speakerId: "narrator",
-      text: "Chocolates accounted for, at least her version of events. There's still the other angle.",
+      text: "cookies accounted for, at least her version of events. There's still the other angle.",
     },
     {
       speakerId: "narrator",
@@ -533,8 +568,8 @@ export const shipMirandaHubC: VnScene = {
       choices: [
         {
           id: "hub-c-choc",
-          label: "Did you give her the chocolates?",
-          nextSceneId: "ship-branch-chocolates",
+          label: "Did you give her the cookies?",
+          nextSceneId: "ship-branch-cookies",
           setFlags: ["path-from-c-choc"],
         },
       ],
@@ -542,14 +577,14 @@ export const shipMirandaHubC: VnScene = {
   ],
 };
 
-export const shipBranchChocolates: VnScene = {
-  id: "ship-branch-chocolates",
-  title: "The chocolates",
+export const shipBranchcookies: VnScene = {
+  id: "ship-branch-cookies",
+  title: "The cookies",
   background: "bg:ship-meeting",
   lines: [
     {
       speakerId: "detective",
-      text: "Miranda, did you actually hand Cressida those chocolates?",
+      text: "Miranda, did you actually hand Cressida those cookies?",
     },
     {
       speakerId: "miranda",
@@ -577,7 +612,7 @@ export const shipBranchChocolates: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Plenty of poison loves chocolate. Is it possible that poison was the actual cause of death?",
+      text: "Plenty of poison loves cookie. Is it possible that poison was the actual cause of death?",
       emotion: "detective-think",
     },
     {
@@ -586,7 +621,7 @@ export const shipBranchChocolates: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "Why are you so interested in the chocolates anyway, Cal?",
+      text: "Why are you so interested in the cookies anyway, Cal?",
     },
     {
       speakerId: "narrator",
@@ -602,7 +637,7 @@ export const shipBranchChocolates: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Titania pulls out some chocolates, neatly wrapped.",
+      text: "Titania pulls out some cookies, neatly wrapped.",
     },
     {
       speakerId: "detective",
@@ -610,11 +645,11 @@ export const shipBranchChocolates: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Titania hands me the chocolates.",
-      //TODO create profile + entry for chocolates: These are Miranda's chocolates, wrapped & sealed in decorative foil.
+      text: "Titania hands me the cookies.",
+      //TODO create profile + entry for cookies: These are Miranda's cookies, wrapped & sealed in decorative foil.
       unlocks: [
-        { type: "revealProfile", profileId: "chocolates" },
-        { type: "revealEntry", profileId: "chocolates", entryId: "chocolates" },
+        { type: "revealProfile", profileId: "cookies" },
+        { type: "revealEntry", profileId: "cookies", entryId: "cookies" },
       ],
     },
     {
@@ -640,7 +675,7 @@ export const shipBranchChocolates: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Miranda left the chocolates outside Cressida's door, huh?",
+      text: "Miranda left the cookies outside Cressida's door, huh?",
     },
     //TODO here put player choice of having to select the profile & entry that shows why this is suspicious.
     // ^ the correct entry is the one that says there are no labels on the doors
@@ -762,7 +797,7 @@ export const shipDay2Scenes: VnScene[] = [
   shipDay2Room,
   shipDay2Crew,
   shipMirandaHubA,
-  shipBranchChocolates,
+  shipBranchcookies,
   shipBranchMistake,
   shipMirandaHubB,
   shipMirandaHubC,
