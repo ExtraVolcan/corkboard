@@ -275,7 +275,7 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "And walking up to them doesn't seem to do anything; they don't open or closeat my presence.",
+      text: "And walking up to them doesn't seem to do anything; they don't open or close at my presence.",
     },
     {
       speakerId: "narrator",
@@ -359,18 +359,15 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "We need results, not spreadsheets. Tell me you did your job.",
-      setFlags: [characterNameRevealFlag("titania")],
+      text: "We don't even need to do that much to keep the ship running. Would it kill you to just be nice?",
     },
     {
       speakerId: "stephano",
-      text: "Telemetry says stable, for now. I'm allowed paranoia.",
-      setFlags: [characterNameRevealFlag("stephano")],
+      text: "Consoling a girl was not in my job description.",
     },
     {
       speakerId: "miranda",
       text: "P-please don't fight… we're all on the same mission.",
-      setFlags: [characterNameRevealFlag("miranda")],
     },
     {
       speakerId: "detective",
