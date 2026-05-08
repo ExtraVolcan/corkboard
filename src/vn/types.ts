@@ -101,6 +101,8 @@ export type VnState = {
   currentSceneId: string;
   lineIndex: number;
   history: VnHistoryEntry[];
+  /** Player score earned from correctly answering questions. */
+  points: number;
   settings: VnSettings;
   flags: Record<string, true>;
   reveals: Record<

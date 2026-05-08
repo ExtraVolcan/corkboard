@@ -218,14 +218,6 @@ export function VisualNovelPage() {
   );
   const selectedAccused = accuseCandidates.find((p) => p.id === selectedProfileId);
 
-  const sceneProgress = useMemo(() => {
-    if (!currentScene.lines.length) return 0;
-    return Math.min(
-      100,
-      Math.round(((state.lineIndex + 1) / currentScene.lines.length) * 100)
-    );
-  }, [currentScene.lines.length, state.lineIndex]);
-
   const portraitHighlightId = useMemo(
     () =>
       resolvePortraitHighlightSpeakerId(
@@ -262,8 +254,7 @@ export function VisualNovelPage() {
       <div className="vn-scene" style={{ background: effectiveSceneBackground }}>
         <div className="vn-scene-hud" aria-hidden={false}>
           <div className="vn-scene-title">
-            {currentScene.title}
-            <span className="vn-scene-progress">Scene {sceneProgress}%</span>
+            Points: {state.points}
           </div>
           <div className="vn-scene-hud-btns">
             <button

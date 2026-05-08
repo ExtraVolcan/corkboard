@@ -84,6 +84,7 @@ function getInitialVnState(
       currentSceneId: "",
       lineIndex: 0,
       history: [],
+      points: 0,
       settings: { textSpeed: 40, autoAdvance: false },
       flags: {},
       reveals: {},
@@ -97,6 +98,7 @@ function getInitialVnState(
     currentSceneId: first.id,
     lineIndex: 0,
     history: [],
+    points: 0,
     settings: { textSpeed: 40, autoAdvance: false },
     flags: initialFlags,
     reveals: initialReveals,
@@ -119,6 +121,10 @@ function loadState(): VnState {
     return {
       ...base,
       ...parsed,
+      points:
+        typeof parsed.points === "number"
+          ? parsed.points
+          : base.points,
       settings: { ...base.settings, ...parsed.settings },
       flags: parsed.flags ?? base.flags,
       reveals: parsed.reveals ?? base.reveals,
@@ -445,6 +451,9 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 ? prev.interaction.selectedProfileId
                 : undefined;
 
+            const POINTS_CORRECT = 10;
+            const POINTS_INCORRECT = 5;
+
             if (line.interaction.kind === "mcq") {
               const lastSelectedId = selectedOptions[selectedOptions.length - 1];
               if (!lastSelectedId) return prev;
@@ -456,6 +465,11 @@ export function VnProvider({ children }: { children: ReactNode }) {
               const outcome = isCorrect
                 ? (selected.outcome ?? line.interaction.onCorrect)
                 : (selected.outcome ?? line.interaction.onIncorrect);
+              const nextPoints = Math.max(
+                0,
+                prev.points +
+                  (isCorrect ? POINTS_CORRECT : -POINTS_INCORRECT)
+              );
               const withFlags = withSetFlags(
                 withSetFlags(prev.flags, line.setFlags),
                 outcome?.setFlags
@@ -474,13 +488,15 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 next = {
                   ...prev,
                   history: withHistory,
-                  flags: withFlags,
+                  // For redoable questions, incorrect answers should only affect points.
+                  flags: prev.flags,
+                  points: nextPoints,
                 };
                 break;
               }
               if (outcome?.nextSceneId) {
                 next = goToScene(
-                  { ...prev, history: withHistory },
+                  { ...prev, history: withHistory, points: nextPoints },
                   outcome.nextSceneId,
                   withFlags,
                   prev.reveals
@@ -488,7 +504,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 break;
               }
               next = goNextLine(
-                { ...prev, history: withHistory },
+                { ...prev, history: withHistory, points: nextPoints },
                 scene,
                 withFlags,
                 prev.reveals
@@ -502,6 +518,11 @@ export function VnProvider({ children }: { children: ReactNode }) {
             const outcome = isCorrect
               ? line.interaction.onCorrect
               : line.interaction.onIncorrect;
+            const nextPoints = Math.max(
+              0,
+              prev.points +
+                (isCorrect ? POINTS_CORRECT : -POINTS_INCORRECT)
+            );
             const withFlags = withSetFlags(
               withSetFlags(prev.flags, line.setFlags),
               outcome?.setFlags
@@ -514,7 +535,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
             );
             if (outcome?.nextSceneId) {
               next = goToScene(
-                { ...prev, history: withHistory },
+                { ...prev, history: withHistory, points: nextPoints },
                 outcome.nextSceneId,
                 withFlags,
                 prev.reveals
@@ -522,7 +543,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
               break;
             }
             next = goNextLine(
-              { ...prev, history: withHistory },
+              { ...prev, history: withHistory, points: nextPoints },
               scene,
               withFlags,
               prev.reveals
