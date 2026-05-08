@@ -766,7 +766,7 @@ export const shipMirandaHubB: VnScene = {
   lines: [
     {
       speakerId: "narrator",
-      text: "cookies accounted for, at least her version of events. There's still the other angle.",
+      text: "Cookies accounted for, at least her version of events. There's still the other angle.",
     },
     {
       speakerId: "narrator",
@@ -835,7 +835,7 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "Anyone see her take them?",
+      text: "Anyone see her take the cookies?",
     },
     {
       speakerId: "stephano",
