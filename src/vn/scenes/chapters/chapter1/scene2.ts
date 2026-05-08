@@ -383,7 +383,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "stephano",
-      text: "Stephano. Systems biomata: mostly diagnostics and rebuild telemetry.",
+      text: "Stephano. Systems: mostly diagnostics and rebuild telemetry.",
       setFlags: [characterNameRevealFlag("stephano")],
     },
     {
@@ -446,7 +446,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "stephano",
-      text: "We're biomata. Skin and nerves behave like baseline humans, until they don't. When we lose one, the system queues a re-print.",
+      text: "We're synthetic now. Skin and nerves behave like baseline humans, until they don't. When we lose one, the system queues a re-print.",
     },
     {
       speakerId: "stephano",
