@@ -61,11 +61,11 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "There's a small puddle of blue liquid surrounding the body.",
+      text: "There's a small puddle of purple liquid surrounding the body.",
     },
     {
       speakerId: "narrator",
-      text: "It's recent, because the blue liquid is still flowing.",
+      text: "It's recent, because the purple liquid is still flowing.",
     },
     {
       speakerId: "detective",
@@ -146,7 +146,7 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "The blue puddle hasn't reached its neck.",
+      text: "The purple puddle hasn't reached its neck.",
     },
     {
       speakerId: "narrator",
@@ -230,7 +230,7 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "The edges & insides of the hole are coated in blue blood.",
+      text: "The edges & insides of the hole are coated in purple blood.",
     },
     {
       speakerId: "narrator",

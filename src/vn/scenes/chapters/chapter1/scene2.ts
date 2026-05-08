@@ -479,7 +479,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "My mind flashes back to picture the blue blood pooling on metal decking.",
+      text: "My mind flashes back to picture the purple blood pooling on metal decking.",
     },
     {
       speakerId: "narrator",
