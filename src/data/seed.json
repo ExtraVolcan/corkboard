@@ -22,13 +22,7 @@
       "nameRevealed": false,
       "imageRevealed": false,
       "profileRevealed": false,
-      "entries": [
-        {
-          "id": "backup-frequency",
-          "text": "[TODO: draft]\n\nShip backup standard Stephano gave: snapshots every minute. Any memory between last backup and death is lost forever.",
-          "revealed": false
-        }
-      ]
+      "entries": []
     },
     {
       "id": "titania",
@@ -81,23 +75,8 @@
       ]
     },
     {
-      "id": "ship-corridor",
-      "name": "Passenger corridor (deck)",
-      "image": "https://picsum.photos/seed/shiphall/360/240",
-      "nameRevealed": false,
-      "imageRevealed": false,
-      "profileRevealed": false,
-      "entries": [
-        {
-          "id": "noDoorLabels",
-          "text": "There are no name plaques, labels, or any identifying features outside the cabins that would denote their occupants.",
-          "revealed": false
-        }
-      ]
-    },
-    {
       "id": "victim-room-titania",
-      "name": "Victim's cabin (hall)",
+      "name": "Victim's cabin",
       "image": "https://picsum.photos/seed/victimcabin/360/240",
       "nameRevealed": false,
       "imageRevealed": false,
@@ -110,7 +89,7 @@
         },
         {
           "id": "foil-wrappers",
-          "text": "Stained decorative foil wrappers lie scattered on the bed and floor; They resemble snack wrappers.",
+          "text": "Stained decorative foil wrappers lie scattered on the bed and floor.",
           "revealed": false
         },
         {
@@ -122,12 +101,17 @@
     },
     {
       "id": "ship-doors",
-      "name": "Ship cabin doors",
+      "name": "Doors",
       "image": "https://picsum.photos/seed/shipdoor/320/240",
       "nameRevealed": false,
       "imageRevealed": false,
       "profileRevealed": false,
       "entries": [
+        {
+          "id": "noDoorLabels",
+          "text": "There are no name plaques, labels, or any identifying features around the doors that would denote their occupants.",
+          "revealed": false
+        },
         {
           "id": "uniform-design",
           "text": "[TODO: draft]\n\nAssume my door and the victim's match the same ship design.",
@@ -141,6 +125,26 @@
         {
           "id": "occupant-bound",
           "text": "[TODO: draft]\n\nHypothesis: doors mainly respond to their registered occupant — still doesn't explain victim's door stuck open.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "synthetic-bodies",
+      "name": "Synthetic bodies",
+      "image": "https://picsum.photos/seed/syntheticbody/360/240",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "synthetic-body-overview",
+          "text": "Every member of the crew has a synthetic body. These bodies work exactly like human ones, except for a few differences, like how we bleed purple blood.",
+          "revealed": false
+        },
+        {
+          "id": "backup-frequency",
+          "text": "[TODO: draft]\n\nShip backup standard Stephano gave: snapshots every minute. Any memory between last backup and death is lost forever.",
           "revealed": false
         }
       ]

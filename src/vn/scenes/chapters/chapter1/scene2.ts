@@ -99,10 +99,10 @@ export const shipDay2Room: VnScene = {
       speakerId: "narrator",
       text: "No little plaques. No etched names by the frames. There's seriously no way to tell whose room this is?",
       unlocks: [
-        { type: "revealProfile", profileId: "ship-corridor" },
+        { type: "revealProfile", profileId: "ship-doors" },
         {
           type: "revealEntry",
-          profileId: "ship-corridor",
+          profileId: "ship-doors",
           entryId: "noDoorLabels",
         },
       ],
@@ -506,7 +506,16 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "stephano",
       text: "We're synthetic now. Skin and nerves behave like baseline humans, until they don't. When we lose one, the system queues a re-print.",
-    },//TODO reveal new profile "Synthetic bodies" & entry about how they behave just like humans
+      unlocks: [
+        { type: "revealProfile", profileId: "synthetic-bodies" },
+        { type: "revealImage", profileId: "synthetic-bodies" },
+        {
+          type: "revealEntry",
+          profileId: "synthetic-bodies",
+          entryId: "synthetic-body-overview",
+        },
+      ],
+    },
     {
       speakerId: "stephano",
       text: "Upload snapshots capture everything recoverable up to the moment of death.",
@@ -529,7 +538,7 @@ export const shipDay2Crew: VnScene = {
       unlocks: [
         {
           type: "revealEntry",
-          profileId: "stephano",
+          profileId: "synthetic-bodies",
           entryId: "backup-frequency",
         },
       ],
