@@ -97,11 +97,12 @@ function getInitialVnState(
       settings: { textSpeed: 60, autoAdvance: false },
       flags: {},
       reveals: {},
+      profileDisplayNames: {},
       interaction: {},
     };
   }
   const firstLine = first.lines[0]!;
-  const initialReveals = applyRevealActions({}, firstLine.unlocks);
+  const initialUnlock = mergeUnlockState({}, {}, firstLine.unlocks);
   const initialFlags = withSetFlags({}, firstLine.setFlags);
   return {
     currentSceneId: first.id,
@@ -110,7 +111,8 @@ function getInitialVnState(
     points: 0,
     settings: { textSpeed: 60, autoAdvance: false },
     flags: initialFlags,
-    reveals: initialReveals,
+    reveals: initialUnlock.reveals,
+    profileDisplayNames: initialUnlock.profileDisplayNames,
     interaction: interactionStateForLine(first.id, 0, scenesById),
   };
 }
@@ -137,6 +139,8 @@ function loadState(): VnState {
       settings: { ...base.settings, ...parsed.settings },
       flags: parsed.flags ?? base.flags,
       reveals: parsed.reveals ?? base.reveals,
+      profileDisplayNames:
+        parsed.profileDisplayNames ?? base.profileDisplayNames,
       interaction: parsed.interaction ?? base.interaction,
       mcqWrongFeedback: parsed.mcqWrongFeedback,
       history: parsed.history ?? [],
@@ -222,10 +226,34 @@ function applyRevealActions(
         }
         break;
       }
+      case "setProfileDisplayName":
+        break;
     }
     if (item !== prev) next[a.profileId] = item;
   }
   return changed ? next : reveals;
+}
+
+function mergeUnlockState(
+  reveals: VnState["reveals"],
+  profileDisplayNames: Record<string, string>,
+  unlocks?: VnRevealAction[]
+): {
+  reveals: VnState["reveals"];
+  profileDisplayNames: Record<string, string>;
+} {
+  const nextReveals = applyRevealActions(reveals, unlocks);
+  if (!unlocks?.some((a) => a.type === "setProfileDisplayName")) {
+    return { reveals: nextReveals, profileDisplayNames };
+  }
+  const nextNames = { ...profileDisplayNames };
+  for (const a of unlocks) {
+    if (a.type === "setProfileDisplayName") {
+      if (a.displayName === "") delete nextNames[a.profileId];
+      else nextNames[a.profileId] = a.displayName;
+    }
+  }
+  return { reveals: nextReveals, profileDisplayNames: nextNames };
 }
 
 function nextVisibleLineIndex(
@@ -293,21 +321,23 @@ export function VnProvider({ children }: { children: ReactNode }) {
         const goToScene = (
           base: VnState,
           targetSceneId: string,
-          flags: Record<string, true>,
-          reveals: VnState["reveals"]
+          flags: Record<string, true>
         ): VnState => {
           const targetScene =
             scenesById.get(targetSceneId) ?? scenes[0] ?? EMPTY_SCENE;
           const initialIndex = nextVisibleLineIndex(targetScene, 0, flags) ?? 0;
+          const atTarget = mergeUnlockState(
+            base.reveals,
+            base.profileDisplayNames,
+            lineAt(targetScene.id, initialIndex, scenesById)?.unlocks
+          );
           return {
             ...base,
             currentSceneId: targetScene.id,
             lineIndex: initialIndex,
             flags,
-            reveals: applyRevealActions(
-              reveals,
-              lineAt(targetScene.id, initialIndex, scenesById)?.unlocks
-            ),
+            reveals: atTarget.reveals,
+            profileDisplayNames: atTarget.profileDisplayNames,
             interaction: interactionStateForLine(
               targetScene.id,
               initialIndex,
@@ -320,8 +350,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
         const goNextLine = (
           base: VnState,
           fromScene: VnScene,
-          flags: Record<string, true>,
-          reveals: VnState["reveals"]
+          flags: Record<string, true>
         ): VnState => {
           const nextLineIndex = nextVisibleLineIndex(
             fromScene,
@@ -332,19 +361,21 @@ export function VnProvider({ children }: { children: ReactNode }) {
             return {
               ...base,
               flags,
-              reveals,
               interaction: {},
               mcqWrongFeedback: undefined,
             };
           }
+          const atNext = mergeUnlockState(
+            base.reveals,
+            base.profileDisplayNames,
+            lineAt(fromScene.id, nextLineIndex, scenesById)?.unlocks
+          );
           return {
             ...base,
             lineIndex: nextLineIndex,
             flags,
-            reveals: applyRevealActions(
-              reveals,
-              lineAt(fromScene.id, nextLineIndex, scenesById)?.unlocks
-            ),
+            reveals: atNext.reveals,
+            profileDisplayNames: atNext.profileDisplayNames,
             interaction: interactionStateForLine(
               fromScene.id,
               nextLineIndex,
@@ -390,15 +421,20 @@ export function VnProvider({ children }: { children: ReactNode }) {
             );
 
             const afterLineFlags = withSetFlags(prev.flags, line.setFlags);
-            const revealsAfterLine = applyRevealActions(
+            const afterUnlock = mergeUnlockState(
               prev.reveals,
+              prev.profileDisplayNames,
               line.unlocks
             );
             next = goNextLine(
-              { ...prev, history },
+              {
+                ...prev,
+                history,
+                reveals: afterUnlock.reveals,
+                profileDisplayNames: afterUnlock.profileDisplayNames,
+              },
               scene,
-              afterLineFlags,
-              revealsAfterLine
+              afterLineFlags
             );
             break;
           }
@@ -425,15 +461,20 @@ export function VnProvider({ children }: { children: ReactNode }) {
               ...(line.setFlags ?? []),
               ...(picked.setFlags ?? []),
             ]);
-            const revealsAfterLine = applyRevealActions(
+            const afterUnlock = mergeUnlockState(
               prev.reveals,
+              prev.profileDisplayNames,
               line.unlocks
             );
             next = goToScene(
-              { ...prev, history: withChoice },
+              {
+                ...prev,
+                history: withChoice,
+                reveals: afterUnlock.reveals,
+                profileDisplayNames: afterUnlock.profileDisplayNames,
+              },
               picked.nextSceneId,
-              withFlags,
-              revealsAfterLine
+              withFlags
             );
             break;
           }
@@ -506,8 +547,9 @@ export function VnProvider({ children }: { children: ReactNode }) {
               const flagsWithElimIfWrong = !isCorrect
                 ? withSetFlags(flagsAfterLineSet, [elimKey])
                 : flagsAfterLineSet;
-              const revealsAfterLine = applyRevealActions(
+              const afterUnlock = mergeUnlockState(
                 prev.reveals,
+                prev.profileDisplayNames,
                 line.unlocks
               );
 
@@ -550,18 +592,28 @@ export function VnProvider({ children }: { children: ReactNode }) {
               );
               if (outcome?.nextSceneId) {
                 next = goToScene(
-                  { ...prev, history: withHistory, points: nextPoints },
+                  {
+                    ...prev,
+                    history: withHistory,
+                    points: nextPoints,
+                    reveals: afterUnlock.reveals,
+                    profileDisplayNames: afterUnlock.profileDisplayNames,
+                  },
                   outcome.nextSceneId,
-                  withFlags,
-                  revealsAfterLine
+                  withFlags
                 );
                 break;
               }
               next = goNextLine(
-                { ...prev, history: withHistory, points: nextPoints },
+                {
+                  ...prev,
+                  history: withHistory,
+                  points: nextPoints,
+                  reveals: afterUnlock.reveals,
+                  profileDisplayNames: afterUnlock.profileDisplayNames,
+                },
                 scene,
-                withFlags,
-                revealsAfterLine
+                withFlags
               );
               break;
             }
@@ -587,30 +639,41 @@ export function VnProvider({ children }: { children: ReactNode }) {
               "Accusation",
               `${line.interaction.prompt} -> ${selectedProfile}`
             );
-            const revealsAfterLineAccuse = applyRevealActions(
+            const afterUnlockAccuse = mergeUnlockState(
               prev.reveals,
+              prev.profileDisplayNames,
               line.unlocks
             );
             if (outcome?.nextSceneId) {
               next = goToScene(
-                { ...prev, history: withHistory, points: nextPoints },
+                {
+                  ...prev,
+                  history: withHistory,
+                  points: nextPoints,
+                  reveals: afterUnlockAccuse.reveals,
+                  profileDisplayNames: afterUnlockAccuse.profileDisplayNames,
+                },
                 outcome.nextSceneId,
-                withFlags,
-                revealsAfterLineAccuse
+                withFlags
               );
               break;
             }
             next = goNextLine(
-              { ...prev, history: withHistory, points: nextPoints },
+              {
+                ...prev,
+                history: withHistory,
+                points: nextPoints,
+                reveals: afterUnlockAccuse.reveals,
+                profileDisplayNames: afterUnlockAccuse.profileDisplayNames,
+              },
               scene,
-              withFlags,
-              revealsAfterLineAccuse
+              withFlags
             );
             break;
           }
           case "goToScene": {
             if (!scenesById.has(intent.sceneId)) return prev;
-            next = goToScene(prev, intent.sceneId, prev.flags, prev.reveals);
+            next = goToScene(prev, intent.sceneId, prev.flags);
             break;
           }
           case "setTextSpeed": {

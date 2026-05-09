@@ -63,7 +63,12 @@ export type VnRevealAction =
   | { type: "revealProfile"; profileId: string }
   | { type: "revealName"; profileId: string }
   | { type: "revealImage"; profileId: string }
-  | { type: "revealEntry"; profileId: string; entryId: string };
+  | { type: "revealEntry"; profileId: string; entryId: string }
+  /**
+   * Corkboard / dossier caption only (does not change server campaign JSON).
+   * When set, shown whenever the profile card is visible, even before revealName.
+   */
+  | { type: "setProfileDisplayName"; profileId: string; displayName: string };
 
 export type VnLine = {
   speakerId?: string;
@@ -120,6 +125,8 @@ export type VnState = {
       entries?: Record<string, true>;
     }
   >;
+  /** Story-local labels for corkboard polaroids & dossiers (see setProfileDisplayName unlock). */
+  profileDisplayNames: Record<string, string>;
   interaction: {
     lineKey?: string;
     selectedOptionIds?: string[];

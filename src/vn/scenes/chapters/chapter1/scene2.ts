@@ -59,7 +59,7 @@ export const shipDay2Room: VnScene = {
         {
           type: "revealEntry",
           profileId: "victim-room-titania",
-          entryId: "cabin-layout-todo",
+          entryId: "cabin-layout",
         },
       ],
     },
@@ -82,7 +82,7 @@ export const shipDay2Room: VnScene = {
         {
           type: "revealEntry",
           profileId: "victim-room-titania",
-          entryId: "foil-wrappers-todo",
+          entryId: "foil-wrappers",
         },
       ],
     },
@@ -184,7 +184,7 @@ export const shipDay2Room: VnScene = {
         {
           type: "revealEntry",
           profileId: "ship-doors",
-          entryId: "uniform-design-todo",
+          entryId: "uniform-design",
         },
       ],
     },
@@ -259,7 +259,7 @@ export const shipDay2Room: VnScene = {
         {
           type: "revealEntry",
           profileId: "ship-doors",
-          entryId: "sensor-walkthrough-todo",
+          entryId: "sensor-walkthrough",
         },
       ],
     },
@@ -294,7 +294,7 @@ export const shipDay2Room: VnScene = {
         {
           type: "revealEntry",
           profileId: "victim-room-titania",
-          entryId: "victim-door-open-todo",
+          entryId: "victim-door-open",
         },
       ],
     },
@@ -325,7 +325,7 @@ export const shipDay2Room: VnScene = {
         {
           type: "revealEntry",
           profileId: "ship-doors",
-          entryId: "occupant-bound-todo",
+          entryId: "occupant-bound",
         },
       ],
     },
@@ -530,7 +530,7 @@ export const shipDay2Crew: VnScene = {
         {
           type: "revealEntry",
           profileId: "stephano",
-          entryId: "backup-frequency-todo",
+          entryId: "backup-frequency",
         },
       ],
     },
@@ -677,9 +677,12 @@ export const shipDay2Crew: VnScene = {
       speakerId: "narrator",
       text: "So your name's Cressida.",
       unlocks: [
-        { type: "revealProfile", profileId: "cressida" },
-        { type: "revealImage", profileId: "cressida" },
         { type: "revealName", profileId: "cressida" },
+        {
+          type: "setProfileDisplayName",
+          profileId: "cressida",
+          displayName: "",
+        },
       ],
     },
     {
@@ -923,7 +926,7 @@ export const shipBranchcookies: VnScene = {
         {
           type: "revealEntry",
           profileId: "miranda",
-          entryId: "cookies-left-at-door-todo",
+          entryId: "cookies-left-at-door",
         },
       ],
     },
@@ -967,7 +970,7 @@ export const shipBranchcookies: VnScene = {
         {
           type: "revealEntry",
           profileId: "titania",
-          entryId: "last-seen-cressida-timing-todo",
+          entryId: "last-seen-cressida-timing",
         },
       ],
     },
@@ -1009,7 +1012,7 @@ export const shipBranchcookies: VnScene = {
         {
           type: "revealEntry",
           profileId: "cookies",
-          entryId: "cookie-handoff-todo",
+          entryId: "cookie-handoff",
         },
       ],
     },

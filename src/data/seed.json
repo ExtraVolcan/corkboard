@@ -9,7 +9,7 @@
       "profileRevealed": false,
       "entries": [
         {
-          "id": "caliban-self-intro-todo",
+          "id": "caliban-self-intro",
           "text": "[TODO: draft — written as Caliban's voice]\n\nI'm Caliban. New sleeve, old habits: introduce myself to the victim even when they can't answer. Whatever hole punched them didn't exit through the back—I checked while they were still face-down in the purple.",
           "revealed": false
         }
@@ -24,7 +24,7 @@
       "profileRevealed": false,
       "entries": [
         {
-          "id": "backup-frequency-todo",
+          "id": "backup-frequency",
           "text": "[TODO: draft]\n\nShip backup standard Stephano gave: snapshots every minute — gap between last backup and death is lost forever.",
           "revealed": false
         }
@@ -39,7 +39,7 @@
       "profileRevealed": false,
       "entries": [
         {
-          "id": "last-seen-cressida-timing-todo",
+          "id": "last-seen-cressida-timing",
           "text": "[TODO: draft]\n\nTitania said she saw Cressida holding the cookies ~15 minutes before I asked — close to my estimated time of death.",
           "revealed": false
         }
@@ -54,7 +54,7 @@
       "profileRevealed": false,
       "entries": [
         {
-          "id": "cookies-left-at-door-todo",
+          "id": "cookies-left-at-door",
           "text": "[TODO: draft]\n\nMiranda says she left the cookies outside Cressida's door; no answer, and she wasn't brave enough to knock twice.",
           "revealed": false
         }
@@ -69,7 +69,7 @@
       "profileRevealed": false,
       "entries": [
         {
-          "id": "body-scene-initial-todo",
+          "id": "body-scene-initial",
           "text": "[TODO: draft]\n\nScene notes: body was face-down first; purple pool underneath hadn't reached the neck yet — frontal wound mattered once turned.",
           "revealed": false
         },
@@ -104,17 +104,17 @@
       "profileRevealed": false,
       "entries": [
         {
-          "id": "cabin-layout-todo",
+          "id": "cabin-layout",
           "text": "[TODO: draft]\n\nPlain room: bed on the bulkhead, single doorway to the corridor — directly across from my cabin on the same hall.",
           "revealed": false
         },
         {
-          "id": "foil-wrappers-todo",
+          "id": "foil-wrappers",
           "text": "[TODO: draft]\n\nStained decorative foil wrappers on the bed and floor — snack pouch torn; did the victim eat them?",
           "revealed": false
         },
         {
-          "id": "victim-door-open-todo",
+          "id": "victim-door-open",
           "text": "[TODO: draft]\n\nVictim's door stayed open — no tampering visible; not \"being polite\" with the sensor like mine.",
           "revealed": false
         }
@@ -129,17 +129,17 @@
       "profileRevealed": false,
       "entries": [
         {
-          "id": "uniform-design-todo",
+          "id": "uniform-design",
           "text": "[TODO: draft]\n\nAssume my door and the victim's match the same ship design.",
           "revealed": false
         },
         {
-          "id": "sensor-walkthrough-todo",
+          "id": "sensor-walkthrough",
           "text": "[TODO: draft]\n\nFrom inside my room → hall opens the door; from hall → stepping back in closes it behind me.",
           "revealed": false
         },
         {
-          "id": "occupant-bound-todo",
+          "id": "occupant-bound",
           "text": "[TODO: draft]\n\nHypothesis: doors mainly respond to their registered occupant — still doesn't explain victim's door stuck open.",
           "revealed": false
         }
@@ -174,7 +174,7 @@
           "revealed": false
         },
         {
-          "id": "cookie-handoff-todo",
+          "id": "cookie-handoff",
           "text": "[TODO: draft]\n\nMiranda's cookies — neat foil wrap. Titania produced them mid-interview and handed them to me; same batch Miranda claims she left outside [[cressida]]'s door.",
           "revealed": false
         }

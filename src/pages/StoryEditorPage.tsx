@@ -207,8 +207,13 @@ export function StoryEditorPage() {
           <li>
             <strong>Line</strong>: <code>text</code>; optional <code>speakerId</code> (must
             match a <code>characters</code> entry); <code>requireFlags</code> /{" "}
-            <code>setFlags</code> for gating; <code>unlocks</code> for profile reveals;
-            <code>choices</code> (branch) or <code>interaction</code> (MCQ / accuse).
+            <code>setFlags</code> for gating; <code>unlocks</code> for profile reveals (
+            <code>revealProfile</code>, <code>revealName</code>, <code>revealImage</code>,{" "}
+            <code>revealEntry</code>, or <code>type: &quot;setProfileDisplayName&quot;</code>{" "}
+            with <code>profileId</code> + <code>displayName</code> — VN-only corkboard label;
+            empty <code>displayName</code> drops the override so the campaign name shows after{" "}
+            <code>revealName</code>). <code>choices</code> (branch) or{" "}
+            <code>interaction</code> (MCQ / accuse).
           </li>
           <li>
             <strong>MCQ</strong>: <code>kind: &quot;mcq&quot;</code>, <code>prompt</code>,{" "}

@@ -13,6 +13,7 @@ import {
   findProfileWithSeedFallback,
   mergeProfilesWithSeed,
 } from "../campaignSeedFallback";
+import { polaroidCaptionFromCampaign } from "../vn/boardProfileLabel";
 import { useVn } from "../vn/state";
 
 export function ProfilePanel({
@@ -26,8 +27,13 @@ export function ProfilePanel({
 }) {
   const { isAdmin } = useAuth();
   const { data, ack, setProfile, mergeAck } = useCampaign();
-  const { isProfileVisible, isNameVisible, isImageVisible, isEntryVisible } =
-    useVn();
+  const {
+    state: vnState,
+    isProfileVisible,
+    isNameVisible,
+    isImageVisible,
+    isEntryVisible,
+  } = useVn();
 
   const vnRevealGate = useMemo(
     () => ({
@@ -68,16 +74,28 @@ export function ProfilePanel({
     (pid: string) => {
       const t = findProfileWithSeedFallback(data.profiles, pid);
       if (!t) return pid;
-      if (isAdmin) return t.name?.trim() || pid;
-      if (
-        (t.profileRevealed || isProfileVisible(t.id)) &&
-        (t.nameRevealed || isNameVisible(t.id))
-      ) {
-        return t.name.trim();
+      const profileVis = t.profileRevealed || isProfileVisible(t.id);
+      const nameVis = t.nameRevealed || isNameVisible(t.id);
+      const override = vnState.profileDisplayNames[pid];
+      if (isAdmin) {
+        return (
+          (override !== undefined && override !== ""
+            ? override
+            : t.name?.trim()) || pid
+        );
       }
+      if (!profileVis) return "?";
+      if (override !== undefined && override !== "") return override.trim();
+      if (nameVis) return t.name.trim();
       return "?";
     },
-    [data.profiles, isAdmin, isProfileVisible, isNameVisible]
+    [
+      data.profiles,
+      isAdmin,
+      isProfileVisible,
+      isNameVisible,
+      vnState.profileDisplayNames,
+    ]
   );
 
   const profileHref = useCallback((pid: string) => {
@@ -150,6 +168,17 @@ export function ProfilePanel({
     isAdmin || (effectiveProfileRevealed && effectiveNameRevealed);
   const showImage =
     isAdmin || (effectiveProfileRevealed && effectiveImageRevealed);
+  const dossierTitle = polaroidCaptionFromCampaign(
+    profile.name,
+    vnState.profileDisplayNames,
+    profile.id,
+    {
+      profileVisible: effectiveProfileRevealed,
+      nameVisible: effectiveNameRevealed,
+      campaignNameRevealed: profile.nameRevealed,
+      isAdmin,
+    }
+  );
 
   return (
     <div className="paper profile-panel">
@@ -189,7 +218,7 @@ export function ProfilePanel({
         </div>
         <div>
           <h1 style={{ marginTop: 0 }}>
-            {showName ? profile.name : "?"}
+            {dossierTitle}
             {!isAdmin && showName && isNameNew(profile, ack, vnRevealGate) ? (
               <>
                 {" "}

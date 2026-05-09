@@ -28,6 +28,7 @@ import {
   layoutPolaroidPositions,
 } from "../graphLayout";
 import { profileHasAnyNew } from "../newBadges";
+import { polaroidCaptionFromCampaign } from "../vn/boardProfileLabel";
 import { useVn } from "../vn/state";
 
 type PolaroidData = {
@@ -226,8 +227,13 @@ function EvidenceBoardIntro() {
 function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
   const { isAdmin } = useAuth();
   const { data, ack } = useCampaign();
-  const { isProfileVisible, isNameVisible, isImageVisible, isEntryVisible } =
-    useVn();
+  const {
+    state: vnState,
+    isProfileVisible,
+    isNameVisible,
+    isImageVisible,
+    isEntryVisible,
+  } = useVn();
 
   const vnRevealGate = useMemo(
     () => ({
@@ -301,12 +307,17 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
       const effectiveProfileRevealed = p.profileRevealed || isProfileVisible(p.id);
       const effectiveNameRevealed = p.nameRevealed || isNameVisible(p.id);
       const effectiveImageRevealed = p.imageRevealed || isImageVisible(p.id);
-      const label =
-        effectiveProfileRevealed && effectiveNameRevealed
-          ? p.name
-          : isAdmin && effectiveNameRevealed
-            ? p.name
-            : "?";
+      const label = polaroidCaptionFromCampaign(
+        p.name,
+        vnState.profileDisplayNames,
+        p.id,
+        {
+          profileVisible: effectiveProfileRevealed,
+          nameVisible: effectiveNameRevealed,
+          campaignNameRevealed: p.nameRevealed,
+          isAdmin,
+        }
+      );
       const image =
         effectiveProfileRevealed && effectiveImageRevealed
           ? p.image
@@ -345,6 +356,7 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
     isNameVisible,
     isImageVisible,
     vnRevealGate,
+    vnState.profileDisplayNames,
   ]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<PolaroidNodeType>([]);

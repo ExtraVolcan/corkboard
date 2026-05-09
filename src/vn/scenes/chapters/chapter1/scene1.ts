@@ -152,9 +152,14 @@ export const scene1: VnScene = {
         { type: "revealProfile", profileId: "cressida" },
         { type: "revealImage", profileId: "cressida" },
         {
+          type: "setProfileDisplayName",
+          profileId: "cressida",
+          displayName: "Victim",
+        },
+        {
           type: "revealEntry",
           profileId: "cressida",
-          entryId: "body-scene-initial-todo",
+          entryId: "body-scene-initial",
         },
       ],
     },
@@ -206,7 +211,7 @@ export const scene1: VnScene = {
         {
           type: "revealEntry",
           profileId: "detective",
-          entryId: "caliban-self-intro-todo",
+          entryId: "caliban-self-intro",
         },
       ],
     },

@@ -21,6 +21,7 @@ import {
   resolveSpeakerDisplayLabel,
   resolveSpeakerPlaceholderInitial,
 } from "../vn/speakerLabel";
+import { polaroidCaptionFromCampaign } from "../vn/boardProfileLabel";
 import { mcqEliminatedFlagKey, useVn } from "../vn/state";
 import { useTypewriterLine } from "../vn/useTypewriterLine";
 import type { PortraitSlot } from "../vn/portraitLayout";
@@ -380,9 +381,20 @@ export function VisualNovelPage() {
       data.profiles.filter((p) => {
         const profileOpen = p.profileRevealed || isProfileVisible(p.id);
         const nameOpen = p.nameRevealed || isNameVisible(p.id);
-        return profileOpen && nameOpen;
+        const caption = polaroidCaptionFromCampaign(
+          p.name,
+          state.profileDisplayNames,
+          p.id,
+          {
+            profileVisible: profileOpen,
+            nameVisible: nameOpen,
+            campaignNameRevealed: p.nameRevealed,
+            isAdmin: false,
+          }
+        );
+        return caption !== "?";
       }),
-    [data.profiles, isNameVisible, isProfileVisible]
+    [data.profiles, isNameVisible, isProfileVisible, state.profileDisplayNames]
   );
   const selectedAccused = accuseCandidates.find((p) => p.id === selectedProfileId);
 
@@ -724,6 +736,19 @@ export function VisualNovelPage() {
                   <div className="vn-accuse-grid">
                     {accuseCandidates.map((p) => {
                       const imageOpen = p.imageRevealed || isImageVisible(p.id);
+                      const nameOpen = p.nameRevealed || isNameVisible(p.id);
+                      const chipLabel = polaroidCaptionFromCampaign(
+                        p.name,
+                        state.profileDisplayNames,
+                        p.id,
+                        {
+                          profileVisible:
+                            p.profileRevealed || isProfileVisible(p.id),
+                          nameVisible: nameOpen,
+                          campaignNameRevealed: p.nameRevealed,
+                          isAdmin: false,
+                        }
+                      );
                       const isSelected = selectedProfileId === p.id;
                       return (
                         <button
@@ -746,7 +771,7 @@ export function VisualNovelPage() {
                             }
                             alt=""
                           />
-                          <span>{p.name}</span>
+                          <span>{chipLabel}</span>
                         </button>
                       );
                     })}
@@ -768,7 +793,23 @@ export function VisualNovelPage() {
                         }
                         alt=""
                       />
-                      <div>{selectedAccused.name}</div>
+                      <div>
+                        {polaroidCaptionFromCampaign(
+                          selectedAccused.name,
+                          state.profileDisplayNames,
+                          selectedAccused.id,
+                          {
+                            profileVisible:
+                              selectedAccused.profileRevealed ||
+                              isProfileVisible(selectedAccused.id),
+                            nameVisible:
+                              selectedAccused.nameRevealed ||
+                              isNameVisible(selectedAccused.id),
+                            campaignNameRevealed: selectedAccused.nameRevealed,
+                            isAdmin: false,
+                          }
+                        )}
+                      </div>
                     </div>
                   ) : null}
                   <button
