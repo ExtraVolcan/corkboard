@@ -337,15 +337,6 @@ export function VisualNovelPage() {
 
   return (
     <div className="vn-shell">
-      <div
-        className={`vn-corkboard-toast-anchor${corkboardToast ? " vn-corkboard-toast-anchor--visible" : ""}`}
-        aria-live="polite"
-      >
-        <div className="vn-corkboard-toast">
-          <span className="vn-corkboard-toast-text">Corkboard updated</span>
-        </div>
-      </div>
-
       <div className="vn-scene" style={{ background: effectiveSceneBackground }}>
         <div className="vn-scene-hud" aria-hidden={false}>
           <div className="vn-scene-title">
@@ -434,6 +425,31 @@ export function VisualNovelPage() {
         <div className="vn-scene-fill" aria-hidden />
 
         <div className="vn-dialogue-outer">
+          <button
+            type="button"
+            className={`vn-corkboard-toast-anchor${
+              corkboardToast ? " vn-corkboard-toast-anchor--visible" : ""
+            }`}
+            aria-hidden={!corkboardToast}
+            aria-label={
+              corkboardToast
+                ? "Corkboard updated — open corkboard"
+                : undefined
+            }
+            tabIndex={corkboardToast ? 0 : -1}
+            title={
+              corkboardToast ? "Open corkboard (new intel)" : undefined
+            }
+            onClick={() => {
+              if (!corkboardToast) return;
+              playSfx("panel", sfxPrefs);
+              openCorkboard();
+            }}
+          >
+            <span className="vn-corkboard-toast">
+              <span className="vn-corkboard-toast-text">Corkboard updated</span>
+            </span>
+          </button>
           {canAdvanceByClick ? (
             <button
               type="button"

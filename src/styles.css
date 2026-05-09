@@ -717,8 +717,10 @@ a.vn-icon-btn {
   padding: 0 0.25rem 1rem;
 }
 
-/* Rounded dialogue frame */
+/* Rounded dialogue frame (above corkboard toast bookmark in stacking order) */
 .vn-dialogue-frame {
+  position: relative;
+  z-index: 1;
   text-align: left;
   width: 100%;
   box-sizing: border-box;
@@ -1044,28 +1046,37 @@ a.vn-icon-btn {
   border: 1px solid var(--paper-edge);
 }
 
-/* Corkboard toast — tab peaks above dialogue; sits behind dialogue (z-index) so slide-down hides behind frame */
+/* Corkboard toast — anchored to .vn-dialogue-outer (not viewport); hides behind .vn-dialogue-frame */
 .vn-corkboard-toast-anchor {
-  position: fixed;
+  position: absolute;
   left: 50%;
-  /* ~one ribbon-height closer than before so resting position hugs dialogue top */
-  bottom: calc(6.15rem + env(safe-area-inset-bottom, 0px));
-  z-index: 1;
-  transform: translate(-50%, 130%);
+  bottom: 100%;
+  z-index: 0;
+  appearance: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  font: inherit;
+  line-height: 0;
+  transform: translateX(-50%) translateY(calc(100% + 6px));
   opacity: 0;
   pointer-events: none;
   transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
 }
 
 .vn-corkboard-toast-anchor--visible {
-  transform: translate(-50%, 0);
+  transform: translateX(-50%) translateY(0);
   opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .vn-corkboard-toast {
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1.2;
   min-width: 12rem;
   padding: 0.55rem 1.15rem 0.65rem;
   border-radius: 0.25rem 0.25rem 0 0;
