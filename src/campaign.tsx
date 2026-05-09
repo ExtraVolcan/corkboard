@@ -15,7 +15,12 @@ import {
   putCampaign,
   resetCampaignOnServer,
 } from "./api/campaignApi";
-import { ACK_KEY, type AckState, loadAck } from "./storage";
+import {
+  ACK_KEY,
+  type AckState,
+  clearAckStorage,
+  loadAck,
+} from "./storage";
 
 type CampaignContextValue = {
   data: CampaignData;
@@ -28,6 +33,8 @@ type CampaignContextValue = {
   resetToSeed: () => Promise<void>;
   saveFullCampaign: (data: CampaignData) => Promise<void>;
   mergeAck: (profileId: string, tokens: string[]) => void;
+  /** Clears corkboard NEW / “seen” ack (localStorage only). */
+  clearAck: () => void;
 };
 
 const CampaignContext = createContext<CampaignContextValue | null>(null);
@@ -151,6 +158,11 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     setAck(current);
   }, []);
 
+  const clearAck = useCallback(() => {
+    clearAckStorage();
+    setAck({});
+  }, []);
+
   const value = useMemo(
     () => ({
       data,
@@ -162,6 +174,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       resetToSeed,
       saveFullCampaign,
       mergeAck,
+      clearAck,
     }),
     [
       data,
@@ -173,6 +186,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       resetToSeed,
       saveFullCampaign,
       mergeAck,
+      clearAck,
     ]
   );
 

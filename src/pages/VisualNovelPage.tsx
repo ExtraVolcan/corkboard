@@ -3,7 +3,10 @@ import { useSearchParams } from "react-router-dom";
 import { CorkboardModal } from "../components/CorkboardModal";
 import { ProfileModal } from "../components/ProfileModal";
 import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
+import { useAuth } from "../auth";
 import { useCampaign } from "../campaign";
+import { mergeProfilesWithSeed } from "../campaignSeedFallback";
+import { corkboardHasUnreadIntel } from "../newBadges";
 import {
   portraitRegistryHint,
   resolveBackground,
@@ -167,7 +170,8 @@ function placeholderArt(letter: string, accent: string): string {
 }
 
 export function VisualNovelPage() {
-  const { data } = useCampaign();
+  const { isAdmin } = useAuth();
+  const { data, ack, clearAck } = useCampaign();
   const [searchParams, setSearchParams] = useSearchParams();
   const showCorkboard = searchParams.get("board") === "1";
   const profileParamRaw = searchParams.get("profile");
@@ -184,6 +188,7 @@ export function VisualNovelPage() {
     isProfileVisible,
     isNameVisible,
     isImageVisible,
+    isEntryVisible,
   } = useVn();
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -247,6 +252,21 @@ export function VisualNovelPage() {
       if (timer !== undefined) clearTimeout(timer);
     };
   }, [state.reveals]);
+
+  const vnRevealGate = useMemo(
+    () => ({
+      isProfileVisible,
+      isNameVisible,
+      isImageVisible,
+      isEntryVisible,
+    }),
+    [isProfileVisible, isNameVisible, isImageVisible, isEntryVisible]
+  );
+
+  const corkboardHasUnread = useMemo(() => {
+    const catalog = mergeProfilesWithSeed(data.profiles);
+    return corkboardHasUnreadIntel(catalog, ack, isAdmin, vnRevealGate);
+  }, [data.profiles, ack, isAdmin, vnRevealGate]);
 
   useEffect(() => {
     if (!showHistory) return;
@@ -436,12 +456,21 @@ export function VisualNovelPage() {
             </button>
             <button
               type="button"
-              className="vn-icon-btn"
+              className={`vn-icon-btn${corkboardHasUnread ? " vn-icon-btn--has-badge" : ""}`}
               onClick={() => openCorkboard()}
-              title="Corkboard"
-              aria-label="Open corkboard"
+              title={
+                corkboardHasUnread ? "Corkboard (new intel)" : "Corkboard"
+              }
+              aria-label={
+                corkboardHasUnread
+                  ? "Open corkboard, new intel to review"
+                  : "Open corkboard"
+              }
             >
               <IconCorkboard />
+              {corkboardHasUnread ? (
+                <span className="vn-icon-badge-dot" aria-hidden />
+              ) : null}
             </button>
             <button
               type="button"
@@ -885,7 +914,15 @@ export function VisualNovelPage() {
                 disabled={!sfxPrefs.enabled}
               />
             </label>
-            <button type="button" className="vn-text-btn" onClick={reset}>
+            <button
+              type="button"
+              className="vn-text-btn"
+              title="Clears story progress, VN unlocks, and local corkboard seen-state so NEW badges can show again."
+              onClick={() => {
+                clearAck();
+                reset();
+              }}
+            >
               Reset VN play state
             </button>
           </div>

@@ -29,6 +29,16 @@ export function ProfilePanel({
   const { isProfileVisible, isNameVisible, isImageVisible, isEntryVisible } =
     useVn();
 
+  const vnRevealGate = useMemo(
+    () => ({
+      isProfileVisible,
+      isNameVisible,
+      isImageVisible,
+      isEntryVisible,
+    }),
+    [isProfileVisible, isNameVisible, isImageVisible, isEntryVisible]
+  );
+
   const profile = useMemo(
     () => findProfileWithSeedFallback(data.profiles, profileId),
     [data.profiles, profileId]
@@ -155,7 +165,7 @@ export function ProfilePanel({
           {showImage ? (
             <>
               <img src={profile.image} alt="" />
-              {!isAdmin && isImageNew(profile, ack) ? (
+              {!isAdmin && isImageNew(profile, ack, vnRevealGate) ? (
                 <p style={{ margin: "0.35rem 0 0" }}>
                   <span className="badge-new">NEW</span>
                 </p>
@@ -180,7 +190,7 @@ export function ProfilePanel({
         <div>
           <h1 style={{ marginTop: 0 }}>
             {showName ? profile.name : "?"}
-            {!isAdmin && showName && isNameNew(profile, ack) ? (
+            {!isAdmin && showName && isNameNew(profile, ack, vnRevealGate) ? (
               <>
                 {" "}
                 <span className="badge-new">NEW</span>
@@ -242,12 +252,7 @@ export function ProfilePanel({
             const showNew =
               !isAdmin &&
               effectiveProfileRevealed &&
-              isEntryNew(
-                profile.id,
-                e.id,
-                e.revealed || isEntryVisible(profile.id, e.id),
-                ack
-              );
+              isEntryNew(profile.id, e.id, e.revealed, ack, vnRevealGate);
 
             return (
               <article key={e.id} className="entry-block">

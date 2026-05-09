@@ -147,11 +147,12 @@ export const scene1: VnScene = {
     {
       speakerId: "narrator",
       text: "Turning over the body, I get a good look at the face.",
-      //TODO: little tutorial about the corkboard here?
+      //TODO: little tutorial about the corkboard here? if necessary
       unlocks: [
         { type: "revealProfile", profileId: "cressida" },
         { type: "revealImage", profileId: "cressida" },
       ],
+      //TODO reveal new entry with the information about the body so far: face-down, purple puddle underneath.
     },
     {
       speakerId: "narrator",
@@ -194,6 +195,7 @@ export const scene1: VnScene = {
       text: "My name is Caliban. It's nice to meet you!",
       emotion: "fingerbang",
       setFlags: [characterNameRevealFlag("detective")],
+      //TODO reveal profile, & image, & entry that reads as if Caliban wrote the entry himself describing himself.
     },
     {
       speakerId: "narrator",

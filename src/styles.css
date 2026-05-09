@@ -589,6 +589,25 @@ a {
   outline-offset: 2px;
 }
 
+.vn-icon-btn--has-badge {
+  position: relative;
+}
+
+/* App-style unread sticker on HUD icons (corkboard) */
+.vn-icon-badge-dot {
+  position: absolute;
+  top: 0.12rem;
+  right: 0.12rem;
+  width: 0.52rem;
+  height: 0.52rem;
+  border-radius: 50%;
+  background: linear-gradient(165deg, #f87171 0%, #dc2626 45%, #b91c1c 100%);
+  box-shadow:
+    0 0 0 2px rgba(24, 20, 16, 0.92),
+    0 1px 4px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
 a.vn-icon-btn {
   text-decoration: none;
 }

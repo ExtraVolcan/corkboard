@@ -13,3 +13,12 @@ export function loadAck(): AckState {
     return {};
   }
 }
+
+/** Clears device-local “seen” markers so corkboard NEW badges show again. */
+export function clearAckStorage(): void {
+  try {
+    localStorage.removeItem(ACK_KEY);
+  } catch {
+    // ignore quota / privacy mode
+  }
+}

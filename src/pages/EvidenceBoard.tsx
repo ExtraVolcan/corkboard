@@ -226,7 +226,18 @@ function EvidenceBoardIntro() {
 function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
   const { isAdmin } = useAuth();
   const { data, ack } = useCampaign();
-  const { isProfileVisible, isNameVisible, isImageVisible } = useVn();
+  const { isProfileVisible, isNameVisible, isImageVisible, isEntryVisible } =
+    useVn();
+
+  const vnRevealGate = useMemo(
+    () => ({
+      isProfileVisible,
+      isNameVisible,
+      isImageVisible,
+      isEntryVisible,
+    }),
+    [isProfileVisible, isNameVisible, isImageVisible, isEntryVisible]
+  );
 
   const profilesCatalog = useMemo(
     () => mergeProfilesWithSeed(data.profiles),
@@ -305,7 +316,7 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
               encodeURIComponent(
                 `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"><rect fill="%23ddd" width="120" height="150"/><text x="60" y="85" font-size="48" text-anchor="middle" fill="%23999">?</text></svg>`
               );
-      const showNew = profileHasAnyNew(p, ack, isAdmin);
+      const showNew = profileHasAnyNew(p, ack, isAdmin, vnRevealGate);
       const profileHref =
         variant === "modal"
           ? `/?board=1&profile=${encodeURIComponent(p.id)}`
@@ -333,6 +344,7 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
     isProfileVisible,
     isNameVisible,
     isImageVisible,
+    vnRevealGate,
   ]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<PolaroidNodeType>([]);

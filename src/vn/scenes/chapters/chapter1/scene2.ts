@@ -53,7 +53,7 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "The door was ajar, so I saw her splayed on the floor like someone dropped a mannequin mid-pose.",
-    },
+    },//TODO reveal new entry (& profile for the room?): Plain room with a single bed in the corner. There is one open doorway that exits to the hallway. It's directly across from my room, which exits to the same hallway.
     {
       speakerId: "narrator",
       text: "But I've already examined her, so focusing on her anymore is just a distraction.",
@@ -69,7 +69,7 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "Actually, there's more of those wrappers scattered around the floor too.",
-    },
+    },//TODO reveal new entry: stained decorative foil wrappers are scattered around the floor & on top of the bed; I think there were snacks inside, so did the victim eat them? 
     {
       speakerId: "narrator",
       text: "Aside from that, not much. My room was pretty barren too.",
@@ -95,8 +95,6 @@ export const shipDay2Room: VnScene = {
       speakerId: "narrator",
       text: "It's the same for my room. No labels. I guess I just have to remember that this one's mine.",
     },
-    //TODO talk about how the locks on the doors work; have Cal test his own door.
-    // ^ door can only lock or unlock by fingerscan of the room's inhabitant?
     {
       speakerId: "narrator",
       text: "Come to think of it, I left my door open too.",
@@ -164,7 +162,7 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "I think I can assume that my door & the victim's door are the same design.",
-    },
+    },//TODO reveal new entry for new profile "Doors": All the room's doors on the ship appear to have the same design. 
     {
       speakerId: "narrator",
       text: "So if I test my own door, maybe I can learn something.",
@@ -232,7 +230,7 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "Walking towards the door from inside my room, it opens again, just like when I woke up.",
-    },
+    },//TODO reveal new entry for profile "Doors": Walking from within my room to the hallway opened my door. While I was outside, it stayed open. Walking from the hallway into my room closed the door behind me.
     {
       speakerId: "narrator",
       text: "Must be some kind of sensor.",
@@ -260,7 +258,7 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "And if someone broke it intentionally, I definitely don't see any damage; the doors & hallway are pristine.",
-    },
+    },//TODO reveal new entry for the victim's room: Door is open & has stayed that way. No evidence of tampering or forced entry.
     {
       speakerId: "narrator",
       text: "There's one more possibility.",
@@ -279,12 +277,12 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "So, only my door has responded to me walking up to it.",
+      text: "So, only my door has responded to me walking in & out of my room.",
     },
     {
       speakerId: "narrator",
       text: "Maybe they're bound to their own occupants.",
-    },
+    },//TODO reveal new entry for profile "Doors": The door to a room appears to only open or close in response to its occupant.
     {
       speakerId: "narrator",
       text: "I like this theory, but that still doesn't explain why the victim's door is open.",
@@ -447,7 +445,7 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "stephano",
       text: "We're synthetic now. Skin and nerves behave like baseline humans, until they don't. When we lose one, the system queues a re-print.",
-    },
+    },//TODO reveal new profile "Synthetic bodies" & entry about how they behave just like humans
     {
       speakerId: "stephano",
       text: "Upload snapshots capture everything recoverable up to the moment of death.",
@@ -467,7 +465,7 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "stephano",
       text: "The standard is every minute.",
-    },
+    },//TODO reveal new entry about backup frequency
     {
       speakerId: "stephano",
       text: "It doesn't take too much bandwidth if that's what you're asking.",
@@ -849,7 +847,7 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "miranda",
       text: "I… I left them outside her door. She didn't answer and I wasn't brave enough to knock twice.",
-    },
+    },//TODO reveal new entry for Miranda: says she left the cookies outside Cressida's door, but Cressida didn't answer and she wasn't brave enough to knock twice.
     {
       speakerId: "titania",
       text: "Because knocking would've meant admitting your fault to her face.",
@@ -886,7 +884,7 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "narrator",
       text: "Wait, did she say...?",
-    },
+    },//TODO reveal new entry for Titania: says she saw Cressida 15 minutes ago from when I asked her, which is close to my estimated time of death for the victim.
     {
       speakerId: "narrator",
       text: "...15 minutes ago?! Was Titania the last person to see Cressida alive?",
