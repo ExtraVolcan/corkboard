@@ -34,6 +34,7 @@ type PolaroidData = {
   image: string;
   label: string;
   profileId: string;
+  profileHref: string;
   showNew?: boolean;
 };
 type PolaroidNodeType = Node<PolaroidData, "polaroid">;
@@ -63,7 +64,7 @@ function PolaroidNode({ data }: NodeProps<PolaroidNodeType>) {
         id="c-src"
         style={HANDLE_CENTER_STYLE}
       />
-      <Link to={`/profile/${data.profileId}`} className="polaroid-link">
+      <Link to={data.profileHref} className="polaroid-link">
         <div className="polaroid-frame">
           {data.showNew ? (
             <span
@@ -305,6 +306,10 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
                 `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"><rect fill="%23ddd" width="120" height="150"/><text x="60" y="85" font-size="48" text-anchor="middle" fill="%23999">?</text></svg>`
               );
       const showNew = profileHasAnyNew(p, ack, isAdmin);
+      const profileHref =
+        variant === "modal"
+          ? `/?board=1&profile=${encodeURIComponent(p.id)}`
+          : `/profile/${p.id}`;
       return {
         id: p.id,
         type: "polaroid",
@@ -313,6 +318,7 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
           image,
           label,
           profileId: p.id,
+          profileHref,
           showNew,
         },
         draggable: false,
@@ -320,6 +326,7 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
     });
   }, [
     profiles,
+    variant,
     isAdmin,
     ack,
     positionById,

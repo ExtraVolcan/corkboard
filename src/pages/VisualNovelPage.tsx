@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CorkboardModal } from "../components/CorkboardModal";
+import { ProfileModal } from "../components/ProfileModal";
 import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
 import { useCampaign } from "../campaign";
 import {
@@ -168,6 +169,9 @@ export function VisualNovelPage() {
   const { data } = useCampaign();
   const [searchParams, setSearchParams] = useSearchParams();
   const showCorkboard = searchParams.get("board") === "1";
+  const profileParamRaw = searchParams.get("profile");
+  const profileModalId =
+    profileParamRaw && profileParamRaw.trim() ? profileParamRaw.trim() : null;
   const {
     state,
     currentScene,
@@ -210,6 +214,22 @@ export function VisualNovelPage() {
     );
   }
 
+  const stripProfileParam = useCallback(() => {
+    setSearchParams(
+      (p) => {
+        const n = new URLSearchParams(p);
+        n.delete("profile");
+        return n;
+      },
+      { replace: true }
+    );
+  }, [setSearchParams]);
+
+  const closeProfileUi = useCallback(() => {
+    playSfx("panel", sfxPrefs);
+    stripProfileParam();
+  }, [sfxPrefs, stripProfileParam]);
+
   useEffect(() => {
     if (prevRevealsRef.current === null) {
       prevRevealsRef.current = state.reveals;
@@ -227,11 +247,22 @@ export function VisualNovelPage() {
   }, [state.reveals]);
 
   useEffect(() => {
-    if (!showHistory && !showSettings && !showCorkboard) return;
+    if (
+      !showHistory &&
+      !showSettings &&
+      !showCorkboard &&
+      !profileModalId
+    ) {
+      return;
+    }
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       setShowHistory(false);
       setShowSettings(false);
+      if (profileModalId) {
+        stripProfileParam();
+        return;
+      }
       if (showCorkboard) {
         setSearchParams(
           (p) => {
@@ -245,7 +276,14 @@ export function VisualNovelPage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [showHistory, showSettings, showCorkboard, setSearchParams]);
+  }, [
+    showHistory,
+    showSettings,
+    showCorkboard,
+    profileModalId,
+    stripProfileParam,
+    setSearchParams,
+  ]);
 
   const speaker = getSpeaker(currentLine?.speakerId);
   const charById = useMemo(
@@ -762,6 +800,9 @@ export function VisualNovelPage() {
       ) : null}
 
       <CorkboardModal open={showCorkboard} onClose={closeCorkboard} />
+      {profileModalId ? (
+        <ProfileModal profileId={profileModalId} onClose={closeProfileUi} />
+      ) : null}
     </div>
   );
 }
