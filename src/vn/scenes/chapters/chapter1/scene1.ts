@@ -151,8 +151,12 @@ export const scene1: VnScene = {
       unlocks: [
         { type: "revealProfile", profileId: "cressida" },
         { type: "revealImage", profileId: "cressida" },
+        {
+          type: "revealEntry",
+          profileId: "cressida",
+          entryId: "body-scene-initial-todo",
+        },
       ],
-      //TODO reveal new entry with the information about the body so far: face-down, purple puddle underneath.
     },
     {
       speakerId: "narrator",
@@ -195,7 +199,16 @@ export const scene1: VnScene = {
       text: "My name is Caliban. It's nice to meet you!",
       emotion: "fingerbang",
       setFlags: [characterNameRevealFlag("detective")],
-      //TODO reveal profile, & image, & entry that reads as if Caliban wrote the entry himself describing himself.
+      unlocks: [
+        { type: "revealProfile", profileId: "detective" },
+        { type: "revealImage", profileId: "detective" },
+        { type: "revealName", profileId: "detective" },
+        {
+          type: "revealEntry",
+          profileId: "detective",
+          entryId: "caliban-self-intro-todo",
+        },
+      ],
     },
     {
       speakerId: "narrator",

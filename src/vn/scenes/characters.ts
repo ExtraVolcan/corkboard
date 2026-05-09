@@ -15,6 +15,7 @@ export const VN_CHARACTERS: VnCharacter[] = [
     accent: "#7c2d12",
     unknownName: "???",
     nameRevealFlag: characterNameRevealFlag("detective"),
+    linkedProfileId: "detective",
   },
   {
     id: "assistant",
@@ -35,6 +36,7 @@ export const VN_CHARACTERS: VnCharacter[] = [
     accent: "#f4eee6",
     unknownName: "???",
     nameRevealFlag: characterNameRevealFlag("miranda"),
+    linkedProfileId: "miranda",
   },
   {
     id: "prospero",
@@ -77,6 +79,7 @@ export const VN_CHARACTERS: VnCharacter[] = [
     accent: "#3c3836",
     unknownName: "???",
     nameRevealFlag: characterNameRevealFlag("cressida"),
+    linkedProfileId: "cressida",
   },
   {
     id: "desdemona",
@@ -91,6 +94,7 @@ export const VN_CHARACTERS: VnCharacter[] = [
     accent: "#ea580c",
     unknownName: "???",
     nameRevealFlag: characterNameRevealFlag("titania"),
+    linkedProfileId: "titania",
   },
   {
     id: "stephano",
@@ -98,6 +102,7 @@ export const VN_CHARACTERS: VnCharacter[] = [
     accent: "#1c1c1c",
     unknownName: "???",
     nameRevealFlag: characterNameRevealFlag("stephano"),
+    linkedProfileId: "stephano",
   },
   {
     id: "francisco",

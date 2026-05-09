@@ -1,6 +1,66 @@
 {
   "profiles": [
     {
+      "id": "detective",
+      "name": "Caliban",
+      "image": "https://picsum.photos/seed/detective-caliban/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "caliban-self-intro-todo",
+          "text": "[TODO: draft — written as Caliban's voice]\n\nI'm Caliban. New sleeve, old habits: introduce myself to the victim even when they can't answer. Whatever hole punched them didn't exit through the back—I checked while they were still face-down in the purple.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "stephano",
+      "name": "Stephano",
+      "image": "https://picsum.photos/seed/stephano/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "backup-frequency-todo",
+          "text": "[TODO: draft]\n\nShip backup standard Stephano gave: snapshots every minute — gap between last backup and death is lost forever.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "titania",
+      "name": "Titania",
+      "image": "https://picsum.photos/seed/titania/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "last-seen-cressida-timing-todo",
+          "text": "[TODO: draft]\n\nTitania said she saw Cressida holding the cookies ~15 minutes before I asked — close to my estimated time of death.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "miranda",
+      "name": "Miranda",
+      "image": "https://picsum.photos/seed/miranda/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "cookies-left-at-door-todo",
+          "text": "[TODO: draft]\n\nMiranda says she left the cookies outside Cressida's door; no answer, and she wasn't brave enough to knock twice.",
+          "revealed": false
+        }
+      ]
+    },
+    {
       "id": "cressida",
       "name": "Cressida",
       "image": "https://picsum.photos/seed/cressida/320/400",
@@ -8,6 +68,11 @@
       "imageRevealed": false,
       "profileRevealed": false,
       "entries": [
+        {
+          "id": "body-scene-initial-todo",
+          "text": "[TODO: draft]\n\nScene notes: body was face-down first; purple pool underneath hadn't reached the neck yet — frontal wound mattered once turned.",
+          "revealed": false
+        },
         {
           "id": "chestWound",
           "text": "[TODO: add real intel here]\n\nAutopsy note (VN): wound favors frontal penetration—the hole wasn't visible while the body lay face-down, so whatever struck didn't punch cleanly through the back.",
@@ -31,6 +96,56 @@
       ]
     },
     {
+      "id": "victim-room-titania",
+      "name": "Victim's cabin (hall)",
+      "image": "https://picsum.photos/seed/victimcabin/360/240",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "cabin-layout-todo",
+          "text": "[TODO: draft]\n\nPlain room: bed on the bulkhead, single doorway to the corridor — directly across from my cabin on the same hall.",
+          "revealed": false
+        },
+        {
+          "id": "foil-wrappers-todo",
+          "text": "[TODO: draft]\n\nStained decorative foil wrappers on the bed and floor — snack pouch torn; did the victim eat them?",
+          "revealed": false
+        },
+        {
+          "id": "victim-door-open-todo",
+          "text": "[TODO: draft]\n\nVictim's door stayed open — no tampering visible; not \"being polite\" with the sensor like mine.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "ship-doors",
+      "name": "Ship cabin doors",
+      "image": "https://picsum.photos/seed/shipdoor/320/240",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "uniform-design-todo",
+          "text": "[TODO: draft]\n\nAssume my door and the victim's match the same ship design.",
+          "revealed": false
+        },
+        {
+          "id": "sensor-walkthrough-todo",
+          "text": "[TODO: draft]\n\nFrom inside my room → hall opens the door; from hall → stepping back in closes it behind me.",
+          "revealed": false
+        },
+        {
+          "id": "occupant-bound-todo",
+          "text": "[TODO: draft]\n\nHypothesis: doors mainly respond to their registered occupant — still doesn't explain victim's door stuck open.",
+          "revealed": false
+        }
+      ]
+    },
+    {
       "id": "maintenance-schedule",
       "name": "Maintenance & wake rotation",
       "image": "https://picsum.photos/seed/maintgrid/440/320",
@@ -40,7 +155,7 @@
       "entries": [
         {
           "id": "rotation-columns",
-          "text": "[TODO: add real intel here]\n\nGrid schedule: each column is a ship-day. Highlighted column (Day 2) lists Titania, Stephano, Miranda, Caliban, and Cressida as active.",
+          "text": "[TODO: add real intel here]\n\nGrid: each column is a ship-day. Day 2 highlights [[detective]], [[titania]], [[stephano]], [[miranda]], and [[cressida]] as active — links tie this sheet to the crew dossiers.",
           "revealed": false
         }
       ]
@@ -56,6 +171,11 @@
         {
           "id": "cookies",
           "text": "[TODO: add real intel here] Placeholder tie-in for Miranda's chocolates / galley trail.",
+          "revealed": false
+        },
+        {
+          "id": "cookie-handoff-todo",
+          "text": "[TODO: draft]\n\nMiranda's cookies — neat foil wrap. Titania produced them mid-interview and handed them to me; same batch Miranda claims she left outside [[cressida]]'s door.",
           "revealed": false
         }
       ]

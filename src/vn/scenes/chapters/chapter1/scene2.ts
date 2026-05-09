@@ -53,7 +53,16 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "The door was ajar, so I saw her splayed on the floor like someone dropped a mannequin mid-pose.",
-    },//TODO reveal new entry (& profile for the room?): Plain room with a single bed in the corner. There is one open doorway that exits to the hallway. It's directly across from my room, which exits to the same hallway.
+      unlocks: [
+        { type: "revealProfile", profileId: "victim-room-titania" },
+        { type: "revealImage", profileId: "victim-room-titania" },
+        {
+          type: "revealEntry",
+          profileId: "victim-room-titania",
+          entryId: "cabin-layout-todo",
+        },
+      ],
+    },
     {
       speakerId: "narrator",
       text: "But I've already examined her, so focusing on her anymore is just a distraction.",
@@ -69,7 +78,14 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "Actually, there's more of those wrappers scattered around the floor too.",
-    },//TODO reveal new entry: stained decorative foil wrappers are scattered around the floor & on top of the bed; I think there were snacks inside, so did the victim eat them? 
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "victim-room-titania",
+          entryId: "foil-wrappers-todo",
+        },
+      ],
+    },
     {
       speakerId: "narrator",
       text: "Aside from that, not much. My room was pretty barren too.",
@@ -162,7 +178,16 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "I think I can assume that my door & the victim's door are the same design.",
-    },//TODO reveal new entry for new profile "Doors": All the room's doors on the ship appear to have the same design. 
+      unlocks: [
+        { type: "revealProfile", profileId: "ship-doors" },
+        { type: "revealImage", profileId: "ship-doors" },
+        {
+          type: "revealEntry",
+          profileId: "ship-doors",
+          entryId: "uniform-design-todo",
+        },
+      ],
+    },
     {
       speakerId: "narrator",
       text: "So if I test my own door, maybe I can learn something.",
@@ -230,7 +255,14 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "Walking towards the door from inside my room, it opens again, just like when I woke up.",
-    },//TODO reveal new entry for profile "Doors": Walking from within my room to the hallway opened my door. While I was outside, it stayed open. Walking from the hallway into my room closed the door behind me.
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "ship-doors",
+          entryId: "sensor-walkthrough-todo",
+        },
+      ],
+    },
     {
       speakerId: "narrator",
       text: "Must be some kind of sensor.",
@@ -258,7 +290,14 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "And if someone broke it intentionally, I definitely don't see any damage; the doors & hallway are pristine.",
-    },//TODO reveal new entry for the victim's room: Door is open & has stayed that way. No evidence of tampering or forced entry.
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "victim-room-titania",
+          entryId: "victim-door-open-todo",
+        },
+      ],
+    },
     {
       speakerId: "narrator",
       text: "There's one more possibility.",
@@ -282,7 +321,14 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "Maybe they're bound to their own occupants.",
-    },//TODO reveal new entry for profile "Doors": The door to a room appears to only open or close in response to its occupant.
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "ship-doors",
+          entryId: "occupant-bound-todo",
+        },
+      ],
+    },
     {
       speakerId: "narrator",
       text: "I like this theory, but that still doesn't explain why the victim's door is open.",
@@ -383,6 +429,11 @@ export const shipDay2Crew: VnScene = {
       speakerId: "stephano",
       text: "Stephano. Systems: mostly diagnostics and rebuild telemetry.",
       setFlags: [characterNameRevealFlag("stephano")],
+      unlocks: [
+        { type: "revealProfile", profileId: "stephano" },
+        { type: "revealImage", profileId: "stephano" },
+        { type: "revealName", profileId: "stephano" },
+      ],
     },
     {
       speakerId: "stephano",
@@ -391,12 +442,22 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "Titania. I work the engine deck, when I'm allowed to be honest about it.",
-      setFlags: [characterNameRevealFlag("titania")]
+      setFlags: [characterNameRevealFlag("titania")],
+      unlocks: [
+        { type: "revealProfile", profileId: "titania" },
+        { type: "revealImage", profileId: "titania" },
+        { type: "revealName", profileId: "titania" },
+      ],
     },
     {
       speakerId: "miranda",
       text: "Miranda. I-I handle nutrient schedules and food prep.",
-      setFlags: [characterNameRevealFlag("miranda")]
+      setFlags: [characterNameRevealFlag("miranda")],
+      unlocks: [
+        { type: "revealProfile", profileId: "miranda" },
+        { type: "revealImage", profileId: "miranda" },
+        { type: "revealName", profileId: "miranda" },
+      ],
     },
     {
       speakerId: "titania",
@@ -465,7 +526,14 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "stephano",
       text: "The standard is every minute.",
-    },//TODO reveal new entry about backup frequency
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "stephano",
+          entryId: "backup-frequency-todo",
+        },
+      ],
+    },
     {
       speakerId: "stephano",
       text: "It doesn't take too much bandwidth if that's what you're asking.",
@@ -608,7 +676,11 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "narrator",
       text: "So your name's Cressida.",
-      unlocks: [{ type: "revealName", profileId: "cressida" }],
+      unlocks: [
+        { type: "revealProfile", profileId: "cressida" },
+        { type: "revealImage", profileId: "cressida" },
+        { type: "revealName", profileId: "cressida" },
+      ],
     },
     {
       speakerId: "narrator",
@@ -847,7 +919,14 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "miranda",
       text: "I… I left them outside her door. She didn't answer and I wasn't brave enough to knock twice.",
-    },//TODO reveal new entry for Miranda: says she left the cookies outside Cressida's door, but Cressida didn't answer and she wasn't brave enough to knock twice.
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "miranda",
+          entryId: "cookies-left-at-door-todo",
+        },
+      ],
+    },
     {
       speakerId: "titania",
       text: "Because knocking would've meant admitting your fault to her face.",
@@ -884,7 +963,14 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "narrator",
       text: "Wait, did she say...?",
-    },//TODO reveal new entry for Titania: says she saw Cressida 15 minutes ago from when I asked her, which is close to my estimated time of death for the victim.
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "titania",
+          entryId: "last-seen-cressida-timing-todo",
+        },
+      ],
+    },
     {
       speakerId: "narrator",
       text: "...15 minutes ago?! Was Titania the last person to see Cressida alive?",
@@ -916,10 +1002,15 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "narrator",
       text: "Titania hands me the cookies.",
-      //TODO create profile + entry for cookies: These are Miranda's cookies, wrapped & sealed in decorative foil.
       unlocks: [
         { type: "revealProfile", profileId: "cookies" },
+        { type: "revealImage", profileId: "cookies" },
         { type: "revealEntry", profileId: "cookies", entryId: "cookies" },
+        {
+          type: "revealEntry",
+          profileId: "cookies",
+          entryId: "cookie-handoff-todo",
+        },
       ],
     },
     {
