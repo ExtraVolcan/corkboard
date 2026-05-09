@@ -10,7 +10,7 @@
       "entries": [
         {
           "id": "caliban-self-intro",
-          "text": "[TODO: draft — written as Caliban's voice]\n\nI'm Caliban. New sleeve, old habits: introduce myself to the victim even when they can't answer. Whatever hole punched them didn't exit through the back—I checked while they were still face-down in the purple.",
+          "text": "I'm Caliban.",
           "revealed": false
         }
       ]
@@ -25,7 +25,7 @@
       "entries": [
         {
           "id": "backup-frequency",
-          "text": "[TODO: draft]\n\nShip backup standard Stephano gave: snapshots every minute — gap between last backup and death is lost forever.",
+          "text": "[TODO: draft]\n\nShip backup standard Stephano gave: snapshots every minute. Any memory between last backup and death is lost forever.",
           "revealed": false
         }
       ]
@@ -90,7 +90,7 @@
       "entries": [
         {
           "id": "noDoorLabels",
-          "text": "[TODO: add real intel here]\n\nNo name plaques beside cabins—only anonymous panels and recessed latch lights. Useful if you're hiding proximity.",
+          "text": "There are no name plaques, labels, or any identifying features outside the cabins that would denote their occupants.",
           "revealed": false
         }
       ]
@@ -105,17 +105,17 @@
       "entries": [
         {
           "id": "cabin-layout",
-          "text": "[TODO: draft]\n\nPlain room: bed on the bulkhead, single doorway to the corridor — directly across from my cabin on the same hall.",
+          "text": "Plain room: bed in the corner, single doorway to the corridor. It's directly across from my cabin on the same hall.",
           "revealed": false
         },
         {
           "id": "foil-wrappers",
-          "text": "[TODO: draft]\n\nStained decorative foil wrappers on the bed and floor — snack pouch torn; did the victim eat them?",
+          "text": "Stained decorative foil wrappers lie scattered on the bed and floor; They resemble snack wrappers.",
           "revealed": false
         },
         {
           "id": "victim-door-open",
-          "text": "[TODO: draft]\n\nVictim's door stayed open — no tampering visible; not \"being polite\" with the sensor like mine.",
+          "text": "The door to the victim's room has stayed open at least since I woke up. No signs of tampering or forced entry.",
           "revealed": false
         }
       ]
