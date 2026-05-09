@@ -27,6 +27,8 @@ export const VN_BACKGROUNDS: Record<string, string> = {
     "linear-gradient(185deg, rgba(28,32,48,0.97), rgba(18,20,32,0.98))",
   "ship-meeting":
     "linear-gradient(180deg, rgba(36,28,40,0.96), rgba(22,18,28,0.97))",
+  "ship-hall":
+    "linear-gradient(175deg, rgba(32,34,42,0.96), rgba(20,22,30,0.98))",
 };
 
 export const VN_PORTRAITS: Record<string, string> = {

@@ -29,7 +29,7 @@ export const scene1: VnScene = {
       //  { type: "revealName", profileId: "sarah-chen" },
       // { type: "revealImage", profileId: "sarah-chen" }],
       //],
-    },
+    },/*
     {
       speakerId: "narrator",
       text: "It's that brand new car smell like fresh leather, fat tires, and stale air.",
@@ -122,10 +122,6 @@ export const scene1: VnScene = {
       text: "Your ID number, that is.",
       emotion: "think"
     },
-    /*{
-      speakerId: "narrator",
-      text: "I. Need. To. Focus."
-    },*/
     {
       speakerId: "narrator",
       text: "You see, that's my first question: "
@@ -147,14 +143,15 @@ export const scene1: VnScene = {
     {
       speakerId: "narrator",
       text: "The purple puddle hasn't reached its neck.",
-    },
+    },*/
     {
       speakerId: "narrator",
       text: "Turning over the body, I get a good look at the face.",
       //TODO: little tutorial about the corkboard here?
       //TODO: animation / alert for new intel? (NEW label?)
       unlocks: [
-       { type: "revealImage", profileId: "cressida" }
+        { type: "revealProfile", profileId: "cressida" },
+        { type: "revealImage", profileId: "cressida" },
       ],
     },
     {

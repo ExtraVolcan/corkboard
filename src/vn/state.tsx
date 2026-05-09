@@ -355,11 +355,15 @@ export function VnProvider({ children }: { children: ReactNode }) {
             );
 
             const afterLineFlags = withSetFlags(prev.flags, line.setFlags);
+            const revealsAfterLine = applyRevealActions(
+              prev.reveals,
+              line.unlocks
+            );
             next = goNextLine(
               { ...prev, history },
               scene,
               afterLineFlags,
-              prev.reveals
+              revealsAfterLine
             );
             break;
           }
@@ -386,11 +390,15 @@ export function VnProvider({ children }: { children: ReactNode }) {
               ...(line.setFlags ?? []),
               ...(picked.setFlags ?? []),
             ]);
+            const revealsAfterLine = applyRevealActions(
+              prev.reveals,
+              line.unlocks
+            );
             next = goToScene(
               { ...prev, history: withChoice },
               picked.nextSceneId,
               withFlags,
-              prev.reveals
+              revealsAfterLine
             );
             break;
           }
@@ -494,12 +502,16 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 };
                 break;
               }
+              const revealsAfterLine = applyRevealActions(
+                prev.reveals,
+                line.unlocks
+              );
               if (outcome?.nextSceneId) {
                 next = goToScene(
                   { ...prev, history: withHistory, points: nextPoints },
                   outcome.nextSceneId,
                   withFlags,
-                  prev.reveals
+                  revealsAfterLine
                 );
                 break;
               }
@@ -507,7 +519,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 { ...prev, history: withHistory, points: nextPoints },
                 scene,
                 withFlags,
-                prev.reveals
+                revealsAfterLine
               );
               break;
             }
@@ -533,12 +545,16 @@ export function VnProvider({ children }: { children: ReactNode }) {
               "Accusation",
               `${line.interaction.prompt} -> ${selectedProfile}`
             );
+            const revealsAfterLineAccuse = applyRevealActions(
+              prev.reveals,
+              line.unlocks
+            );
             if (outcome?.nextSceneId) {
               next = goToScene(
                 { ...prev, history: withHistory, points: nextPoints },
                 outcome.nextSceneId,
                 withFlags,
-                prev.reveals
+                revealsAfterLineAccuse
               );
               break;
             }
@@ -546,7 +562,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
               { ...prev, history: withHistory, points: nextPoints },
               scene,
               withFlags,
-              prev.reveals
+              revealsAfterLineAccuse
             );
             break;
           }

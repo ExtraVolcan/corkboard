@@ -442,7 +442,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "You mean our bodies?",
+      text: "You mean our bodies? I'd say we look pretty human. Smells different though.",
     },
     {
       speakerId: "stephano",

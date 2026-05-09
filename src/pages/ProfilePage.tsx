@@ -9,6 +9,7 @@ import {
   isNameNew,
   visibleTokensAfterVisit,
 } from "../newBadges";
+import { findProfileWithSeedFallback, mergeProfilesWithSeed } from "../campaignSeedFallback";
 import { useVn } from "../vn/state";
 
 export function ProfilePage() {
@@ -18,12 +19,12 @@ export function ProfilePage() {
   const { isProfileVisible, isNameVisible, isImageVisible, isEntryVisible } = useVn();
 
   const profile = useMemo(
-    () => data.profiles.find((p) => p.id === id),
+    () => findProfileWithSeedFallback(data.profiles, id),
     [data.profiles, id]
   );
 
   const knownIds = useMemo(
-    () => new Set(data.profiles.map((p) => p.id)),
+    () => new Set(mergeProfilesWithSeed(data.profiles).map((p) => p.id)),
     [data.profiles]
   );
 
@@ -72,7 +73,7 @@ export function ProfilePage() {
     return (
       <div className="paper">
         <p>Profile not found.</p>
-        <Link to="/corkboard">← Corkboard</Link>
+        <Link to="/?board=1">← Corkboard</Link>
       </div>
     );
   }
@@ -82,7 +83,7 @@ export function ProfilePage() {
   const effectiveImageRevealed = profile.imageRevealed || isImageVisible(profile.id);
 
   if (!effectiveProfileRevealed && !isAdmin) {
-    return <Navigate to="/corkboard" replace />;
+    return <Navigate to="/?board=1" replace />;
   }
 
   const showName =
@@ -93,7 +94,7 @@ export function ProfilePage() {
   return (
     <div className="paper">
       <p>
-        <Link to="/corkboard" className="muted">
+        <Link to="/?board=1" className="muted">
           ← Corkboard
         </Link>
       </p>

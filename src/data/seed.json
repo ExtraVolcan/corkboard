@@ -1,56 +1,6 @@
 {
   "profiles": [
     {
-      "id": "sarah-chen",
-      "name": "Sarah Chen",
-      "image": "https://picsum.photos/seed/sarah/320/400",
-      "nameRevealed": false,
-      "imageRevealed": false,
-      "profileRevealed": false,
-      "entries": [
-        {
-          "id": "e1",
-          "text": "Last seen near the old library. She knew [[marcus-veil]] from university.",
-          "revealed": false
-        },
-        {
-          "id": "e2",
-          "text": "Witness reports mention a silver locket.",
-          "revealed": false
-        }
-      ]
-    },
-    {
-      "id": "marcus-veil",
-      "name": "Marcus Veil",
-      "image": "https://picsum.photos/seed/marcus/320/400",
-      "nameRevealed": false,
-      "imageRevealed": false,
-      "profileRevealed": false,
-      "entries": [
-        {
-          "id": "e1",
-          "text": "Teaches night classes. Refuses to discuss [[sarah-chen]].",
-          "revealed": false
-        }
-      ]
-    },
-    {
-      "id": "the-archivist",
-      "name": "The Archivist",
-      "image": "https://picsum.photos/seed/archive/320/400",
-      "nameRevealed": false,
-      "imageRevealed": false,
-      "profileRevealed": false,
-      "entries": [
-        {
-          "id": "e1",
-          "text": "Anonymous tip: follow the thread from [[marcus-veil]] to the cellar.",
-          "revealed": false
-        }
-      ]
-    },
-    {
       "id": "cressida",
       "name": "Cressida",
       "image": "https://picsum.photos/seed/cressida/320/400",
@@ -60,7 +10,7 @@
       "entries": [
         {
           "id": "chestWound",
-          "text": "Autopsy note (VN): wound favors frontal penetration—the hole wasn't visible while the body lay face-down, so whatever struck didn't punch cleanly through the back.",
+          "text": "[TODO: add real intel here]\n\nAutopsy note (VN): wound favors frontal penetration—the hole wasn't visible while the body lay face-down, so whatever struck didn't punch cleanly through the back.",
           "revealed": false
         }
       ]
@@ -75,7 +25,7 @@
       "entries": [
         {
           "id": "noDoorLabels",
-          "text": "No name plaques beside cabins—only anonymous panels and recessed latch lights. Useful if you're hiding proximity.",
+          "text": "[TODO: add real intel here]\n\nNo name plaques beside cabins—only anonymous panels and recessed latch lights. Useful if you're hiding proximity.",
           "revealed": false
         }
       ]
@@ -90,7 +40,22 @@
       "entries": [
         {
           "id": "rotation-columns",
-          "text": "Grid schedule: each column is a ship-day. Highlighted column (Day 2) lists Titania, Stephano, Miranda, Caliban, and Cressida as active—upload windows and re-print slots annotated in the margins.",
+          "text": "[TODO: add real intel here]\n\nGrid schedule: each column is a ship-day. Highlighted column (Day 2) lists Titania, Stephano, Miranda, Caliban, and Cressida as active—upload windows and re-print slots annotated in the margins.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "cookies",
+      "name": "Galley — cookie batch",
+      "image": "https://picsum.photos/seed/chocolate/320/240",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "cookies",
+          "text": "[TODO: add real intel here] Placeholder tie-in for Miranda's chocolates / galley trail.",
           "revealed": false
         }
       ]

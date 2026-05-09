@@ -160,7 +160,7 @@ export function AdminCampaign() {
   return (
     <div className="paper admin-campaign-page">
       <p>
-        <Link to="/corkboard" className="muted">
+        <Link to="/?board=1" className="muted">
           ← Corkboard
         </Link>
       </p>

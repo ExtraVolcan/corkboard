@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { CorkboardModal } from "../components/CorkboardModal";
 import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
 import { useCampaign } from "../campaign";
 import {
@@ -19,8 +20,40 @@ import {
 import { useVn } from "../vn/state";
 import type { PortraitSlot } from "../vn/portraitLayout";
 import type { SpeakerLabelContext } from "../vn/speakerLabel";
-import type { VnCharacter } from "../vn/types";
+import type { VnCharacter, VnState } from "../vn/types";
 import type { Profile } from "../types";
+
+function revealsIncreased(
+  prev: VnState["reveals"],
+  next: VnState["reveals"]
+): boolean {
+  const ids = new Set([...Object.keys(prev), ...Object.keys(next)]);
+  for (const pid of ids) {
+    const pPrev = prev[pid];
+    const pNext = next[pid];
+    if (!pPrev && pNext) {
+      if (
+        pNext.profile ||
+        pNext.name ||
+        pNext.image ||
+        Object.keys(pNext.entries ?? {}).some((eid) => pNext.entries?.[eid])
+      ) {
+        return true;
+      }
+      continue;
+    }
+    if (!pNext) continue;
+    if (!pPrev?.profile && pNext.profile) return true;
+    if (!pPrev?.name && pNext.name) return true;
+    if (!pPrev?.image && pNext.image) return true;
+    const ePrev = pPrev?.entries ?? {};
+    const eNext = pNext.entries ?? {};
+    for (const eid of Object.keys(eNext)) {
+      if (eNext[eid] && !ePrev[eid]) return true;
+    }
+  }
+  return false;
+}
 
 function PortraitFigure({
   slot,
@@ -133,6 +166,8 @@ function placeholderArt(letter: string, accent: string): string {
 
 export function VisualNovelPage() {
   const { data } = useCampaign();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showCorkboard = searchParams.get("board") === "1";
   const {
     state,
     currentScene,
@@ -147,19 +182,70 @@ export function VisualNovelPage() {
   } = useVn();
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [corkboardToast, setCorkboardToast] = useState(false);
   const [sfxPrefs, setSfxPrefs] = useState<SfxPrefs>(() => loadSfxPrefs());
+  const prevRevealsRef = useRef<VnState["reveals"] | null>(null);
+
+  function openCorkboard() {
+    playSfx("panel", sfxPrefs);
+    setSearchParams(
+      (p) => {
+        const n = new URLSearchParams(p);
+        n.set("board", "1");
+        return n;
+      },
+      { replace: true }
+    );
+  }
+
+  function closeCorkboard() {
+    playSfx("panel", sfxPrefs);
+    setSearchParams(
+      (p) => {
+        const n = new URLSearchParams(p);
+        n.delete("board");
+        return n;
+      },
+      { replace: true }
+    );
+  }
 
   useEffect(() => {
-    if (!showHistory && !showSettings) return;
+    if (prevRevealsRef.current === null) {
+      prevRevealsRef.current = state.reveals;
+      return;
+    }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    if (revealsIncreased(prevRevealsRef.current, state.reveals)) {
+      setCorkboardToast(true);
+      timer = setTimeout(() => setCorkboardToast(false), 4200);
+    }
+    prevRevealsRef.current = state.reveals;
+    return () => {
+      if (timer !== undefined) clearTimeout(timer);
+    };
+  }, [state.reveals]);
+
+  useEffect(() => {
+    if (!showHistory && !showSettings && !showCorkboard) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setShowHistory(false);
-        setShowSettings(false);
+      if (e.key !== "Escape") return;
+      setShowHistory(false);
+      setShowSettings(false);
+      if (showCorkboard) {
+        setSearchParams(
+          (p) => {
+            const n = new URLSearchParams(p);
+            n.delete("board");
+            return n;
+          },
+          { replace: true }
+        );
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [showHistory, showSettings]);
+  }, [showHistory, showSettings, showCorkboard, setSearchParams]);
 
   const speaker = getSpeaker(currentLine?.speakerId);
   const charById = useMemo(
@@ -251,6 +337,15 @@ export function VisualNovelPage() {
 
   return (
     <div className="vn-shell">
+      <div
+        className={`vn-corkboard-toast-anchor${corkboardToast ? " vn-corkboard-toast-anchor--visible" : ""}`}
+        aria-live="polite"
+      >
+        <div className="vn-corkboard-toast">
+          <span className="vn-corkboard-toast-text">Corkboard updated</span>
+        </div>
+      </div>
+
       <div className="vn-scene" style={{ background: effectiveSceneBackground }}>
         <div className="vn-scene-hud" aria-hidden={false}>
           <div className="vn-scene-title">
@@ -269,14 +364,15 @@ export function VisualNovelPage() {
             >
               <IconHistory />
             </button>
-            <Link
+            <button
+              type="button"
               className="vn-icon-btn"
-              to="/corkboard"
+              onClick={() => openCorkboard()}
               title="Corkboard"
               aria-label="Open corkboard"
             >
               <IconCorkboard />
-            </Link>
+            </button>
             <button
               type="button"
               className="vn-icon-btn"
@@ -648,6 +744,8 @@ export function VisualNovelPage() {
           </div>
         </div>
       ) : null}
+
+      <CorkboardModal open={showCorkboard} onClose={closeCorkboard} />
     </div>
   );
 }

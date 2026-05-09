@@ -3,11 +3,12 @@ import { useAuth } from "../auth";
 
 export function Layout() {
   const { isAdmin, logout } = useAuth();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const boardOpen = new URLSearchParams(search).get("board") === "1";
+  const storyTabActive = pathname === "/" && !boardOpen;
+  const corkTabActive = pathname === "/" && boardOpen;
   const wide =
     pathname === "/" ||
-    pathname === "/corkboard" ||
-    pathname.startsWith("/evidence") ||
     pathname.startsWith("/admin");
   const flushVn = pathname === "/";
 
@@ -18,13 +19,14 @@ export function Layout() {
           Mystery VN
         </NavLink>
         <nav className="tabs">
-          <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")} end>
+          <NavLink
+            to="/"
+            className={() => (storyTabActive ? "active" : "")}
+            end
+          >
             Story
           </NavLink>
-          <NavLink
-            to="/corkboard"
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
+          <NavLink to="/?board=1" className={() => (corkTabActive ? "active" : "")}>
             Corkboard
           </NavLink>
           {isAdmin ? (

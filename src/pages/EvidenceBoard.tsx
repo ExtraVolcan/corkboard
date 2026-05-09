@@ -19,6 +19,7 @@ import "@xyflow/react/dist/style.css";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useCampaign } from "../campaign";
+import { mergeProfilesWithSeed } from "../campaignSeedFallback";
 import { buildLinkEdges } from "../graph";
 import {
   CLUSTER_GAP,
@@ -112,7 +113,7 @@ function FitViewOnLoad({ layoutKey }: { layoutKey: string }) {
   return null;
 }
 
-function EvidenceBoardIntro() {
+function EvidenceBoardIntro({ variant }: { variant: "page" | "modal" }) {
   const { isAdmin } = useAuth();
   const { data, refresh, resetToSeed, saveFullCampaign } = useCampaign();
   const importRef = useRef<HTMLInputElement>(null);
@@ -153,7 +154,9 @@ function EvidenceBoardIntro() {
 
   return (
     <div className="paper" style={{ marginBottom: "1rem" }}>
-      <h1 style={{ marginTop: 0 }}>Corkboard</h1>
+      {variant === "page" ? (
+        <h1 style={{ marginTop: 0 }}>Corkboard</h1>
+      ) : null}
       <p className="muted" style={{ marginBottom: 0 }}>
         {isAdmin
           ? "Open a polaroid for the full dossier. Reveal profiles and entries from each dossier page."
@@ -226,21 +229,28 @@ function EvidenceBoardFlow() {
   const { data, ack } = useCampaign();
   const { isProfileVisible, isNameVisible, isImageVisible } = useVn();
 
+  const profilesCatalog = useMemo(
+    () => mergeProfilesWithSeed(data.profiles),
+    [data.profiles]
+  );
+
   const profiles = useMemo(
     () =>
       isAdmin
-        ? data.profiles
-        : data.profiles.filter((p) => p.profileRevealed || isProfileVisible(p.id)),
-    [data.profiles, isAdmin, isProfileVisible]
+        ? profilesCatalog
+        : profilesCatalog.filter(
+            (p) => p.profileRevealed || isProfileVisible(p.id)
+          ),
+    [profilesCatalog, isAdmin, isProfileVisible]
   );
 
   const linkEdgesForLayout = useMemo(() => {
-    const raw = buildLinkEdges(data.profiles, {
+    const raw = buildLinkEdges(profilesCatalog, {
       includeUnrevealedEntries: isAdmin,
     });
     const ids = new Set(profiles.map((p) => p.id));
     return raw.filter((e) => ids.has(e.source) && ids.has(e.target));
-  }, [data.profiles, isAdmin, profiles]);
+  }, [profilesCatalog, isAdmin, profiles]);
 
   const computedEdges: Edge[] = useMemo(
     () =>
@@ -372,10 +382,14 @@ function EvidenceBoardFlow() {
   );
 }
 
-export function EvidenceBoard() {
+export function EvidenceBoard({
+  variant = "page",
+}: {
+  variant?: "page" | "modal";
+}) {
   return (
     <>
-      <EvidenceBoardIntro />
+      <EvidenceBoardIntro variant={variant} />
       <ReactFlowProvider>
         <EvidenceBoardFlow />
       </ReactFlowProvider>
