@@ -321,6 +321,22 @@ a {
   border: 2px solid #0f0a06;
 }
 
+/* Corkboard modal: fill remaining dialog height (don’t use fixed 85vh — avoids body scrollbar) */
+.evidence-board-modal-fill {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.graph-wrap.graph-wrap--modal {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+}
+
 .graph-wrap .react-flow__edge-path {
   stroke: var(--line-red) !important;
   stroke-width: 2.5px;
@@ -1117,6 +1133,7 @@ a.vn-icon-btn {
   display: flex;
   flex-direction: column;
   width: min(1120px, 100%);
+  height: min(92dvh, 920px);
   max-height: min(92dvh, 920px);
   background: var(--paper-bg, #f4eee6);
   border-radius: 0.65rem;
@@ -1147,6 +1164,12 @@ a.vn-icon-btn {
 .corkboard-modal-body {
   flex: 1;
   min-height: 0;
-  overflow: auto;
-  padding: 0.65rem 0.85rem 0.85rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem 0.45rem 0.45rem;
+}
+
+.react-flow__attribution {
+  display: none;
 }

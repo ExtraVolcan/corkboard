@@ -113,7 +113,7 @@ function FitViewOnLoad({ layoutKey }: { layoutKey: string }) {
   return null;
 }
 
-function EvidenceBoardIntro({ variant }: { variant: "page" | "modal" }) {
+function EvidenceBoardIntro() {
   const { isAdmin } = useAuth();
   const { data, refresh, resetToSeed, saveFullCampaign } = useCampaign();
   const importRef = useRef<HTMLInputElement>(null);
@@ -154,9 +154,7 @@ function EvidenceBoardIntro({ variant }: { variant: "page" | "modal" }) {
 
   return (
     <div className="paper" style={{ marginBottom: "1rem" }}>
-      {variant === "page" ? (
-        <h1 style={{ marginTop: 0 }}>Corkboard</h1>
-      ) : null}
+      <h1 style={{ marginTop: 0 }}>Corkboard</h1>
       <p className="muted" style={{ marginBottom: 0 }}>
         {isAdmin
           ? "Open a polaroid for the full dossier. Reveal profiles and entries from each dossier page."
@@ -224,7 +222,7 @@ function EvidenceBoardIntro({ variant }: { variant: "page" | "modal" }) {
   );
 }
 
-function EvidenceBoardFlow() {
+function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
   const { isAdmin } = useAuth();
   const { data, ack } = useCampaign();
   const { isProfileVisible, isNameVisible, isImageVisible } = useVn();
@@ -341,7 +339,7 @@ function EvidenceBoardFlow() {
     setEdges(computedEdges);
   }, [computedEdges, setEdges]);
 
-  if (profiles.length === 0) {
+  if (profiles.length === 0 && variant === "page") {
     return (
       <p className="graph-note">
         Nothing published on the board yet. Check back later.
@@ -349,14 +347,27 @@ function EvidenceBoardFlow() {
     );
   }
 
+  const showPageHints = variant === "page" && profiles.length > 0;
+
   return (
     <>
-      <p className="graph-note">Click a polaroid to open that dossier.</p>
-      <p className="muted graph-note" style={{ fontSize: "0.88rem", marginTop: "-0.35rem" }}>
-        Drag to pan; zoom with the corner controls. The graph is not forced to shrink and fit
-        the panel, so extra spacing stays visible—zoom out to see the full board.
-      </p>
-      <div className="graph-wrap">
+      {showPageHints ? (
+        <>
+          <p className="graph-note">Click a polaroid to open that dossier.</p>
+          <p
+            className="muted graph-note"
+            style={{ fontSize: "0.88rem", marginTop: "-0.35rem" }}
+          >
+            Drag to pan; zoom with the corner controls. The graph is not forced to shrink and fit
+            the panel, so extra spacing stays visible—zoom out to see the full board.
+          </p>
+        </>
+      ) : null}
+      <div
+        className={
+          variant === "modal" ? "graph-wrap graph-wrap--modal" : "graph-wrap"
+        }
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -389,9 +400,15 @@ export function EvidenceBoard({
 }) {
   return (
     <>
-      <EvidenceBoardIntro variant={variant} />
+      {variant === "page" ? <EvidenceBoardIntro /> : null}
       <ReactFlowProvider>
-        <EvidenceBoardFlow />
+        {variant === "modal" ? (
+          <div className="evidence-board-modal-fill">
+            <EvidenceBoardFlow variant={variant} />
+          </div>
+        ) : (
+          <EvidenceBoardFlow variant={variant} />
+        )}
       </ReactFlowProvider>
     </>
   );
