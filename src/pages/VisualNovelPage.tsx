@@ -19,6 +19,7 @@ import {
   resolveSpeakerPlaceholderInitial,
 } from "../vn/speakerLabel";
 import { mcqEliminatedFlagKey, useVn } from "../vn/state";
+import { useTypewriterLine } from "../vn/useTypewriterLine";
 import type { PortraitSlot } from "../vn/portraitLayout";
 import type { SpeakerLabelContext } from "../vn/speakerLabel";
 import type { VnCharacter, VnState } from "../vn/types";
@@ -391,6 +392,23 @@ export function VisualNovelPage() {
     currentLine && !hasChoices && !interaction
   );
 
+  const advanceDialogueText = currentLine?.text ?? "";
+  const advanceTw = useTypewriterLine(
+    advanceDialogueText,
+    canAdvanceByClick,
+    state.settings.textSpeed
+  );
+
+  const mcqFeedbackTypingEnabled = Boolean(
+    showingMcqWrongFeedback && mcqWrongFeedback
+  );
+  const mcqFeedbackText = mcqWrongFeedback?.text ?? "";
+  const mcqFbTw = useTypewriterLine(
+    mcqFeedbackText,
+    mcqFeedbackTypingEnabled,
+    state.settings.textSpeed
+  );
+
   function updateSfxPrefs(next: SfxPrefs) {
     const saved = saveSfxPrefs(next);
     setSfxPrefs(saved);
@@ -516,6 +534,10 @@ export function VisualNovelPage() {
               type="button"
               className="vn-dialogue-frame vn-dialogue-frame--advance"
               onClick={() => {
+                if (!advanceTw.isRevealComplete) {
+                  advanceTw.skipToEnd();
+                  return;
+                }
                 playSfx("advance", sfxPrefs);
                 dispatch({ type: "advanceDialogue" });
               }}
@@ -535,9 +557,11 @@ export function VisualNovelPage() {
                   currentLine?.speakerId === "narrator" ? " vn-line--narrator" : ""
                 }`}
               >
-                {currentLine?.text ?? "No dialogue loaded."}
+                {advanceTw.visibleText}
               </p>
-              <span className="vn-continue-hint">Click to continue</span>
+              <span className="vn-continue-hint">
+                {"Click to continue"}
+              </span>
             </button>
           ) : (
             <div
@@ -584,6 +608,10 @@ export function VisualNovelPage() {
                     type="button"
                     className="vn-dialogue-frame vn-dialogue-frame--advance"
                     onClick={() => {
+                      if (!mcqFbTw.isRevealComplete) {
+                        mcqFbTw.skipToEnd();
+                        return;
+                      }
                       playSfx("advance", sfxPrefs);
                       dispatch({ type: "advanceDialogue" });
                     }}
@@ -605,9 +633,11 @@ export function VisualNovelPage() {
                         mcqFbSpeakerId === "narrator" ? " vn-line--narrator" : ""
                       }`}
                     >
-                      {mcqWrongFeedback.text}
+                      {mcqFbTw.visibleText}
                     </p>
-                    <span className="vn-continue-hint">Click to continue</span>
+                    <span className="vn-continue-hint">
+                      {"Click to continue"}
+                    </span>
                   </button>
                 ) : (
                   <div className="vn-interaction-box">
@@ -805,7 +835,10 @@ export function VisualNovelPage() {
               </button>
             </div>
             <label className="vn-setting-row">
-              <span>Text speed: {state.settings.textSpeed}</span>
+              <span>
+                Text speed: {state.settings.textSpeed}
+                {state.settings.textSpeed >= 100 ? " (instant)" : ""}
+              </span>
               <input
                 type="range"
                 min={0}

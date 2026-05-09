@@ -521,7 +521,6 @@ export const shipDay2Crew: VnScene = {
       interaction: {
         kind: "mcq",
         prompt: "Which column is today?",
-        redoable: true,
         options: [
           {
             id: "col-1",
@@ -574,7 +573,6 @@ export const shipDay2Crew: VnScene = {
       interaction: {
         kind: "mcq",
         prompt: "What is the victim's name?",
-        redoable: true,
         //TODO: include other characters as guesses,
         // OR, change to a text input field
         options: [

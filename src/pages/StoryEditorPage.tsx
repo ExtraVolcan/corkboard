@@ -212,7 +212,6 @@ export function StoryEditorPage() {
           </li>
           <li>
             <strong>MCQ</strong>: <code>kind: &quot;mcq&quot;</code>, <code>prompt</code>,{" "}
-            <code>redoable</code> (legacy; behavior is single-choice with retries),{" "}
             <code>options</code> with <code>id</code>, <code>label</code>, optional{" "}
             <code>correct</code>, <code>wrongFeedback</code> /{" "}
             <code>wrongFeedbackSpeakerId</code>, and <code>outcome</code>; optional{" "}

@@ -43,7 +43,6 @@ export type VnMcqOption = {
 export type VnMcqInteraction = {
   kind: "mcq";
   prompt: string;
-  redoable: boolean;
   options: VnMcqOption[];
   onCorrect?: VnInteractionOutcome;
   onIncorrect?: VnInteractionOutcome;

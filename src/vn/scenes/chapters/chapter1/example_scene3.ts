@@ -24,7 +24,6 @@ export const scene3: VnScene = {
       interaction: {
         kind: "mcq",
         prompt: "Where does the strongest lead point right now?",
-        redoable: false,
         options: [
           {
             id: "loc-docks",
