@@ -18,7 +18,7 @@ import {
   resolveSpeakerDisplayLabel,
   resolveSpeakerPlaceholderInitial,
 } from "../vn/speakerLabel";
-import { useVn } from "../vn/state";
+import { mcqEliminatedFlagKey, useVn } from "../vn/state";
 import type { PortraitSlot } from "../vn/portraitLayout";
 import type { SpeakerLabelContext } from "../vn/speakerLabel";
 import type { VnCharacter, VnState } from "../vn/types";
@@ -189,6 +189,7 @@ export function VisualNovelPage() {
   const [corkboardToast, setCorkboardToast] = useState(false);
   const [sfxPrefs, setSfxPrefs] = useState<SfxPrefs>(() => loadSfxPrefs());
   const prevRevealsRef = useRef<VnState["reveals"] | null>(null);
+  const historyListRef = useRef<HTMLDivElement>(null);
 
   function openCorkboard() {
     playSfx("panel", sfxPrefs);
@@ -245,6 +246,15 @@ export function VisualNovelPage() {
       if (timer !== undefined) clearTimeout(timer);
     };
   }, [state.reveals]);
+
+  useEffect(() => {
+    if (!showHistory) return;
+    const el = historyListRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+  }, [showHistory, state.history.length]);
 
   useEffect(() => {
     if (
@@ -330,6 +340,19 @@ export function VisualNovelPage() {
     state.interaction.lineKey === interactionLineKey
       ? state.interaction.selectedProfileId
       : undefined;
+
+  const mcqWrongFeedback = state.mcqWrongFeedback;
+  const showingMcqWrongFeedback = Boolean(
+    interaction?.kind === "mcq" &&
+      mcqWrongFeedback?.lineKey === interactionLineKey
+  );
+  const mcqFbSpeakerId = mcqWrongFeedback?.speakerId ?? "narrator";
+  const mcqFbSpeakerLabel = showingMcqWrongFeedback
+    ? resolveSpeakerDisplayLabel(mcqFbSpeakerId, charById, speakerLabelCtx)
+    : null;
+  const mcqFbSpeakerStyle = showingMcqWrongFeedback
+    ? getSpeaker(mcqFbSpeakerId)
+    : undefined;
 
   const accuseCandidates = useMemo(
     () =>
@@ -556,44 +579,84 @@ export function VisualNovelPage() {
                   ))}
                 </div>
               ) : interaction?.kind === "mcq" ? (
-                <div className="vn-interaction-box">
-                  <p className="vn-interaction-prompt">{interaction.prompt}</p>
-                  <div className="vn-choices">
-                    {interaction.options.map((option) => {
-                      const selected = selectedOptionIds.includes(option.id);
-                      const disabled = interaction.redoable ? selected : false;
-                      return (
-                        <button
-                          key={option.id}
-                          type="button"
-                          className="vn-pill"
-                          disabled={disabled}
-                          style={selected ? { opacity: 0.45 } : undefined}
-                          onClick={() => {
-                            playSfx("select", sfxPrefs);
-                            dispatch({
-                              type: "selectInteractionOption",
-                              optionId: option.id,
-                            });
-                          }}
-                        >
-                          {option.label}
-                        </button>
-                      );
-                    })}
-                  </div>
+                showingMcqWrongFeedback && mcqWrongFeedback ? (
                   <button
                     type="button"
-                    className="vn-pill vn-pill--primary"
-                    disabled={!selectedOptionIds.length}
+                    className="vn-dialogue-frame vn-dialogue-frame--advance"
                     onClick={() => {
-                      playSfx("submit", sfxPrefs);
-                      dispatch({ type: "submitInteraction" });
+                      playSfx("advance", sfxPrefs);
+                      dispatch({ type: "advanceDialogue" });
                     }}
                   >
-                    Submit answer
+                    {mcqFbSpeakerLabel ? (
+                      <div
+                        className="vn-speaker"
+                        style={{
+                          color:
+                            mcqFbSpeakerStyle?.accent ||
+                            "rgba(253, 230, 200, 0.95)",
+                        }}
+                      >
+                        {mcqFbSpeakerLabel}
+                      </div>
+                    ) : null}
+                    <p
+                      className={`vn-line${
+                        mcqFbSpeakerId === "narrator" ? " vn-line--narrator" : ""
+                      }`}
+                    >
+                      {mcqWrongFeedback.text}
+                    </p>
+                    <span className="vn-continue-hint">Click to continue</span>
                   </button>
-                </div>
+                ) : (
+                  <div className="vn-interaction-box">
+                    <p className="vn-interaction-prompt">{interaction.prompt}</p>
+                    <div className="vn-choices">
+                      {interaction.options.map((option) => {
+                        const eliminated = Boolean(
+                          state.flags[
+                            mcqEliminatedFlagKey(
+                              currentScene.id,
+                              state.lineIndex,
+                              option.id
+                            )
+                          ]
+                        );
+                        const selected = selectedOptionIds.includes(option.id);
+                        return (
+                          <button
+                            key={option.id}
+                            type="button"
+                            className={`vn-pill${selected ? " vn-pill--selected-mcq" : ""}`}
+                            disabled={eliminated}
+                            onClick={() => {
+                              if (eliminated) return;
+                              playSfx("select", sfxPrefs);
+                              dispatch({
+                                type: "selectInteractionOption",
+                                optionId: option.id,
+                              });
+                            }}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      type="button"
+                      className="vn-pill vn-pill--primary"
+                      disabled={!selectedOptionIds.length}
+                      onClick={() => {
+                        playSfx("submit", sfxPrefs);
+                        dispatch({ type: "submitInteraction" });
+                      }}
+                    >
+                      Submit answer
+                    </button>
+                  </div>
+                )
               ) : interaction?.kind === "accuse" ? (
                 <div className="vn-interaction-box">
                   <p className="vn-interaction-prompt vn-interaction-prompt-strong">
@@ -695,20 +758,17 @@ export function VisualNovelPage() {
               </button>
             </div>
             {state.history.length ? (
-              <div className="vn-history-list">
-                {state.history
-                  .slice()
-                  .reverse()
-                  .map((h) => (
-                    <p key={`${h.atMs}-${h.text}`}>
-                      {h.speakerName ? (
-                        <>
-                          <strong>{h.speakerName}:</strong>{" "}
-                        </>
-                      ) : null}
-                      {h.text}
-                    </p>
-                  ))}
+              <div className="vn-history-list" ref={historyListRef}>
+                {state.history.map((h) => (
+                  <p key={`${h.atMs}-${h.text}`}>
+                    {h.speakerName ? (
+                      <>
+                        <strong>{h.speakerName}:</strong>{" "}
+                      </>
+                    ) : null}
+                    {h.text}
+                  </p>
+                ))}
               </div>
             ) : (
               <p className="muted">No dialogue has been logged yet.</p>

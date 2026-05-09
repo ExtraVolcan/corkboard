@@ -31,6 +31,13 @@ export type VnMcqOption = {
   label: string;
   correct?: boolean;
   outcome?: VnInteractionOutcome;
+  /**
+   * After a wrong submit, shown briefly before returning to the question.
+   * If omitted, a generic line is used.
+   */
+  wrongFeedback?: string;
+  /** Speaker nameplate for wrongFeedback (defaults to narrator). */
+  wrongFeedbackSpeakerId?: string;
 };
 
 export type VnMcqInteraction = {
@@ -118,6 +125,12 @@ export type VnState = {
     lineKey?: string;
     selectedOptionIds?: string[];
     selectedProfileId?: string;
+  };
+  /** Brief overlay after an incorrect MCQ submit (same lineKey as the MCQ line). */
+  mcqWrongFeedback?: {
+    lineKey: string;
+    text: string;
+    speakerId?: string;
   };
 };
 

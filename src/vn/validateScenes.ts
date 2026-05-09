@@ -106,6 +106,16 @@ export function validateScenes(
               `Unknown scene id "${n}"`
             );
           }
+          if (
+            o.wrongFeedbackSpeakerId &&
+            !speakerExists(charSet, o.wrongFeedbackSpeakerId)
+          ) {
+            push(
+              errors,
+              `${lp}.interaction.options(${o.id}).wrongFeedbackSpeakerId`,
+              `Unknown character "${o.wrongFeedbackSpeakerId}"`
+            );
+          }
         }
         for (const key of ["onCorrect", "onIncorrect"] as const) {
           const o = line.interaction[key];

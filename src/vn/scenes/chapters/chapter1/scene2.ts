@@ -523,14 +523,27 @@ export const shipDay2Crew: VnScene = {
         prompt: "Which column is today?",
         redoable: true,
         options: [
-          { id: "col-1", label: "First column (Day 1)" },
+          {
+            id: "col-1",
+            label: "First column (Day 1)",
+            wrongFeedback:
+              "Day one would be the first column; I'm not listed on that day.",
+          },
           {
             id: "col-2",
             label: "Second column (Day 2)",
             correct: true,
           },
-          { id: "col-3", label: "Third column (Day 3)" },
-          { id: "col-4", label: "Fourth column (Day 4)" },
+          {
+            id: "col-3",
+            label: "Third column (Day 3)",
+            wrongFeedback: "No, Day 3 doesn't make sense, the people listed for Day 3 don't match up with the people I've seen today.",
+          },
+          {
+            id: "col-4",
+            label: "Fourth column (Day 4)",
+            wrongFeedback: "Too far forward; the people listed for Day 4 don't match up with who I'm talking to.",
+          },
         ],
       },
     },
@@ -565,15 +578,34 @@ export const shipDay2Crew: VnScene = {
         //TODO: include other characters as guesses,
         // OR, change to a text input field
         options: [
-          { id: "guess-miranda", label: "Miranda" },
-          { id: "guess-titania", label: "Titania" },
-          { id: "guess-stephano", label: "Stephano" },
+          {
+            id: "guess-miranda",
+            label: "Miranda",
+            wrongFeedback:
+              "Miranda is literally standing right there. The victim's name is something else.",
+          },
+          {
+            id: "guess-titania",
+            label: "Titania",
+            wrongFeedback:
+              "Titania is right in front of me! She's not the victim.",
+          },
+          {
+            id: "guess-stephano",
+            label: "Stephano",
+            wrongFeedback:
+              "Stephano is the one who gave me the maintenance schedule. He also doesn't have a hole in his chest, last I checked.",
+          },
           {
             id: "guess-cressida",
             label: "Cressida",
             correct: true,
           },
-          { id: "guess-detective", label: "Caliban" },
+          {
+            id: "guess-detective",
+            label: "Caliban",
+            wrongFeedback: "That's me! I don't plan on being a victim today.",
+          },
         ],
       },
     },

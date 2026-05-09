@@ -47,6 +47,15 @@ type VnContextValue = {
 
 const VnContext = createContext<VnContextValue | null>(null);
 
+/** Flag set when the player submitted this MCQ option and it was wrong (option stays disabled). */
+export function mcqEliminatedFlagKey(
+  sceneId: string,
+  lineIndex: number,
+  optionId: string
+): string {
+  return `vnMcqElim_${sceneId}_${lineIndex}_${optionId}`;
+}
+
 function interactionKey(sceneId: string, lineIndex: number): string {
   return `${sceneId}::${lineIndex}`;
 }
@@ -129,6 +138,7 @@ function loadState(): VnState {
       flags: parsed.flags ?? base.flags,
       reveals: parsed.reveals ?? base.reveals,
       interaction: parsed.interaction ?? base.interaction,
+      mcqWrongFeedback: parsed.mcqWrongFeedback,
       history: parsed.history ?? [],
     };
   } catch {
@@ -303,6 +313,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
               initialIndex,
               scenesById
             ),
+            mcqWrongFeedback: undefined,
           };
         };
 
@@ -318,7 +329,13 @@ export function VnProvider({ children }: { children: ReactNode }) {
             flags
           );
           if (nextLineIndex == null) {
-            return { ...base, flags, reveals, interaction: {} };
+            return {
+              ...base,
+              flags,
+              reveals,
+              interaction: {},
+              mcqWrongFeedback: undefined,
+            };
           }
           return {
             ...base,
@@ -333,12 +350,30 @@ export function VnProvider({ children }: { children: ReactNode }) {
               nextLineIndex,
               scenesById
             ),
+            mcqWrongFeedback: undefined,
           };
         };
 
         switch (intent.type) {
           case "advanceDialogue": {
             if (!line) return prev;
+            const lkAdv = interactionKey(scene.id, prev.lineIndex);
+            if (prev.mcqWrongFeedback?.lineKey === lkAdv) {
+              const fb = prev.mcqWrongFeedback;
+              const historyName =
+                resolveSpeakerDisplayLabel(fb.speakerId, charById, {
+                  flags: prev.flags,
+                  reveals: prev.reveals,
+                }) ?? "";
+              const history = pushHistory(
+                prev.history,
+                scene.id,
+                historyName,
+                fb.text
+              );
+              next = { ...prev, history, mcqWrongFeedback: undefined };
+              break;
+            }
             if (line.choices?.length) return prev;
             if (line.interaction) return prev;
 
@@ -406,31 +441,14 @@ export function VnProvider({ children }: { children: ReactNode }) {
             if (!line?.interaction || line.interaction.kind !== "mcq")
               return prev;
             const lk = interactionKey(scene.id, prev.lineIndex);
-            const selected =
-              prev.interaction.lineKey === lk
-                ? (prev.interaction.selectedOptionIds ?? [])
-                : [];
-            if (line.interaction.redoable) {
-              if (selected.includes(intent.optionId)) return prev;
-              next = {
-                ...prev,
-                interaction: {
-                  lineKey: lk,
-                  selectedOptionIds: [...selected, intent.optionId],
-                  selectedProfileId: prev.interaction.selectedProfileId,
-                },
-              };
-            } else {
-              // One-time MCQ: allow changing selection before submit.
-              next = {
-                ...prev,
-                interaction: {
-                  lineKey: lk,
-                  selectedOptionIds: [intent.optionId],
-                  selectedProfileId: prev.interaction.selectedProfileId,
-                },
-              };
-            }
+            next = {
+              ...prev,
+              interaction: {
+                lineKey: lk,
+                selectedOptionIds: [intent.optionId],
+                selectedProfileId: prev.interaction.selectedProfileId,
+              },
+            };
             break;
           }
           case "selectAccusedProfile": {
@@ -463,10 +481,10 @@ export function VnProvider({ children }: { children: ReactNode }) {
             const POINTS_INCORRECT = 5;
 
             if (line.interaction.kind === "mcq") {
-              const lastSelectedId = selectedOptions[selectedOptions.length - 1];
-              if (!lastSelectedId) return prev;
+              const selId = selectedOptions[0];
+              if (!selId) return prev;
               const selected = line.interaction.options.find(
-                (o) => o.id === lastSelectedId
+                (o) => o.id === selId
               );
               if (!selected) return prev;
               const isCorrect = selected.correct === true;
@@ -478,8 +496,50 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 prev.points +
                   (isCorrect ? POINTS_CORRECT : -POINTS_INCORRECT)
               );
+              const lkMcq = interactionKey(scene.id, prev.lineIndex);
+              const elimKey = mcqEliminatedFlagKey(
+                scene.id,
+                prev.lineIndex,
+                selId
+              );
+              const flagsAfterLineSet = withSetFlags(prev.flags, line.setFlags);
+              const flagsWithElimIfWrong = !isCorrect
+                ? withSetFlags(flagsAfterLineSet, [elimKey])
+                : flagsAfterLineSet;
+              const revealsAfterLine = applyRevealActions(
+                prev.reveals,
+                line.unlocks
+              );
+
+              if (!isCorrect && !outcome?.nextSceneId) {
+                const wrongFbRaw =
+                  selected.wrongFeedback?.trim() || "Not quite—try another angle.";
+                const wrongFbSpeaker =
+                  selected.wrongFeedbackSpeakerId ?? "narrator";
+                const flagsAfterWrong = withSetFlags(
+                  flagsWithElimIfWrong,
+                  outcome?.setFlags
+                );
+                next = {
+                  ...prev,
+                  points: nextPoints,
+                  flags: flagsAfterWrong,
+                  mcqWrongFeedback: {
+                    lineKey: lkMcq,
+                    text: wrongFbRaw,
+                    speakerId: wrongFbSpeaker,
+                  },
+                  interaction: {
+                    lineKey: lkMcq,
+                    selectedOptionIds: [],
+                    selectedProfileId: prev.interaction.selectedProfileId,
+                  },
+                };
+                break;
+              }
+
               const withFlags = withSetFlags(
-                withSetFlags(prev.flags, line.setFlags),
+                flagsWithElimIfWrong,
                 outcome?.setFlags
               );
               const withHistory = pushHistory(
@@ -487,24 +547,6 @@ export function VnProvider({ children }: { children: ReactNode }) {
                 scene.id,
                 "Choice",
                 `${line.interaction.prompt} -> ${selected.label}`
-              );
-              if (
-                !isCorrect &&
-                line.interaction.redoable &&
-                !outcome?.nextSceneId
-              ) {
-                next = {
-                  ...prev,
-                  history: withHistory,
-                  // For redoable questions, incorrect answers should only affect points.
-                  flags: prev.flags,
-                  points: nextPoints,
-                };
-                break;
-              }
-              const revealsAfterLine = applyRevealActions(
-                prev.reveals,
-                line.unlocks
               );
               if (outcome?.nextSceneId) {
                 next = goToScene(

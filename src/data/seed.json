@@ -40,7 +40,7 @@
       "entries": [
         {
           "id": "rotation-columns",
-          "text": "[TODO: add real intel here]\n\nGrid schedule: each column is a ship-day. Highlighted column (Day 2) lists Titania, Stephano, Miranda, Caliban, and Cressida as active—upload windows and re-print slots annotated in the margins.",
+          "text": "[TODO: add real intel here]\n\nGrid schedule: each column is a ship-day. Highlighted column (Day 2) lists Titania, Stephano, Miranda, Caliban, and Cressida as active.",
           "revealed": false
         }
       ]

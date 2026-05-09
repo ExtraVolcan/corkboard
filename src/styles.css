@@ -974,6 +974,12 @@ a.vn-icon-btn {
   cursor: not-allowed;
 }
 
+.vn-pill.vn-pill--selected-mcq:not(:disabled) {
+  border-color: rgba(251, 191, 36, 0.65);
+  background: rgba(120, 53, 15, 0.42);
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.22);
+}
+
 .vn-pill--primary,
 .vn-pill--primary[type="button"] {
   border-color: rgba(251, 191, 36, 0.5);

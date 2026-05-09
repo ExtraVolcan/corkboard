@@ -26,14 +26,24 @@ export const scene3: VnScene = {
         prompt: "Where does the strongest lead point right now?",
         redoable: false,
         options: [
-          { id: "loc-docks", label: "The old docks" },
+          {
+            id: "loc-docks",
+            label: "The old docks",
+            wrongFeedback:
+              "Nothing we've logged puts the strongest lead at the docks.",
+          },
           {
             id: "loc-library",
             label: "The library district",
             correct: true,
             outcome: { setFlags: ["quiz-library-correct"] },
           },
-          { id: "loc-courthouse", label: "The courthouse basement" },
+          {
+            id: "loc-courthouse",
+            label: "The courthouse basement",
+            wrongFeedback:
+              "The courthouse basement isn't where the briefing aimed us.",
+          },
         ],
         onIncorrect: { setFlags: ["quiz-library-missed-once"] },
       },
