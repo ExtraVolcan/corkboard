@@ -34,7 +34,7 @@
       "entries": [
         {
           "id": "last-seen-cressida-timing",
-          "text": "[TODO: draft]\n\nTitania said she saw Cressida holding the cookies ~15 minutes before I asked — close to my estimated time of death.",
+          "text": "Titania said she saw [[cressida]] holding the cookies ~15 minutes before I asked: close to [[cressida]]'s estimated time of death.",
           "revealed": false
         }
       ]
@@ -49,7 +49,7 @@
       "entries": [
         {
           "id": "cookies-left-at-door",
-          "text": "[TODO: draft]\n\nMiranda says she left the cookies outside Cressida's door; no answer, and she wasn't brave enough to knock twice.",
+          "text": "Miranda says she left the cookies outside [[cressida]]'s door; no answer, and she wasn't brave enough to knock twice.",
           "revealed": false
         }
       ]
@@ -64,12 +64,12 @@
       "entries": [
         {
           "id": "body-scene-initial",
-          "text": "[TODO: draft]\n\nScene notes: body was face-down first; purple pool underneath hadn't reached the neck yet — frontal wound mattered once turned.",
+          "text": "The body was splayed face-down when I found it; the purple pool of blood underneath hadn't reached the neck yet.",
           "revealed": false
         },
         {
           "id": "chestWound",
-          "text": "[TODO: add real intel here]\n\nAutopsy note (VN): wound favors frontal penetration—the hole wasn't visible while the body lay face-down, so whatever struck didn't punch cleanly through the back.",
+          "text": "There's a large hole in the chest, about the size of a basketball; the wound wasn't visible while the body lay face-down, so whatever made this hole didn't penetrate through the back.",
           "revealed": false
         }
       ]
@@ -114,17 +114,17 @@
         },
         {
           "id": "uniform-design",
-          "text": "[TODO: draft]\n\nAssume my door and the victim's match the same ship design.",
+          "text": "Every cabin door on the ship seems to have the same design.",
           "revealed": false
         },
         {
           "id": "sensor-walkthrough",
-          "text": "[TODO: draft]\n\nFrom inside my room → hall opens the door; from hall → stepping back in closes it behind me.",
+          "text": "From my testing: Walking out of my room to the hall opens the door; Stepping into my room closes the door behind me.",
           "revealed": false
         },
         {
           "id": "occupant-bound",
-          "text": "[TODO: draft]\n\nHypothesis: doors mainly respond to their registered occupant — still doesn't explain victim's door stuck open.",
+          "text": "Hypothesis: doors only respond to their registered occupant.",
           "revealed": false
         }
       ]
@@ -144,7 +144,7 @@
         },
         {
           "id": "backup-frequency",
-          "text": "[TODO: draft]\n\nShip backup standard Stephano gave: snapshots every minute. Any memory between last backup and death is lost forever.",
+          "text": "According to Stephano: synthetic bodies upload snapshots of their memories every minute. So if we die, that backup is used to restore our memories when we're resurrected. Any memory between last backup and death is lost forever.",
           "revealed": false
         }
       ]

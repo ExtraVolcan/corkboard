@@ -1137,7 +1137,7 @@ export const shipBranchMistake: VnScene = {
     //TODO change the mistake
     {
       speakerId: "miranda",
-      text: "My wording on the galley roster. It looked like I shortened her sleep window on purpose.",
+      text: "",
     },
     {
       speakerId: "miranda",

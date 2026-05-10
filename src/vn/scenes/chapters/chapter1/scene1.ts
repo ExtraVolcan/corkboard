@@ -14,7 +14,7 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 //TODO assign an image to each of these lines. Some can have none, like narration? 
 // But we want to show the protag character making faces
 
-    //TODO come up with ability for the first case culprit
+    //TODO come up with ability for the other ppl
 
 export const scene1: VnScene = {
   id: "opening",
@@ -242,15 +242,15 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "It's a large hole in the chest.",
+      text: "It's a large hole in the chest, about the size of a basketball.",
     },
     {
       speakerId: "narrator",
-      text: "The edges & insides of the hole are coated in purple blood.",
+      text: "The edges of the hole are coated in purple blood, & I can see... organs inside the body.",
     },
     {
       speakerId: "narrator",
-      text: "Aside from that, nothing else inside.",
+      text: "But there's nothing in the area with the hole.",
     },
     {
       speakerId: "narrator",
@@ -259,6 +259,18 @@ export const scene1: VnScene = {
     {
       speakerId: "narrator",
       text: "Like, isn't there supposed to be important stuff inside us?",
+    },
+    {
+      speakerId: "narrator",
+      text: "It's like they carved out this area, but at the same time I doubt something as crude as a knife could've done this.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Even if the culprit removed the organs in the chest area...",
+    },
+    {
+      speakerId: "narrator",
+      text: "Does that mean they were meticulous enough to take the organs, but not to clean up the blood?",
     },
     {
       speakerId: "narrator",
