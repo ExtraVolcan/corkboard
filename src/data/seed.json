@@ -159,17 +159,17 @@
       "entries": [
         {
           "id": "rotation-columns",
-          "text": "[[stephano]] showed me this document. It's a list of who's awake on each day. Anyone not highlighted on a particular day is offline, undergoing their scheduledmaintenance window.",
+          "text": "[[stephano]] showed me this document. It's a list of who's awake on each day. Anyone not highlighted on a particular day is offline, undergoing their scheduled maintenance window.",
           "revealed": false
         },
         {
           "id": "day-1-active",
-          "text": "[TODO: finalize schedule] Day 1 highlights Miranda, Titania, Stephano, Cressida, and Ariel as active.",
+          "text": "[TODO: finalize schedule + add puck] Day 1 highlights Miranda, Titania, Stephano, Cressida, and Ariel as active.",
           "revealed": false
         },
         {
           "id": "day-2-active",
-          "text": "Day 2 highlights Miranda, Titania, Stephano, Cressida, and Caliban as active.",
+          "text": "[TODO: finalize schedule + add puck] Day 2 highlights Miranda, Titania, Stephano, Cressida, and Caliban as active.",
           "revealed": false
         },
         {
