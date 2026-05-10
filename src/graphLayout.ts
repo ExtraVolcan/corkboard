@@ -4,8 +4,9 @@
  *   **non-adjacent** pairs only (so linked polaroids can sit at ~frame-width apart without fighting
  *   the tall-frame clearance used for everyone else).
  * - **CLUSTER_GAP / CLUSTER_PAD** only affect packing **separate** components on the grid.
- * - After packing, a small nudge pass slides polaroids aside when a string would cut through an
- *   **unrelated** frame (edges stay under cards in React Flow).
+ * - After packing, **contractTowardCentroid** pulls every polaroid toward the board centroid so
+ *   disconnected clusters move inward; **enforceMinCenterSeparation** runs each step so overlap
+ *   never wins. Then string nudges run as before.
  */
 
 export type LinkEdge = { source: string; target: string };
@@ -16,18 +17,18 @@ type Pt = { x: number; y: number };
 const NODE_W = 140;
 const NODE_H = 230;
 
-/** Small breathing room between frame edges (px). */
-const FRAME_PAD = 14;
+/** Gap between polaroid frame edges at minimum center distance (vertical stack is tightest case). */
+const FRAME_PAD = 50;
 
 /**
  * Extra padding around each cluster’s bounding box (used when packing clusters on the grid).
  * Exported for React consumers’ layout deps.
  */
-export const CLUSTER_PAD = 20;
+export const CLUSTER_PAD = 12;
 /**
  * Minimum gap between cluster padded footprints on the grid (center-to-center minus 2×maxExtent).
  */
-export const CLUSTER_GAP = 22;
+export const CLUSTER_GAP = 12;
 /**
  * Multiplies node positions after the force step. Keep at 1 for dense layouts.
  */
@@ -88,7 +89,7 @@ function forceLayoutCluster(
     return pos;
   }
 
-  const initR = 40 + n * 8;
+  const initR = 28 + n * 6;
   ids.forEach((id, i) => {
     const a = (2 * Math.PI * i) / n - Math.PI / 2;
     pos.set(id, {
@@ -151,7 +152,7 @@ function forceLayoutCluster(
       let ox = pb.x - pa.x;
       let oy = pb.y - pa.y;
       const dist = Math.hypot(ox, oy) || 0.01;
-      const delta = (dist - LINK_LEN) * 0.2 * cool;
+      const delta = (dist - LINK_LEN) * 0.28 * cool;
       ox = (ox / dist) * delta;
       oy = (oy / dist) * delta;
       fx.set(e.source, fx.get(e.source)! + ox);
@@ -268,15 +269,16 @@ function segmentHitsAabb(
  */
 function nudgeCentersClearForeignEdges(
   centers: Map<string, Pt>,
-  edges: LinkEdge[]
+  edges: LinkEdge[],
+  passes: number
 ): void {
-  const inflate = 10;
+  const inflate = 8;
   const hw = NODE_W / 2 + inflate;
   const hh = NODE_H / 2 + inflate;
-  const STEP = 14;
-  const PASSES = 14;
+  const STEP = 11;
 
-  for (let pass = 0; pass < PASSES; pass++) {
+  for (let pass = 0; pass < passes; pass++) {
+
     for (const e of edges) {
       const ca = centers.get(e.source);
       const cb = centers.get(e.target);
@@ -306,6 +308,73 @@ function nudgeCentersClearForeignEdges(
         centers.set(u, { x: cu.x + nx * STEP, y: cu.y + ny * STEP });
       }
     }
+  }
+}
+
+/** Enforce minimum center distance so cards never overlap (all pairs, global). */
+function enforceMinCenterSeparation(
+  centers: Map<string, Pt>,
+  minCenter: number,
+  iterations: number
+): void {
+  const ids = [...centers.keys()];
+  for (let iter = 0; iter < iterations; iter++) {
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const ia = ids[i]!;
+        const ib = ids[j]!;
+        const pa = centers.get(ia)!;
+        const pb = centers.get(ib)!;
+        let ox = pb.x - pa.x;
+        let oy = pb.y - pa.y;
+        const dist = Math.hypot(ox, oy);
+        if (!dist || dist >= minCenter) continue;
+        const push = (minCenter - dist) / 2;
+        ox /= dist;
+        oy /= dist;
+        centers.set(ia, { x: pa.x - ox * push, y: pa.y - oy * push });
+        centers.set(ib, { x: pb.x + ox * push, y: pb.y + oy * push });
+      }
+    }
+  }
+}
+
+/**
+ * Pull every polaroid toward the current centroid so scattered / grid-spaced components tighten.
+ * Separation runs inside the loop so attraction never collapses the layout past MIN_CENTER.
+ */
+function contractTowardCentroid(
+  centers: Map<string, Pt>,
+  minCenter: number,
+  iterations: number,
+  pullMin: number,
+  pullMax: number
+): void {
+  const ids = [...centers.keys()];
+  if (ids.length <= 1) return;
+  for (let iter = 0; iter < iterations; iter++) {
+    const t = iterations <= 1 ? 0 : iter / (iterations - 1);
+    const pull = pullMax + (pullMin - pullMax) * t;
+
+    let sx = 0;
+    let sy = 0;
+    for (const id of ids) {
+      const p = centers.get(id)!;
+      sx += p.x;
+      sy += p.y;
+    }
+    const n = ids.length;
+    const cx = sx / n;
+    const cy = sy / n;
+
+    for (const id of ids) {
+      const p = centers.get(id)!;
+      centers.set(id, {
+        x: p.x + pull * (cx - p.x),
+        y: p.y + pull * (cy - p.y),
+      });
+    }
+    enforceMinCenterSeparation(centers, minCenter, 10);
   }
 }
 
@@ -371,7 +440,11 @@ export function layoutPolaroidPositions(
     }
   }
 
-  nudgeCentersClearForeignEdges(centers, linkEdges);
+  const minCenter = NODE_H + FRAME_PAD;
+  contractTowardCentroid(centers, minCenter, 72, 0.045, 0.14);
+  nudgeCentersClearForeignEdges(centers, linkEdges, 18);
+  enforceMinCenterSeparation(centers, minCenter, 42);
+  nudgeCentersClearForeignEdges(centers, linkEdges, 10);
 
   for (const [id, c] of centers) {
     topLeft.set(id, centerToTopLeft(c));
