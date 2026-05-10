@@ -56,6 +56,7 @@ export const shipDay2Room: VnScene = {
       unlocks: [
         { type: "revealProfile", profileId: "victim-room-titania" },
         { type: "revealImage", profileId: "victim-room-titania" },
+        { type: "revealName", profileId: "victim-room-titania" },
         {
           type: "revealEntry",
           profileId: "victim-room-titania",
@@ -100,6 +101,8 @@ export const shipDay2Room: VnScene = {
       text: "No little plaques. No etched names by the frames. There's seriously no way to tell whose room this is?",
       unlocks: [
         { type: "revealProfile", profileId: "ship-doors" },
+        { type: "revealImage", profileId: "ship-doors" },
+        { type: "revealName", profileId: "ship-doors" },
         {
           type: "revealEntry",
           profileId: "ship-doors",
@@ -509,6 +512,7 @@ export const shipDay2Crew: VnScene = {
       unlocks: [
         { type: "revealProfile", profileId: "synthetic-bodies" },
         { type: "revealImage", profileId: "synthetic-bodies" },
+        { type: "revealName", profileId: "synthetic-bodies" },
         {
           type: "revealEntry",
           profileId: "synthetic-bodies",
@@ -575,6 +579,7 @@ export const shipDay2Crew: VnScene = {
       unlocks: [
         { type: "revealProfile", profileId: "maintenance-schedule" },
         { type: "revealImage", profileId: "maintenance-schedule" },
+        { type: "revealName", profileId: "maintenance-schedule" },
         {
           type: "revealEntry",
           profileId: "maintenance-schedule",
@@ -1017,6 +1022,7 @@ export const shipBranchcookies: VnScene = {
       unlocks: [
         { type: "revealProfile", profileId: "cookies" },
         { type: "revealImage", profileId: "cookies" },
+        { type: "revealName", profileId: "cookies" },
         { type: "revealEntry", profileId: "cookies", entryId: "cookies" },
         {
           type: "revealEntry",
