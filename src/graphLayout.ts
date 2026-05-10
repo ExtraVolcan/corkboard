@@ -1,9 +1,11 @@
 /**
  * Layout polaroids for the evidence board:
- * - Each **connected component** of the link graph is one “cluster” for layout (force sim).
- * - **CLUSTER_GAP / CLUSTER_PAD** only affect **packing separate components** on the grid.
- * - As soon as the graph is **one** connected piece, spacing is almost entirely the force sim
- *   (`LINK_LEN`, `TARGET_MIN`) plus {@link INTRA_CLUSTER_SPREAD} — tune those for tight corkboards.
+ * - Each **connected component** is laid out with a force sim: springs on edges, repulsion on
+ *   **non-adjacent** pairs only (so linked polaroids can sit at ~frame-width apart without fighting
+ *   the tall-frame clearance used for everyone else).
+ * - **CLUSTER_GAP / CLUSTER_PAD** only affect packing **separate** components on the grid.
+ * - After packing, a small nudge pass slides polaroids aside when a string would cut through an
+ *   **unrelated** frame (edges stay under cards in React Flow).
  */
 
 export type LinkEdge = { source: string; target: string };
@@ -14,24 +16,28 @@ type Pt = { x: number; y: number };
 const NODE_W = 140;
 const NODE_H = 230;
 
+/** Small breathing room between frame edges (px). */
+const FRAME_PAD = 14;
+
 /**
  * Extra padding around each cluster’s bounding box (used when packing clusters on the grid).
- * Kept modest so multiple **disconnected** components sit closer; still clears frame corners on
- * the square cell grid. Exported for React consumers’ layout deps.
+ * Exported for React consumers’ layout deps.
  */
-export const CLUSTER_PAD = 72;
+export const CLUSTER_PAD = 20;
 /**
  * Minimum gap between cluster padded footprints on the grid (center-to-center minus 2×maxExtent).
- * Lower values pull unlinked polaroids together; too low risks visual crowding.
  */
-export const CLUSTER_GAP = 56;
+export const CLUSTER_GAP = 22;
 /**
- * Multiplies node positions after the force step (before frame centering). Values above 1
- * zoom the whole cluster out; keep near 1 for a dense board. Re-exported for EvidenceBoard deps.
+ * Multiplies node positions after the force step. Keep at 1 for dense layouts.
  */
-export const INTRA_CLUSTER_SPREAD = 1.08;
+export const INTRA_CLUSTER_SPREAD = 1;
 /** Minimum half-extent for a single isolated polaroid so grid cells don't collapse. */
-const MIN_HALF_EXTENT = 96;
+const MIN_HALF_EXTENT = Math.max(NODE_W / 2 + FRAME_PAD, NODE_H / 2 + FRAME_PAD);
+
+function neighborPairKey(a: string, b: string): string {
+  return a < b ? `${a}\0${b}` : `${b}\0${a}`;
+}
 
 function connectedComponents(ids: string[], edges: LinkEdge[]): string[][] {
   const adj = new Map<string, Set<string>>();
@@ -82,7 +88,7 @@ function forceLayoutCluster(
     return pos;
   }
 
-  const initR = 56 + n * 14;
+  const initR = 40 + n * 8;
   ids.forEach((id, i) => {
     const a = (2 * Math.PI * i) / n - Math.PI / 2;
     pos.set(id, {
@@ -92,11 +98,20 @@ function forceLayoutCluster(
   });
 
   const internal = edgesWithin(new Set(ids), edges);
-  /** Target center distance along an edge (polaroid frames ~140×230 — keep rope short). */
-  const LINK_LEN = 230;
-  /** Soft minimum center distance for non-adjacent repulsion (avoid overlap, not a football field). */
-  const TARGET_MIN = 200;
-  const ITER = 200;
+  const linkedPairs = new Set<string>();
+  for (const e of internal) {
+    linkedPairs.add(neighborPairKey(e.source, e.target));
+  }
+
+  /**
+   * Minimum center distance between polaroid **frames** (any orientation, including vertical).
+   * Same value for springs (linked) and repulsion (non-neighbors): tall card height dominates.
+   * Graph neighbors skip repulsion so the spring can settle here without fighting a larger floor.
+   */
+  const MIN_CENTER = NODE_H + FRAME_PAD;
+  const LINK_LEN = MIN_CENTER;
+  const TARGET_MIN = MIN_CENTER;
+  const ITER = 220;
 
   for (let iter = 0; iter < ITER; iter++) {
     const cool = 1 - (iter / ITER) * 0.9;
@@ -108,6 +123,7 @@ function forceLayoutCluster(
       for (let j = i + 1; j < ids.length; j++) {
         const ia = ids[i];
         const ib = ids[j];
+        if (linkedPairs.has(neighborPairKey(ia, ib))) continue;
         const pa = pos.get(ia)!;
         const pb = pos.get(ib)!;
         let ox = pb.x - pa.x;
@@ -117,7 +133,7 @@ function forceLayoutCluster(
         if (dist < TARGET_MIN) {
           mag = ((TARGET_MIN - dist) / dist) * 3.2 * cool;
         } else {
-          mag = (15000 / (dist * dist)) * cool;
+          mag = (5200 / (dist * dist)) * cool;
         }
         ox = (ox / dist) * mag;
         oy = (oy / dist) * mag;
@@ -135,7 +151,7 @@ function forceLayoutCluster(
       let ox = pb.x - pa.x;
       let oy = pb.y - pa.y;
       const dist = Math.hypot(ox, oy) || 0.01;
-      const delta = (dist - LINK_LEN) * 0.14 * cool;
+      const delta = (dist - LINK_LEN) * 0.2 * cool;
       ox = (ox / dist) * delta;
       oy = (oy / dist) * delta;
       fx.set(e.source, fx.get(e.source)! + ox);
@@ -208,6 +224,91 @@ function centerToTopLeft(c: Pt): Pt {
   return { x: c.x - NODE_W / 2, y: c.y - NODE_H / 2 };
 }
 
+/** Liang–Barsky: segment p0→p1 with t∈[0,1] intersects closed axis-aligned box. */
+function segmentHitsAabb(
+  p0: Pt,
+  p1: Pt,
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number
+): boolean {
+  let tMin = 0;
+  let tMax = 1;
+  const dx = p1.x - p0.x;
+  const dy = p1.y - p0.y;
+  const EPS = 1e-9;
+
+  const clip = (p: number, d: number, lo: number, hi: number): boolean => {
+    if (Math.abs(d) < EPS) {
+      if (p < lo || p > hi) return false;
+      return true;
+    }
+    const inv = 1 / d;
+    let t0 = (lo - p) * inv;
+    let t1 = (hi - p) * inv;
+    if (t0 > t1) {
+      const s = t0;
+      t0 = t1;
+      t1 = s;
+    }
+    tMin = Math.max(tMin, t0);
+    tMax = Math.min(tMax, t1);
+    return tMin <= tMax;
+  };
+
+  if (!clip(p0.x, dx, minX, maxX)) return false;
+  if (!clip(p0.y, dy, minY, maxY)) return false;
+  return tMin <= tMax && tMax >= 0 && tMin <= 1;
+}
+
+/**
+ * If a string between A and B passes through polaroid U’s frame (U ≠ A,B), nudge U sideways off
+ * the segment. Keeps ropes under nodes in z-order while reducing unrelated occlusion.
+ */
+function nudgeCentersClearForeignEdges(
+  centers: Map<string, Pt>,
+  edges: LinkEdge[]
+): void {
+  const inflate = 10;
+  const hw = NODE_W / 2 + inflate;
+  const hh = NODE_H / 2 + inflate;
+  const STEP = 14;
+  const PASSES = 14;
+
+  for (let pass = 0; pass < PASSES; pass++) {
+    for (const e of edges) {
+      const ca = centers.get(e.source);
+      const cb = centers.get(e.target);
+      if (!ca || !cb) continue;
+
+      for (const u of centers.keys()) {
+        if (u === e.source || u === e.target) continue;
+        const cu = centers.get(u)!;
+        const minX = cu.x - hw;
+        const maxX = cu.x + hw;
+        const minY = cu.y - hh;
+        const maxY = cu.y + hh;
+        if (!segmentHitsAabb(ca, cb, minX, minY, maxX, maxY)) continue;
+
+        const sx = cb.x - ca.x;
+        const sy = cb.y - ca.y;
+        const slen = Math.hypot(sx, sy);
+        if (slen < 1e-6) continue;
+        let nx = -sy / slen;
+        let ny = sx / slen;
+        const midx = (ca.x + cb.x) / 2;
+        const midy = (ca.y + cb.y) / 2;
+        if (nx * (cu.x - midx) + ny * (cu.y - midy) < 0) {
+          nx = -nx;
+          ny = -ny;
+        }
+        centers.set(u, { x: cu.x + nx * STEP, y: cu.y + ny * STEP });
+      }
+    }
+  }
+}
+
 /**
  * Top-left positions for React Flow from profile ids and undirected link edges.
  */
@@ -269,6 +370,8 @@ export function layoutPolaroidPositions(
       centers.set(id, { x: c.x + gx, y: c.y + gy });
     }
   }
+
+  nudgeCentersClearForeignEdges(centers, linkEdges);
 
   for (const [id, c] of centers) {
     topLeft.set(id, centerToTopLeft(c));

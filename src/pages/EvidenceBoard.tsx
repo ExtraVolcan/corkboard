@@ -279,7 +279,6 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
         targetHandle: "c-tgt",
         type: "straight" as const,
         style: { stroke: "#b91c1c", strokeWidth: 2.5 },
-        zIndex: 0,
       })),
     [linkEdgesForLayout]
   );
