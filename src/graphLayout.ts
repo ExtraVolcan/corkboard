@@ -1,9 +1,9 @@
 /**
  * Layout polaroids for the evidence board:
  * - Each **connected component** of the link graph is one “cluster” for layout (force sim).
- * - **CLUSTER_GAP / grid packing** only apply when there are **2+ disconnected** components.
- *   Typical campaigns are one connected piece — spacing there comes from the force sim and
- *   {@link INTRA_CLUSTER_SPREAD}, not from CLUSTER_GAP.
+ * - **CLUSTER_GAP / CLUSTER_PAD** only affect **packing separate components** on the grid.
+ * - As soon as the graph is **one** connected piece, spacing is almost entirely the force sim
+ *   (`LINK_LEN`, `TARGET_MIN`) plus {@link INTRA_CLUSTER_SPREAD} — tune those for tight corkboards.
  */
 
 export type LinkEdge = { source: string; target: string };
@@ -26,11 +26,10 @@ export const CLUSTER_PAD = 72;
  */
 export const CLUSTER_GAP = 56;
 /**
- * Multiplies node positions after the force step (before frame centering). Use this to
- * spread polaroids apart when the graph is **one** connected component — CLUSTER_GAP does
- * nothing in that case. Re-exported for EvidenceBoard useMemo deps.
+ * Multiplies node positions after the force step (before frame centering). Values above 1
+ * zoom the whole cluster out; keep near 1 for a dense board. Re-exported for EvidenceBoard deps.
  */
-export const INTRA_CLUSTER_SPREAD = 1.55;
+export const INTRA_CLUSTER_SPREAD = 1.08;
 /** Minimum half-extent for a single isolated polaroid so grid cells don't collapse. */
 const MIN_HALF_EXTENT = 96;
 
@@ -83,7 +82,7 @@ function forceLayoutCluster(
     return pos;
   }
 
-  const initR = 90 + n * 22;
+  const initR = 56 + n * 14;
   ids.forEach((id, i) => {
     const a = (2 * Math.PI * i) / n - Math.PI / 2;
     pos.set(id, {
@@ -93,8 +92,10 @@ function forceLayoutCluster(
   });
 
   const internal = edgesWithin(new Set(ids), edges);
-  const LINK_LEN = 460;
-  const TARGET_MIN = 500;
+  /** Target center distance along an edge (polaroid frames ~140×230 — keep rope short). */
+  const LINK_LEN = 230;
+  /** Soft minimum center distance for non-adjacent repulsion (avoid overlap, not a football field). */
+  const TARGET_MIN = 200;
   const ITER = 200;
 
   for (let iter = 0; iter < ITER; iter++) {

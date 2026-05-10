@@ -10,7 +10,11 @@ function edgeKey(a: string, b: string): EdgeKey {
 /** Build undirected edges from profile entry text. */
 export function buildLinkEdges(
   profiles: Profile[],
-  opts: { includeUnrevealedEntries: boolean }
+  opts: {
+    includeUnrevealedEntries: boolean;
+    /** When set (e.g. story play), entries visible via VN count even if campaign `revealed` is false. */
+    isEntryVisible?: (profileId: string, entryId: string) => boolean;
+  }
 ): { source: string; target: string }[] {
   const ids = new Set(profiles.map((p) => p.id));
   const seen = new Set<EdgeKey>();
@@ -18,7 +22,11 @@ export function buildLinkEdges(
 
   for (const p of profiles) {
     for (const e of p.entries) {
-      if (!opts.includeUnrevealedEntries && !e.revealed) continue;
+      const countsForLinks =
+        opts.includeUnrevealedEntries ||
+        e.revealed ||
+        (opts.isEntryVisible?.(p.id, e.id) ?? false);
+      if (!countsForLinks) continue;
       for (const target of parseMentionedProfileIds(e.text)) {
         if (target === p.id || !ids.has(target)) continue;
         const k = edgeKey(p.id, target);

@@ -84,7 +84,7 @@
       "entries": [
         {
           "id": "cabin-layout",
-          "text": "Plain room: bed in the corner, single doorway to the corridor. It's directly across from my cabin on the same hall.",
+          "text": "Plain room: bed in the corner, single doorway to the corridor. It's directly across from my cabin on the same hall. [[cressida]] found dead here.",
           "revealed": false
         },
         {
@@ -94,7 +94,7 @@
         },
         {
           "id": "victim-door-open",
-          "text": "The door to the victim's room has stayed open at least since I woke up. No signs of tampering or forced entry.",
+          "text": "The door to this room has stayed open at least since I woke up. No signs of tampering or forced entry.",
           "revealed": false
         }
       ]

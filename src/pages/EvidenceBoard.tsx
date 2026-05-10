@@ -263,10 +263,11 @@ function EvidenceBoardFlow({ variant }: { variant: "page" | "modal" }) {
   const linkEdgesForLayout = useMemo(() => {
     const raw = buildLinkEdges(profilesCatalog, {
       includeUnrevealedEntries: isAdmin,
+      ...(!isAdmin ? { isEntryVisible } : {}),
     });
     const ids = new Set(profiles.map((p) => p.id));
     return raw.filter((e) => ids.has(e.source) && ids.has(e.target));
-  }, [profilesCatalog, isAdmin, profiles]);
+  }, [profilesCatalog, isAdmin, profiles, isEntryVisible]);
 
   const computedEdges: Edge[] = useMemo(
     () =>
