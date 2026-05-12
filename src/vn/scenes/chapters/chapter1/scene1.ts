@@ -21,14 +21,25 @@ export const scene1: VnScene = {
   title: "An Unfinished Board",
   background: "bg:office-night",
   lines: [
+    /*{
+      speakerId: "detective",
+      text: "\"A Mission to Defy Death\"",
+    },
+    {
+      speakerId: "detective",
+      text: "That's how it was marketed.",
+    },
+    {
+      speakerId: "detective",
+      text: "I should've known better than to believe it.",
+    },
+    {
+      speakerId: "detective",
+      text: "...",
+    },*/
     {
       speakerId: "narrator",
       text: "The first thing I remember is the smell.",
-      //unlocks: [
-      //  { type: "revealProfile", profileId: "sarah-chen" },
-      //  { type: "revealName", profileId: "sarah-chen" },
-      // { type: "revealImage", profileId: "sarah-chen" }],
-      //],
     },
     {
       speakerId: "narrator",
