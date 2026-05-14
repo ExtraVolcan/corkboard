@@ -516,9 +516,17 @@ a {
   min-height: 0;
   /* Portrait overlap extends horizontally; keep vertical scroll off the scene */
   overflow: visible;
-  /* Hard rails for NPC horizontal placement (tune without touching layout code) */
-  --vn-portrait-row-inset-end: clamp(1.25rem, 11vw, 6.5rem);
-  --vn-portrait-npc-strip-max-w: min(26rem, 100%);
+  /*
+   * Portrait band (inherits into .vn-portrait-column):
+   * --vn-portrait-column-max — max width of portrait row (dialogue stays 40rem); wider = B further out.
+   * --vn-portrait-row-inset-end — padding-right on portrait row (pulls whole NPC block left).
+   * --vn-portrait-slot-overlap — negative margin between consecutive NPC slots (D←C←B); larger = more overlap.
+   * --vn-portrait-fixed-gap — extra flex gap between slots (usually 0 when overlapping).
+   */
+  --vn-portrait-column-max: 43rem;
+  --vn-portrait-row-inset-end: clamp(1.25rem, 11vw, 0rem);
+  --vn-portrait-slot-overlap: 11rem;
+  --vn-portrait-fixed-gap: 0;
 }
 
 /* Scene meta + icon toolbar */
@@ -638,15 +646,18 @@ a.vn-icon-btn {
 }
 
 /*
- * Centered column matching dialogue max-width; avoids flex “shrink-to-content” so rails are predictable.
+ * Centered band for portraits — may be wider than .vn-dialogue-outer so NPCs (especially B) can sit
+ * slightly past the dialogue edges (--vn-portrait-column-max on .vn-scene).
  */
 .vn-portrait-column {
   box-sizing: border-box;
   align-self: flex-end;
-  width: min(100%, 40rem);
-  max-width: 40rem;
+  width: min(100%, var(--vn-portrait-column-max, 40rem));
+  max-width: var(--vn-portrait-column-max, 40rem);
   margin: 0 auto;
   padding: 0 0.25rem;
+  /* Shared by fixed slots + .vn-portrait-figure-wrap */
+  --vn-portrait-size: min(17.5rem, 34vw, 42vh);
 }
 
 .vn-portrait-area {
@@ -709,26 +720,54 @@ a.vn-icon-btn {
   overflow: visible;
 }
 
-/* Non-protagonist portraits: capped width so the cluster cannot extend arbitrarily far right. */
+/* Non-protagonist portraits: three fixed columns (see portraitLayout.NPC_FIXED_SLOT_COUNT). */
 .vn-portrait-npc-strip {
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
-  flex: 0 1 auto;
-  max-width: var(--vn-portrait-npc-strip-max-w, 100%);
+  flex: 0 0 auto;
   min-width: 0;
   overflow: visible;
 }
 
-.vn-portrait-cluster--npc {
+/* Spatial order L→R: slot 0 = 3rd NPC, 1 = 2nd, 2 = 1st (right “B” column). Overlap via margin-left. */
+.vn-portrait-npc-fixed-row {
   display: flex;
   flex-flow: row nowrap;
   align-items: flex-end;
-  justify-content: flex-start;
+  justify-content: flex-end;
+  gap: var(--vn-portrait-fixed-gap, 0);
   flex: 0 0 auto;
   min-width: 0;
-  gap: 0;
+}
+
+.vn-portrait-fixed-slot {
+  box-sizing: border-box;
+  flex: 0 0 var(--vn-portrait-size, min(17.5rem, 34vw, 42vh));
+  width: var(--vn-portrait-size, min(17.5rem, 34vw, 42vh));
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: var(--vn-portrait-size, min(17.5rem, 34vw, 42vh));
   overflow: visible;
+  position: relative;
+}
+
+/* Higher index = further right = paint on top when overlapping */
+.vn-portrait-npc-fixed-row .vn-portrait-fixed-slot:nth-child(1) {
+  z-index: 1;
+}
+.vn-portrait-npc-fixed-row .vn-portrait-fixed-slot:nth-child(2) {
+  z-index: 2;
+  margin-left: calc(-1 * var(--vn-portrait-slot-overlap, 0px));
+}
+.vn-portrait-npc-fixed-row .vn-portrait-fixed-slot:nth-child(3) {
+  z-index: 3;
+  margin-left: calc(-1 * var(--vn-portrait-slot-overlap, 0px));
+}
+
+.vn-portrait-fixed-slot--empty {
+  pointer-events: none;
 }
 
 .vn-portrait-slot {
@@ -743,13 +782,12 @@ a.vn-icon-btn {
 
 /* Square frame for 600×600 (and similar) art — shorter than old bust crop; no cropping */
 .vn-portrait-figure-wrap {
-  --vn-portrait-size: min(17.5rem, 34vw, 42vh);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--vn-portrait-size);
-  height: var(--vn-portrait-size);
+  width: var(--vn-portrait-size, min(17.5rem, 34vw, 42vh));
+  height: var(--vn-portrait-size, min(17.5rem, 34vw, 42vh));
   overflow: hidden;
   flex-shrink: 0;
   align-self: flex-end;

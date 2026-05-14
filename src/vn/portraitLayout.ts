@@ -8,10 +8,11 @@ export const PROTAGONIST_SPEAKER_IDS = new Set<string>(["detective"]);
 export const INNER_MONOLOGUE_PORTRAIT_SPEAKER_ID = "detective";
 
 /**
- * Negative margin between consecutive NPC portraits (LTR: each tucks under the one to its right).
- * Larger = heavier overlap = narrower strip toward the detective.
+ * Fixed NPC portrait columns (spatial order left → right: “D … C … B”).
+ * 1st NPC by scene appearance → right column; 2nd → middle; 3rd → left. Columns stay reserved so
+ * new faces “spawn” into place without shifting existing portraits.
  */
-const NPC_PORTRAIT_OVERLAP_PX = 324;
+export const NPC_FIXED_SLOT_COUNT = 3;
 
 export type SpeakerPortraitSnapshot = {
   speakerId: string;
@@ -33,8 +34,11 @@ export type PortraitSlot = {
 
 export type PortraitClusters = {
   left: PortraitSlot[];
-  /** One row, DOM order: 1st NPC by appearance, then 3rd+, …, 2nd by appearance (right anchor). */
-  npc: PortraitSlot[];
+  /**
+   * Length {@link NPC_FIXED_SLOT_COUNT}. Index 0 = left column (3rd NPC by appearance), 1 = middle
+   * (2nd), 2 = right (1st). `null` = reserved column, character not introduced yet at `lineIndex`.
+   */
+  npcFixedSlots: (PortraitSlot | null)[];
 };
 
 function skipPortraitForSpeaker(line: VnLine): boolean {
@@ -101,32 +105,25 @@ export function collectPortraitSnapshots(
   return map;
 }
 
-function firstAppearanceLine(lines: VnLine[], speakerId: string): number {
-  const base = canonicalSpeakerId(speakerId);
-  for (let i = 0; i < lines.length; i++) {
-    const sid = lines[i]?.speakerId;
-    if (sid && canonicalSpeakerId(sid) === base) return i;
-  }
-  return 999999;
-}
-
-function sortOthersByAppearance(lines: VnLine[], others: string[]): string[] {
-  return [...others].sort(
-    (a, b) => firstAppearanceLine(lines, a) - firstAppearanceLine(lines, b)
-  );
-}
-
 /**
- * NPC flex order (LTR): first speaker, then everyone after the second in appearance order,
- * then the **second** speaker last — so that portrait is the rightmost (mirrors the detective on the left).
+ * All NPC portrait speaker ids in **first-appearance** order across the whole scene (not clipped
+ * by current line). Used so empty fixed columns know which rank each column is for.
  */
-function npcDomOrderByAppearance(othersSorted: string[]): string[] {
-  if (othersSorted.length === 0) return [];
-  if (othersSorted.length === 1) return [othersSorted[0]!];
-  const o1 = othersSorted[0]!;
-  const o2 = othersSorted[1]!;
-  const tail = othersSorted.slice(2);
-  return [o1, ...tail, o2];
+export function collectNpcPortraitIdsInSceneOrder(scene: VnScene): string[] {
+  const seen = new Set<string>();
+  const order: string[] = [];
+  for (const line of scene.lines) {
+    if (skipPortraitForSpeaker(line)) continue;
+    const sid = line.speakerId!;
+    const base = canonicalSpeakerId(sid);
+    const portraitSpeakerId =
+      base === "narrator" ? INNER_MONOLOGUE_PORTRAIT_SPEAKER_ID : base;
+    if (PROTAGONIST_SPEAKER_IDS.has(portraitSpeakerId)) continue;
+    if (seen.has(portraitSpeakerId)) continue;
+    seen.add(portraitSpeakerId);
+    order.push(portraitSpeakerId);
+  }
+  return order;
 }
 
 function buildSlot(
@@ -161,11 +158,11 @@ function buildSlot(
 }
 
 /**
- * - **Left**: protagonist (`detective`) — fixed left anchor.
- * - **NPC** (`npc`): one row, end-aligned in CSS. Order is `[1st NPC, 3rd, 4th, …, 2nd NPC]` by scene
- *   appearance so the **second** NPC is the **right** anchor (mirror of the detective). Overlap pulls
- *   earlier slots left so the strip stays compact away from the detective.
- * - Current line `emotion` / highlight still get z-index boosts in {@link buildSlot}.
+ * - **Left**: protagonist (`detective`).
+ * - **npcFixedSlots**: always {@link NPC_FIXED_SLOT_COUNT} entries. Spatial L→R = 3rd, 2nd, 1st NPC by
+ *   **scene-wide** first appearance among non-protagonists (matches `A … D … C … B`). A column stays
+ *   `null` until that rank’s character has appeared at or before `lineIndex`; then they render in
+ *   place without moving other portraits.
  */
 export function buildPortraitLayout(
   scene: VnScene,
@@ -177,21 +174,31 @@ export function buildPortraitLayout(
 
   const ids = [...snaps.keys()];
   const protagonistIds = ids.filter((id) => PROTAGONIST_SPEAKER_IDS.has(id));
-  const othersRaw = ids.filter((id) => !PROTAGONIST_SPEAKER_IDS.has(id));
-  const others = sortOthersByAppearance(lines, othersRaw);
-
   const left: PortraitSlot[] = protagonistIds.map((id) =>
     buildSlot(id, snaps, highlightSpeakerId, lines, lineIndex, {})
   );
 
-  const order = npcDomOrderByAppearance(others);
-  const npc: PortraitSlot[] = order.map((id, i) =>
-    buildSlot(id, snaps, highlightSpeakerId, lines, lineIndex, {
-      overlapMarginLeftPx: i === 0 ? 0 : -NPC_PORTRAIT_OVERLAP_PX,
-      /** Later in DOM = further right = paint on top when overlapping */
-      stackZIndex: 200 + i * 120,
-    })
-  );
+  const sceneNpcOrder = collectNpcPortraitIdsInSceneOrder(scene);
+  const tier = sceneNpcOrder.slice(0, NPC_FIXED_SLOT_COUNT);
 
-  return { left, npc };
+  const npcFixedSlots: (PortraitSlot | null)[] = [];
+  for (let slotIdx = 0; slotIdx < NPC_FIXED_SLOT_COUNT; slotIdx++) {
+    const charIndex = NPC_FIXED_SLOT_COUNT - 1 - slotIdx;
+    if (charIndex >= tier.length) {
+      npcFixedSlots.push(null);
+      continue;
+    }
+    const speakerId = tier[charIndex]!;
+    if (!snaps.has(speakerId)) {
+      npcFixedSlots.push(null);
+      continue;
+    }
+    npcFixedSlots.push(
+      buildSlot(speakerId, snaps, highlightSpeakerId, lines, lineIndex, {
+        stackZIndex: 220 + slotIdx * 160,
+      })
+    );
+  }
+
+  return { left, npcFixedSlots };
 }

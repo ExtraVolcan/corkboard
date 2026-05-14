@@ -513,6 +513,7 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "We have to be. Out here the mission isn't a slogan, it's the reason any of us wake up at all.",
+      emotion: "neutral"
     },
     {
       speakerId: "stephano",

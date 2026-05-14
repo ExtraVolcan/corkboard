@@ -529,16 +529,25 @@ export function VisualNovelPage() {
                 <div className="vn-portrait-row-spacer" aria-hidden />
                 <div className="vn-portrait-npc-rail">
                   <div className="vn-portrait-npc-strip">
-                    <div className="vn-portrait-cluster vn-portrait-cluster--npc">
-                      {portraitLayout.npc.map((slot) => (
-                        <PortraitFigure
-                          key={slot.speakerId}
-                          slot={slot}
-                          charById={charById}
-                          speakerLabelCtx={speakerLabelCtx}
-                          campaignProfiles={data.profiles}
-                          isImageVisible={isImageVisible}
-                        />
+                    <div className="vn-portrait-npc-fixed-row">
+                      {portraitLayout.npcFixedSlots.map((slot, slotIdx) => (
+                        <div
+                          key={`npc-slot-${slotIdx}`}
+                          className={`vn-portrait-fixed-slot${
+                            slot ? "" : " vn-portrait-fixed-slot--empty"
+                          }`}
+                          aria-hidden={!slot}
+                        >
+                          {slot ? (
+                            <PortraitFigure
+                              slot={slot}
+                              charById={charById}
+                              speakerLabelCtx={speakerLabelCtx}
+                              campaignProfiles={data.profiles}
+                              isImageVisible={isImageVisible}
+                            />
+                          ) : null}
+                        </div>
                       ))}
                     </div>
                   </div>
