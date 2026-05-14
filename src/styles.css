@@ -516,6 +516,9 @@ a {
   min-height: 0;
   /* Portrait overlap extends horizontally; keep vertical scroll off the scene */
   overflow: visible;
+  /* Hard rails for NPC horizontal placement (tune without touching layout code) */
+  --vn-portrait-row-inset-end: clamp(1.25rem, 11vw, 6.5rem);
+  --vn-portrait-npc-strip-max-w: min(26rem, 100%);
 }
 
 /* Scene meta + icon toolbar */
@@ -634,12 +637,22 @@ a.vn-icon-btn {
   overflow: visible;
 }
 
-/* Same horizontal band as .vn-dialogue-outer — portraits line up with dialogue left edge */
+/*
+ * Centered column matching dialogue max-width; avoids flex “shrink-to-content” so rails are predictable.
+ */
+.vn-portrait-column {
+  box-sizing: border-box;
+  align-self: flex-end;
+  width: min(100%, 40rem);
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 0 0.25rem;
+}
+
 .vn-portrait-area {
   box-sizing: border-box;
-  flex: 0 1 auto;
-  width: min(100%, 40rem);
-  padding: 0 0.25rem 0;
+  width: 100%;
+  min-width: 0;
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
@@ -649,14 +662,25 @@ a.vn-icon-btn {
 .vn-portrait-row {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-wrap: nowrap;
   width: 100%;
+  box-sizing: border-box;
   gap: 0.35rem;
   min-width: 0;
+  /* Pull NPC cluster left of the column’s geometric right (independent of dialogue box width). */
+  padding-right: var(--vn-portrait-row-inset-end, 0);
   /* Lift row so a sliver can tuck under the dialogue strip */
   transform-origin: bottom center;
   transform: translateY(clamp(-5rem, -12vh, -2.5rem));
+}
+
+/* Grows between detective and NPCs; min-width enforces a floor so overlap never crosses the detective. */
+.vn-portrait-row-spacer {
+  flex: 1 1 auto;
+  min-width: clamp(2rem, 10vw, 5.5rem);
+  align-self: stretch;
+  pointer-events: none;
 }
 
 .vn-portrait-cluster {
@@ -674,18 +698,37 @@ a.vn-icon-btn {
   flex-shrink: 0;
 }
 
-.vn-portrait-cluster--center {
+/* Fills space between spacer and row’s right padding; NPC strip is end-aligned inside this rail. */
+.vn-portrait-npc-rail {
   flex: 1 1 auto;
-  justify-content: center;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
   min-width: 0;
-  padding: 0 0.2rem;
+  max-width: 100%;
   overflow: visible;
 }
 
-.vn-portrait-cluster--right {
+/* Non-protagonist portraits: capped width so the cluster cannot extend arbitrarily far right. */
+.vn-portrait-npc-strip {
+  display: flex;
+  align-items: flex-end;
   justify-content: flex-end;
+  flex: 0 1 auto;
+  max-width: var(--vn-portrait-npc-strip-max-w, 100%);
+  min-width: 0;
+  overflow: visible;
+}
+
+.vn-portrait-cluster--npc {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-end;
+  justify-content: flex-start;
   flex: 0 0 auto;
-  flex-shrink: 0;
+  min-width: 0;
+  gap: 0;
+  overflow: visible;
 }
 
 .vn-portrait-slot {
@@ -710,6 +753,8 @@ a.vn-icon-btn {
   overflow: hidden;
   flex-shrink: 0;
   align-self: flex-end;
+  border: none;
+  outline: none;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
 }
 
@@ -724,7 +769,7 @@ a.vn-icon-btn {
   padding: 0.4rem 0.55rem;
   border-radius: 0.4rem;
   background: rgba(10, 8, 6, 0.82);
-  border: 1px solid rgba(255, 250, 245, 0.16);
+  border: none;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
@@ -764,6 +809,8 @@ a.vn-icon-btn {
   filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
   user-select: none;
   -webkit-user-drag: none;
+  border: none;
+  outline: none;
 }
 
 /* Dialogue + controls at bottom of scene (in front of portraits) */

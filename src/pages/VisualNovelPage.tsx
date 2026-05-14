@@ -174,7 +174,7 @@ function IconClose() {
 }
 
 function placeholderArt(letter: string, accent: string): string {
-  const body = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="480" viewBox="0 0 360 480"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a2018"/><stop offset="100%" stop-color="#0f0c0a"/></linearGradient></defs><rect width="360" height="480" fill="url(#g)" rx="20" stroke="rgba(255,255,255,0.08)"/><text x="180" y="268" text-anchor="middle" font-size="120" font-family="Georgia,serif" fill="${accent}">${letter}</text></svg>`;
+  const body = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="480" viewBox="0 0 360 480"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a2018"/><stop offset="100%" stop-color="#0f0c0a"/></linearGradient></defs><rect width="360" height="480" fill="url(#g)" rx="20"/><text x="180" y="268" text-anchor="middle" font-size="120" font-family="Georgia,serif" fill="${accent}">${letter}</text></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(body)}`;
 }
 
@@ -511,43 +511,38 @@ export function VisualNovelPage() {
         </div>
 
         <div className="vn-portrait-layer">
-          <div className="vn-portrait-area">
-            <div className="vn-portrait-row">
-              <div className="vn-portrait-cluster vn-portrait-cluster--left">
-                {portraitLayout.left.map((slot) => (
-                  <PortraitFigure
-                    key={slot.speakerId}
-                    slot={slot}
-                    charById={charById}
-                    speakerLabelCtx={speakerLabelCtx}
-                    campaignProfiles={data.profiles}
-                    isImageVisible={isImageVisible}
-                  />
-                ))}
-              </div>
-              <div className="vn-portrait-cluster vn-portrait-cluster--center">
-                {portraitLayout.center.map((slot) => (
-                  <PortraitFigure
-                    key={slot.speakerId}
-                    slot={slot}
-                    charById={charById}
-                    speakerLabelCtx={speakerLabelCtx}
-                    campaignProfiles={data.profiles}
-                    isImageVisible={isImageVisible}
-                  />
-                ))}
-              </div>
-              <div className="vn-portrait-cluster vn-portrait-cluster--right">
-                {portraitLayout.right.map((slot) => (
-                  <PortraitFigure
-                    key={slot.speakerId}
-                    slot={slot}
-                    charById={charById}
-                    speakerLabelCtx={speakerLabelCtx}
-                    campaignProfiles={data.profiles}
-                    isImageVisible={isImageVisible}
-                  />
-                ))}
+          <div className="vn-portrait-column">
+            <div className="vn-portrait-area">
+              <div className="vn-portrait-row">
+                <div className="vn-portrait-cluster vn-portrait-cluster--left">
+                  {portraitLayout.left.map((slot) => (
+                    <PortraitFigure
+                      key={slot.speakerId}
+                      slot={slot}
+                      charById={charById}
+                      speakerLabelCtx={speakerLabelCtx}
+                      campaignProfiles={data.profiles}
+                      isImageVisible={isImageVisible}
+                    />
+                  ))}
+                </div>
+                <div className="vn-portrait-row-spacer" aria-hidden />
+                <div className="vn-portrait-npc-rail">
+                  <div className="vn-portrait-npc-strip">
+                    <div className="vn-portrait-cluster vn-portrait-cluster--npc">
+                      {portraitLayout.npc.map((slot) => (
+                        <PortraitFigure
+                          key={slot.speakerId}
+                          slot={slot}
+                          charById={charById}
+                          speakerLabelCtx={speakerLabelCtx}
+                          campaignProfiles={data.profiles}
+                          isImageVisible={isImageVisible}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -431,7 +431,7 @@ export const shipDay2Crew: VnScene = {
       emotion: "think",
       portraitOnly: true,
       text: "",
-    },
+    },//TODO use portraitOnly on all other think-talk lines
     {
       speakerId: "detective",
       text: "Caliban. Pretty much just woke up. I hope my hair looks okay. You are?",
@@ -478,7 +478,13 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "Dinner, ehhhh, not so much.",
-      emotion: "squint"
+      emotion: "squint-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "squint",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "narrator",

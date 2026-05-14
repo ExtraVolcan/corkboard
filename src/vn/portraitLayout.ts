@@ -8,10 +8,10 @@ export const PROTAGONIST_SPEAKER_IDS = new Set<string>(["detective"]);
 export const INNER_MONOLOGUE_PORTRAIT_SPEAKER_ID = "detective";
 
 /**
- * Horizontal overlap in the middle strip (1st NPC + 3rd+). Larger overlap keeps the strip
- * narrower so 3rd/4th portraits are less likely to be clipped by the scene edge.
+ * Negative margin between consecutive NPC portraits (LTR: each tucks under the one to its right).
+ * Larger = heavier overlap = narrower strip toward the detective.
  */
-const MIDDLE_STRIP_OVERLAP_PX = 108;
+const NPC_PORTRAIT_OVERLAP_PX = 324;
 
 export type SpeakerPortraitSnapshot = {
   speakerId: string;
@@ -25,7 +25,7 @@ export type PortraitSlot = {
   emotion?: string;
   portraitId?: string;
   isSpeaking: boolean;
-  /** Negative margin-left to overlap the previous portrait in the middle strip. */
+  /** Negative margin-left: pull this frame left over the previous sibling in the NPC row. */
   overlapMarginLeftPx?: number;
   /** Stacking order; higher draws on top when portraits overlap. */
   stackZIndex?: number;
@@ -33,8 +33,8 @@ export type PortraitSlot = {
 
 export type PortraitClusters = {
   left: PortraitSlot[];
-  center: PortraitSlot[];
-  right: PortraitSlot[];
+  /** One row, DOM order: 1st NPC by appearance, then 3rd+, …, 2nd by appearance (right anchor). */
+  npc: PortraitSlot[];
 };
 
 function skipPortraitForSpeaker(line: VnLine): boolean {
@@ -116,6 +116,19 @@ function sortOthersByAppearance(lines: VnLine[], others: string[]): string[] {
   );
 }
 
+/**
+ * NPC flex order (LTR): first speaker, then everyone after the second in appearance order,
+ * then the **second** speaker last — so that portrait is the rightmost (mirrors the detective on the left).
+ */
+function npcDomOrderByAppearance(othersSorted: string[]): string[] {
+  if (othersSorted.length === 0) return [];
+  if (othersSorted.length === 1) return [othersSorted[0]!];
+  const o1 = othersSorted[0]!;
+  const o2 = othersSorted[1]!;
+  const tail = othersSorted.slice(2);
+  return [o1, ...tail, o2];
+}
+
 function buildSlot(
   speakerId: string,
   snaps: Map<string, SpeakerPortraitSnapshot>,
@@ -148,11 +161,11 @@ function buildSlot(
 }
 
 /**
- * - **Left**: protagonist (`detective`).
- * - **Right** (far right): **second** non-protagonist to speak (`O2`), fixed anchor.
- * - **Center** (between left and right): **first** NPC (`O1`) plus **third+** NPCs (`O3`…),
- *   same baseline, optional horizontal overlap so they read as one middle group.
- * - Current line `emotion` for a portrait adds a z-index boost so that sprite paints on top.
+ * - **Left**: protagonist (`detective`) — fixed left anchor.
+ * - **NPC** (`npc`): one row, end-aligned in CSS. Order is `[1st NPC, 3rd, 4th, …, 2nd NPC]` by scene
+ *   appearance so the **second** NPC is the **right** anchor (mirror of the detective). Overlap pulls
+ *   earlier slots left so the strip stays compact away from the detective.
+ * - Current line `emotion` / highlight still get z-index boosts in {@link buildSlot}.
  */
 export function buildPortraitLayout(
   scene: VnScene,
@@ -171,38 +184,14 @@ export function buildPortraitLayout(
     buildSlot(id, snaps, highlightSpeakerId, lines, lineIndex, {})
   );
 
-  if (others.length === 0) {
-    return { left, center: [], right: [] };
-  }
-
-  if (others.length === 1) {
-    return {
-      left,
-      center: [],
-      right: [
-        buildSlot(others[0]!, snaps, highlightSpeakerId, lines, lineIndex, {}),
-      ],
-    };
-  }
-
-  const O1 = others[0]!;
-  const O2 = others[1]!;
-  const middleTail = others.slice(2);
-  const middleOrder = [O1, ...middleTail];
-
-  const center: PortraitSlot[] = middleOrder.map((id, i) =>
+  const order = npcDomOrderByAppearance(others);
+  const npc: PortraitSlot[] = order.map((id, i) =>
     buildSlot(id, snaps, highlightSpeakerId, lines, lineIndex, {
-      overlapMarginLeftPx: i === 0 ? 0 : -MIDDLE_STRIP_OVERLAP_PX,
-      /** Later joiners stack on top of earlier middle-strip portraits */
-      stackZIndex: 300 + i * 80,
+      overlapMarginLeftPx: i === 0 ? 0 : -NPC_PORTRAIT_OVERLAP_PX,
+      /** Later in DOM = further right = paint on top when overlapping */
+      stackZIndex: 200 + i * 120,
     })
   );
 
-  const right: PortraitSlot[] = [
-    buildSlot(O2, snaps, highlightSpeakerId, lines, lineIndex, {
-      stackZIndex: 260,
-    }),
-  ];
-
-  return { left, center, right };
+  return { left, npc };
 }
