@@ -407,6 +407,7 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "We don't even need to do that much to keep the ship running. Would it kill you to just be nice?",
+      emotion: "neutral"
     },
     {
       speakerId: "stephano",
@@ -423,6 +424,7 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "New face. You lost?",
+      emotion: "think-talk"
     },
     {
       speakerId: "detective",
@@ -430,7 +432,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "stephano",
-      text: "Stephano. Systems: mostly diagnostics and rebuild telemetry.",
+      text: "Stephano. I worked on the synthetic systems before this mission got off the ground.",
       setFlags: [characterNameRevealFlag("stephano")],
       unlocks: [
         { type: "revealProfile", profileId: "stephano" },
@@ -444,7 +446,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "Titania. I work the engine deck, when I'm allowed to be honest about it.",
+      text: "Titania. I can fix the engine if it breaks, but let's hope that doesn't happen.",
       setFlags: [characterNameRevealFlag("titania")],
       unlocks: [
         { type: "revealProfile", profileId: "titania" },
@@ -454,7 +456,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "miranda",
-      text: "Miranda. I-I handle nutrient schedules and food prep.",
+      text: "Miranda. I-I handle food prep.",
       setFlags: [characterNameRevealFlag("miranda")],
       unlocks: [
         { type: "revealProfile", profileId: "miranda" },
@@ -465,10 +467,12 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "She cooks lunch. It's pretty good!",
+      emotion: "neutral"
     },
     {
       speakerId: "titania",
       text: "Dinner, ehhhh, not so much.",
+      emotion: "squint"
     },
     {
       speakerId: "narrator",

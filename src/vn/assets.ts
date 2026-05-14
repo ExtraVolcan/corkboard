@@ -8,6 +8,10 @@ import { canonicalSpeakerId } from "./speakerLabel";
  * - scene.background: "bg:office-night"
  * - line.background: optional override per line (persists until another override)
  * - line.portraitId: "portrait:detective-default"
+ * - **Image files**: put PNG/WebP in `public/assets/portraits/` (Vite serves `public/` at site root).
+ *   Reference as `"/assets/portraits/<filename>.png"` in {@link VN_PORTRAITS} keys below.
+ *   Square art (e.g. 600×600) is shown in a square frame (`object-fit: contain`, no crop).
+ *   Emotion lookup uses `"{canonicalSpeakerId}-{emotion}"` (e.g. `titania-worried`) then bare `emotion`.
  * - line.emotion + speakerId → "{canonicalSpeakerId}-{emotion}" then bare "{emotion}".
  *   Narrator lines with emotion apply to the detective portrait (inner monologue).
  *
@@ -32,8 +36,10 @@ export const VN_BACKGROUNDS: Record<string, string> = {
 };
 
 export const VN_PORTRAITS: Record<string, string> = {
-  // Add real portrait assets here as you create them.
-  // Example: "detective-default": "/assets/portraits/detective-default.png"
+  // Files live in public/assets/portraits/ — filenames can match these keys (see header above).
+  "titania-neutral": "/assets/portraits/titania-neutral.png",
+  "titania-think-talk": "/assets/portraits/titania-think-talk.png",
+  "titania-squint": "/assets/portraits/titania-squint.png",
 };
 
 const BG_PREFIX = "bg:";

@@ -106,6 +106,14 @@ function PortraitFigure({
       className={`vn-portrait-slot${
         slot.isSpeaking ? "" : " vn-portrait-slot--inactive"
       }`}
+      style={{
+        position: "relative",
+        zIndex: slot.stackZIndex ?? 0,
+        ...(slot.overlapMarginLeftPx !== undefined &&
+        slot.overlapMarginLeftPx !== 0
+          ? { marginLeft: `${slot.overlapMarginLeftPx}px` }
+          : {}),
+      }}
     >
       <div className="vn-portrait-figure-wrap">
         <img
