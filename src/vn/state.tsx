@@ -20,6 +20,7 @@ import {
   canonicalSpeakerId,
   resolveSpeakerDisplayLabel,
 } from "./speakerLabel";
+import { preloadRegisteredVnPortraits } from "./assets";
 
 const SAVE_KEY = "mystery-vn-state-v1";
 
@@ -334,6 +335,10 @@ export function VnProvider({ children }: { children: ReactNode }) {
     window.addEventListener(STORY_RELOAD_EVENT, onReload);
     return () => window.removeEventListener(STORY_RELOAD_EVENT, onReload);
   }, []);
+
+  useEffect(() => {
+    void preloadRegisteredVnPortraits();
+  }, [storyRev]);
 
   useEffect(() => {
     if (storyRev === 0) return;

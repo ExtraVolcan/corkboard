@@ -19,6 +19,9 @@ import { canonicalSpeakerId } from "./speakerLabel";
  * - `"think"` tries VN_PORTRAITS["detective-think"] (composite) then VN_PORTRAITS["think"].
  * - `"detective-think"` tries VN_PORTRAITS["detective-detective-think"] then VN_PORTRAITS["detective-think"].
  * Register the URL once under "detective-think" and use either emotion string depending on which fallback you want.
+ *
+ * **Performance:** call {@link preloadRegisteredVnPortraits} on VN startup so emotion/portrait swaps read from cache.
+ * Use WebP/optimized dimensions for large PNGs; dev server can be slower than production static hosting.
  */
 export const VN_BACKGROUNDS: Record<string, string> = {
   "office-night":
@@ -38,6 +41,7 @@ export const VN_BACKGROUNDS: Record<string, string> = {
 export const VN_PORTRAITS: Record<string, string> = {
   // Files live in public/assets/portraits/ — filenames can match these keys (see header above).
   "titania-neutral": "/assets/portraits/titania-neutral.png",
+  "titania-neutral-talk": "/assets/portraits/titania-neutral-talk.png",
   "titania-think": "/assets/portraits/titania-think.png",
   "titania-think-talk": "/assets/portraits/titania-think-talk.png",
   "titania-squint": "/assets/portraits/titania-squint.png",
@@ -47,6 +51,47 @@ export const VN_PORTRAITS: Record<string, string> = {
 const BG_PREFIX = "bg:";
 const PORTRAIT_PREFIX = "portrait:";
 const FALLBACK_BG = "linear-gradient(180deg, #20150f, #120b08)";
+
+/** In-flight preloads so duplicate URLs share one promise. */
+const portraitPreloadByUrl = new Map<string, Promise<void>>();
+
+/**
+ * Loads and decodes a portrait URL into the browser image cache so later `<img src>` updates are fast.
+ * Resolves on error (missing file) so startup never hangs.
+ */
+export function preloadPortraitUrl(url: string): Promise<void> {
+  const u = url?.trim();
+  if (!u || u.startsWith("data:")) return Promise.resolve();
+  const hit = portraitPreloadByUrl.get(u);
+  if (hit) return hit;
+  const p = new Promise<void>((resolve) => {
+    const img = new Image();
+    const done = () => resolve();
+    img.onload = () => {
+      if ("decode" in img && typeof img.decode === "function") {
+        img.decode().then(done).catch(done);
+      } else {
+        done();
+      }
+    };
+    img.onerror = done;
+    img.src = u;
+  });
+  portraitPreloadByUrl.set(u, p);
+  return p;
+}
+
+/** Preload every {@link VN_PORTRAITS} asset — call when the VN mounts or story bundle reloads. */
+export function preloadRegisteredVnPortraits(): Promise<void> {
+  const urls = [...new Set(Object.values(VN_PORTRAITS).filter(Boolean))] as string[];
+  return Promise.all(urls.map(preloadPortraitUrl)).then(() => undefined);
+}
+
+/** Preload arbitrary portrait/dossier image URLs (e.g. campaign profile `image` fields). */
+export function preloadPortraitUrls(urls: readonly string[]): Promise<void> {
+  const uniq = [...new Set(urls.filter(Boolean))] as string[];
+  return Promise.all(uniq.map(preloadPortraitUrl)).then(() => undefined);
+}
 
 export function resolveBackground(background: string): string {
   if (!background.startsWith(BG_PREFIX)) return background;

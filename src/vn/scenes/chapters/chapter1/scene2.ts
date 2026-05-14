@@ -798,18 +798,28 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "That's diplomat speak. It was a damn knife fight with words.",
+      emotion: "neutral-talk"
     },
     {
       speakerId: "titania",
       text: "Cressida carved Miranda up!",
+      emotion: "neutral-talk"
     },
     {
       speakerId: "titania",
       text: "Not literally.",
+      emotion: "neutral-talk"
     },
     {
       speakerId: "titania",
       text: "Figuratively.",
+      emotion: "squint-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",
@@ -818,10 +828,18 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "Ugh, come on, if they actually drew blood there's no way I'd keep that gossip to myself.",
+      emotion: "squint-talk"
     },
     {
       speakerId: "titania",
       text: "But like, Cressida really laid into Miranda, she had some... choice words.",
+      emotion: "think-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "think",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
@@ -838,6 +856,13 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "Figuratively.",
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",

@@ -9,6 +9,7 @@ import { mergeProfilesWithSeed } from "../campaignSeedFallback";
 import { corkboardHasUnreadIntel } from "../newBadges";
 import {
   portraitRegistryHint,
+  preloadPortraitUrls,
   resolveBackground,
   resolveEffectiveSceneBackground,
   resolvePortraitForSnapshot,
@@ -120,6 +121,8 @@ function PortraitFigure({
           className="vn-portrait"
           src={src}
           alt={label ? `${label} portrait` : ""}
+          decoding="async"
+          fetchPriority={slot.isSpeaking ? "high" : "low"}
         />
         {showPlaceholderEmotionHint ? (
           <div className="vn-portrait-emotion-hint" aria-hidden>
@@ -205,6 +208,18 @@ export function VisualNovelPage() {
   const [sfxPrefs, setSfxPrefs] = useState<SfxPrefs>(() => loadSfxPrefs());
   const prevRevealsRef = useRef<VnState["reveals"] | null>(null);
   const historyListRef = useRef<HTMLDivElement>(null);
+
+  const profileImageUrls = useMemo(
+    () =>
+      data.profiles
+        .map((p) => p.image?.trim())
+        .filter((u): u is string => Boolean(u)),
+    [data.profiles]
+  );
+
+  useEffect(() => {
+    void preloadPortraitUrls(profileImageUrls);
+  }, [profileImageUrls]);
 
   function openCorkboard() {
     playSfx("panel", sfxPrefs);
