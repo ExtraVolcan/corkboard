@@ -212,7 +212,10 @@ export function StoryEditorPage() {
             <code>revealEntry</code>, or <code>type: &quot;setProfileDisplayName&quot;</code>{" "}
             with <code>profileId</code> + <code>displayName</code> — VN-only corkboard label;
             empty <code>displayName</code> drops the override so the campaign name shows after{" "}
-            <code>revealName</code>). <code>choices</code> (branch) or{" "}
+            <code>revealName</code>). <code>portraitOnly: true</code> updates portraits (and{" "}
+            flags/unlocks) without dialogue or speaker highlight — use with{" "}
+            <code>speakerId</code> + <code>emotion</code> or <code>portraitId</code> and{" "}
+            <code>text: &quot;&quot;</code>. <code>choices</code> (branch) or{" "}
             <code>interaction</code> (MCQ / accuse).
           </li>
           <li>

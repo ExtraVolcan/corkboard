@@ -79,6 +79,12 @@ export type VnLine = {
    * Resolved as `VN_PORTRAITS["{speakerId}-{emotion}"]` when assets exist.
    */
   emotion?: string;
+  /**
+   * When true, this line only updates portraits (and flags/unlocks); no dialogue is shown and
+   * no speaker highlight. Use `text: ""` and `speakerId` + `emotion` or `portraitId` to set a
+   * background character’s expression while another line is “foreground.”
+   */
+  portraitOnly?: boolean;
   /** Overrides scene background from this line onward (same `bg:` ids or raw CSS as scene.background). */
   background?: string;
   text: string;

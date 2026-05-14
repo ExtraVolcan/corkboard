@@ -427,6 +427,12 @@ export const shipDay2Crew: VnScene = {
       emotion: "think-talk"
     },
     {
+      speakerId: "titania",
+      emotion: "think",
+      portraitOnly: true,
+      text: "",
+    },
+    {
       speakerId: "detective",
       text: "Caliban. Pretty much just woke up. I hope my hair looks okay. You are?",
     },

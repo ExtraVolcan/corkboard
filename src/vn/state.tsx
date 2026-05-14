@@ -104,17 +104,21 @@ function getInitialVnState(
   const firstLine = first.lines[0]!;
   const initialUnlock = mergeUnlockState({}, {}, firstLine.unlocks);
   const initialFlags = withSetFlags({}, firstLine.setFlags);
-  return {
-    currentSceneId: first.id,
-    lineIndex: 0,
-    history: [],
-    points: 0,
-    settings: { textSpeed: 60, autoAdvance: false },
-    flags: initialFlags,
-    reveals: initialUnlock.reveals,
-    profileDisplayNames: initialUnlock.profileDisplayNames,
-    interaction: interactionStateForLine(first.id, 0, scenesById),
-  };
+  return absorbPortraitOnlyPrefix(
+    first,
+    {
+      currentSceneId: first.id,
+      lineIndex: 0,
+      history: [],
+      points: 0,
+      settings: { textSpeed: 60, autoAdvance: false },
+      flags: initialFlags,
+      reveals: initialUnlock.reveals,
+      profileDisplayNames: initialUnlock.profileDisplayNames,
+      interaction: interactionStateForLine(first.id, 0, scenesById),
+    },
+    scenesById
+  );
 }
 
 function loadState(): VnState {
@@ -256,6 +260,49 @@ function mergeUnlockState(
   return { reveals: nextReveals, profileDisplayNames: nextNames };
 }
 
+/** Skip leading portrait-only beats so the player never “stops” on an empty dialogue line. */
+function absorbPortraitOnlyPrefix(
+  scene: VnScene,
+  st: VnState,
+  scenesById: Map<string, VnScene>
+): VnState {
+  let idx = st.lineIndex;
+  let f = st.flags;
+  let r = st.reveals;
+  let p = st.profileDisplayNames;
+  while (idx < scene.lines.length) {
+    const ln = scene.lines[idx];
+    if (!ln?.portraitOnly) break;
+    if (!hasRequiredFlags(f, ln.requireFlags)) break;
+    const m = mergeUnlockState(r, p, ln.unlocks);
+    r = m.reveals;
+    p = m.profileDisplayNames;
+    f = withSetFlags(f, ln.setFlags);
+    const n2 = nextVisibleLineIndex(scene, idx + 1, f);
+    if (n2 == null) {
+      return {
+        ...st,
+        lineIndex: idx,
+        flags: f,
+        reveals: r,
+        profileDisplayNames: p,
+        interaction: {},
+        mcqWrongFeedback: undefined,
+      };
+    }
+    idx = n2;
+  }
+  return {
+    ...st,
+    lineIndex: idx,
+    flags: f,
+    reveals: r,
+    profileDisplayNames: p,
+    interaction: interactionStateForLine(scene.id, idx, scenesById),
+    mcqWrongFeedback: undefined,
+  };
+}
+
 function nextVisibleLineIndex(
   scene: VnScene,
   fromIndex: number,
@@ -331,20 +378,24 @@ export function VnProvider({ children }: { children: ReactNode }) {
             base.profileDisplayNames,
             lineAt(targetScene.id, initialIndex, scenesById)?.unlocks
           );
-          return {
-            ...base,
-            currentSceneId: targetScene.id,
-            lineIndex: initialIndex,
-            flags,
-            reveals: atTarget.reveals,
-            profileDisplayNames: atTarget.profileDisplayNames,
-            interaction: interactionStateForLine(
-              targetScene.id,
-              initialIndex,
-              scenesById
-            ),
-            mcqWrongFeedback: undefined,
-          };
+          return absorbPortraitOnlyPrefix(
+            targetScene,
+            {
+              ...base,
+              currentSceneId: targetScene.id,
+              lineIndex: initialIndex,
+              flags,
+              reveals: atTarget.reveals,
+              profileDisplayNames: atTarget.profileDisplayNames,
+              interaction: interactionStateForLine(
+                targetScene.id,
+                initialIndex,
+                scenesById
+              ),
+              mcqWrongFeedback: undefined,
+            },
+            scenesById
+          );
         };
 
         const goNextLine = (
@@ -352,12 +403,12 @@ export function VnProvider({ children }: { children: ReactNode }) {
           fromScene: VnScene,
           flags: Record<string, true>
         ): VnState => {
-          const nextLineIndex = nextVisibleLineIndex(
+          const firstNext = nextVisibleLineIndex(
             fromScene,
             base.lineIndex + 1,
             flags
           );
-          if (nextLineIndex == null) {
+          if (firstNext == null) {
             return {
               ...base,
               flags,
@@ -365,24 +416,60 @@ export function VnProvider({ children }: { children: ReactNode }) {
               mcqWrongFeedback: undefined,
             };
           }
-          const atNext = mergeUnlockState(
-            base.reveals,
-            base.profileDisplayNames,
-            lineAt(fromScene.id, nextLineIndex, scenesById)?.unlocks
-          );
-          return {
-            ...base,
-            lineIndex: nextLineIndex,
-            flags,
-            reveals: atNext.reveals,
-            profileDisplayNames: atNext.profileDisplayNames,
-            interaction: interactionStateForLine(
-              fromScene.id,
-              nextLineIndex,
-              scenesById
-            ),
-            mcqWrongFeedback: undefined,
-          };
+          let idx = firstNext;
+          let f = flags;
+          let r = base.reveals;
+          let p = base.profileDisplayNames;
+          while (true) {
+            const ln = fromScene.lines[idx]!;
+            if (!hasRequiredFlags(f, ln.requireFlags)) {
+              return {
+                ...base,
+                lineIndex: idx,
+                flags: f,
+                reveals: r,
+                profileDisplayNames: p,
+                interaction: interactionStateForLine(
+                  fromScene.id,
+                  idx,
+                  scenesById
+                ),
+                mcqWrongFeedback: undefined,
+              };
+            }
+            const m = mergeUnlockState(r, p, ln.unlocks);
+            r = m.reveals;
+            p = m.profileDisplayNames;
+            f = withSetFlags(f, ln.setFlags);
+            if (!ln.portraitOnly) {
+              return {
+                ...base,
+                lineIndex: idx,
+                flags: f,
+                reveals: r,
+                profileDisplayNames: p,
+                interaction: interactionStateForLine(
+                  fromScene.id,
+                  idx,
+                  scenesById
+                ),
+                mcqWrongFeedback: undefined,
+              };
+            }
+            const n2 = nextVisibleLineIndex(fromScene, idx + 1, f);
+            if (n2 == null) {
+              return {
+                ...base,
+                lineIndex: idx,
+                flags: f,
+                reveals: r,
+                profileDisplayNames: p,
+                interaction: {},
+                mcqWrongFeedback: undefined,
+              };
+            }
+            idx = n2;
+          }
         };
 
         switch (intent.type) {
@@ -408,6 +495,26 @@ export function VnProvider({ children }: { children: ReactNode }) {
             if (line.choices?.length) return prev;
             if (line.interaction) return prev;
 
+            const afterLineFlags = withSetFlags(prev.flags, line.setFlags);
+            const afterUnlock = mergeUnlockState(
+              prev.reveals,
+              prev.profileDisplayNames,
+              line.unlocks
+            );
+
+            if (line.portraitOnly) {
+              next = goNextLine(
+                {
+                  ...prev,
+                  reveals: afterUnlock.reveals,
+                  profileDisplayNames: afterUnlock.profileDisplayNames,
+                },
+                scene,
+                afterLineFlags
+              );
+              break;
+            }
+
             const historyName =
               resolveSpeakerDisplayLabel(line.speakerId, charById, {
                 flags: prev.flags,
@@ -420,12 +527,6 @@ export function VnProvider({ children }: { children: ReactNode }) {
               line.text
             );
 
-            const afterLineFlags = withSetFlags(prev.flags, line.setFlags);
-            const afterUnlock = mergeUnlockState(
-              prev.reveals,
-              prev.profileDisplayNames,
-              line.unlocks
-            );
             next = goNextLine(
               {
                 ...prev,

@@ -51,6 +51,7 @@ function skipPortraitForSpeaker(line: VnLine): boolean {
 export function resolvePortraitHighlightSpeakerId(
   line: VnLine | undefined
 ): string | undefined {
+  if (line?.portraitOnly) return undefined;
   if (!line?.speakerId) return undefined;
   const base = canonicalSpeakerId(line.speakerId);
   if (base === "narrator") {

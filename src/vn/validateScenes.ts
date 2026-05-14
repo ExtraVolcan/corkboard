@@ -1,5 +1,10 @@
 import type { VnScene } from "./types";
-import { VN_BACKGROUNDS, VN_PORTRAITS } from "./assets";
+import {
+  VN_BACKGROUNDS,
+  VN_PORTRAITS,
+  portraitRegistryHint,
+  resolvePortraitForSnapshot,
+} from "./assets";
 import { canonicalSpeakerId } from "./speakerLabel";
 
 function speakerExists(charIds: Set<string>, speakerId: string): boolean {
@@ -70,6 +75,53 @@ export function validateScenes(
           `${lp}.speakerId`,
           `Unknown character "${line.speakerId}"`
         );
+      }
+      if (line.portraitOnly) {
+        if (!line.speakerId?.trim()) {
+          push(errors, lp, "portraitOnly lines require speakerId");
+        } else if (!speakerExists(charSet, line.speakerId)) {
+          push(
+            errors,
+            `${lp}.speakerId`,
+            `Unknown character "${line.speakerId}"`
+          );
+        } else if (!line.portraitId?.trim() && !line.emotion?.trim()) {
+          push(
+            errors,
+            lp,
+            "portraitOnly lines require portraitId or emotion"
+          );
+        } else {
+          const base = canonicalSpeakerId(line.speakerId);
+          const sidForPortrait =
+            base === "narrator" && line.emotion?.trim()
+              ? "detective"
+              : line.speakerId;
+          const resolved = resolvePortraitForSnapshot({
+            speakerId: sidForPortrait,
+            emotion: line.emotion,
+            portraitId: line.portraitId,
+          });
+          if (!resolved) {
+            const hint = portraitRegistryHint({
+              speakerId: sidForPortrait,
+              emotion: line.emotion,
+            });
+            push(
+              errors,
+              lp,
+              hint
+                ? `portraitOnly: no VN_PORTRAITS match (tried ${hint})`
+                : "portraitOnly: no VN_PORTRAITS match for portraitId / emotion"
+            );
+          }
+        }
+        if (line.choices?.length) {
+          push(errors, lp, "portraitOnly lines cannot include choices");
+        }
+        if (line.interaction) {
+          push(errors, lp, "portraitOnly lines cannot include interaction");
+        }
       }
       if (line.portraitId) {
         const portraitId = line.portraitId.startsWith("portrait:")

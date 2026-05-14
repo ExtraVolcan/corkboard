@@ -355,6 +355,9 @@ export function VisualNovelPage() {
       ),
     [currentLine?.speakerId, charById, speakerLabelCtx]
   );
+  const dialogueSpeakerLabel = currentLine?.portraitOnly
+    ? null
+    : speakerDisplayLabel;
   const visibleChoices =
     currentLine?.choices?.filter(
       (c) => !c.requireFlags?.length || c.requireFlags.every((f) => state.flags[f])
@@ -591,14 +594,14 @@ export function VisualNovelPage() {
                 dispatch({ type: "advanceDialogue" });
               }}
             >
-              {speakerDisplayLabel != null ? (
+              {dialogueSpeakerLabel != null ? (
                 <div
                   className="vn-speaker"
                   style={{
                     color: speaker?.accent || "rgba(253, 230, 200, 0.95)",
                   }}
                 >
-                  {speakerDisplayLabel}
+                  {dialogueSpeakerLabel}
                 </div>
               ) : null}
               <p
@@ -617,14 +620,14 @@ export function VisualNovelPage() {
               className="vn-dialogue-frame vn-dialogue-frame--static"
               style={{ color: "inherit" }}
             >
-              {speakerDisplayLabel != null ? (
+              {dialogueSpeakerLabel != null ? (
                 <div
                   className="vn-speaker"
                   style={{
                     color: speaker?.accent || "rgba(253, 230, 200, 0.95)",
                   }}
                 >
-                  {speakerDisplayLabel}
+                  {dialogueSpeakerLabel}
                 </div>
               ) : null}
               <p

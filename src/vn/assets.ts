@@ -38,6 +38,7 @@ export const VN_BACKGROUNDS: Record<string, string> = {
 export const VN_PORTRAITS: Record<string, string> = {
   // Files live in public/assets/portraits/ — filenames can match these keys (see header above).
   "titania-neutral": "/assets/portraits/titania-neutral.png",
+  "titania-think": "/assets/portraits/titania-think.png",
   "titania-think-talk": "/assets/portraits/titania-think-talk.png",
   "titania-squint": "/assets/portraits/titania-squint.png",
 };
