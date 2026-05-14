@@ -148,6 +148,7 @@ export type VnState = {
 
 export type VnIntent =
   | { type: "advanceDialogue" }
+  | { type: "skipToNextInteraction" }
   | { type: "chooseOption"; optionId: string }
   | { type: "selectInteractionOption"; optionId: string }
   | { type: "selectAccusedProfile"; profileId: string }

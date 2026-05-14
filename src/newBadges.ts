@@ -16,8 +16,7 @@ function profileVisibleToPlayer(profile: Profile, vn?: VnRevealGate): boolean {
   return profile.profileRevealed || Boolean(vn?.isProfileVisible(profile.id));
 }
 
-export function visibleTokensAfterVisit(profile: Profile, isAdmin: boolean): string[] {
-  if (isAdmin) return [];
+export function visibleTokensAfterVisit(profile: Profile): string[] {
   const tokens: string[] = [];
   if (profile.profileRevealed) {
     if (profile.nameRevealed) tokens.push(NAME);
@@ -62,10 +61,9 @@ export function isImageNew(profile: Profile, ack: AckState, vn?: VnRevealGate): 
 export function profileHasAnyNew(
   profile: Profile,
   ack: AckState,
-  isAdmin: boolean,
   vn?: VnRevealGate
 ): boolean {
-  if (isAdmin || !profileVisibleToPlayer(profile, vn)) return false;
+  if (!profileVisibleToPlayer(profile, vn)) return false;
   if (isNameNew(profile, ack, vn)) return true;
   if (isImageNew(profile, ack, vn)) return true;
   for (const e of profile.entries) {
@@ -81,13 +79,10 @@ export function profileHasAnyNew(
 export function corkboardHasUnreadIntel(
   catalog: Profile[],
   ack: AckState,
-  isAdmin: boolean,
   vn: VnRevealGate
 ): boolean {
-  const visible = isAdmin
-    ? catalog
-    : catalog.filter((p) => profileVisibleToPlayer(p, vn));
-  return visible.some((p) => profileHasAnyNew(p, ack, isAdmin, vn));
+  const visible = catalog.filter((p) => profileVisibleToPlayer(p, vn));
+  return visible.some((p) => profileHasAnyNew(p, ack, vn));
 }
 
 export { NAME as ACK_NAME, IMAGE as ACK_IMAGE };

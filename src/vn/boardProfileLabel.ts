@@ -6,14 +6,11 @@ export function polaroidCaptionFromCampaign(
   opts: {
     profileVisible: boolean;
     nameVisible: boolean;
-    campaignNameRevealed: boolean;
-    isAdmin: boolean;
   }
 ): string {
   if (!opts.profileVisible) return "?";
   const override = profileDisplayNames[profileId];
   if (override !== undefined && override !== "") return override;
-  if (opts.nameVisible || (opts.isAdmin && opts.campaignNameRevealed))
-    return campaignName;
+  if (opts.nameVisible) return campaignName;
   return "?";
 }

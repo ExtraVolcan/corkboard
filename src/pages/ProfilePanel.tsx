@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { useAuth } from "../auth";
 import { useCampaign } from "../campaign";
 import { EntryText } from "../components/EntryText";
 import {
@@ -25,8 +24,7 @@ export function ProfilePanel({
   variant: "page" | "modal";
   onCloseModal?: () => void;
 }) {
-  const { isAdmin } = useAuth();
-  const { data, ack, setProfile, mergeAck } = useCampaign();
+  const { data, ack, mergeAck } = useCampaign();
   const {
     state: vnState,
     isProfileVisible,
@@ -55,20 +53,20 @@ export function ProfilePanel({
     [data.profiles]
   );
 
-  const entriesToShow = useMemo(() => {
-    if (isAdmin) return profile?.entries ?? [];
-    return (profile?.entries ?? []).filter(
-      (e) => e.revealed || isEntryVisible(profile?.id ?? "", e.id)
-    );
-  }, [profile?.entries, profile?.id, isAdmin, isEntryVisible]);
+  const entriesToShow = useMemo(
+    () =>
+      (profile?.entries ?? []).filter(
+        (e) => e.revealed || isEntryVisible(profile?.id ?? "", e.id)
+      ),
+    [profile?.entries, profile?.id, isEntryVisible]
+  );
 
   const showEntriesSection = useMemo(() => {
     if (!profile) return false;
-    if (isAdmin) return profile.entries.length > 0;
     return profile.entries.some(
       (e) => e.revealed || isEntryVisible(profile.id, e.id)
     );
-  }, [profile, isAdmin, isEntryVisible]);
+  }, [profile, isEntryVisible]);
 
   const entryLinkLabel = useCallback(
     (pid: string) => {
@@ -77,25 +75,12 @@ export function ProfilePanel({
       const profileVis = t.profileRevealed || isProfileVisible(t.id);
       const nameVis = t.nameRevealed || isNameVisible(t.id);
       const override = vnState.profileDisplayNames[pid];
-      if (isAdmin) {
-        return (
-          (override !== undefined && override !== ""
-            ? override
-            : t.name?.trim()) || pid
-        );
-      }
       if (!profileVis) return "?";
       if (override !== undefined && override !== "") return override.trim();
       if (nameVis) return t.name.trim();
       return "?";
     },
-    [
-      data.profiles,
-      isAdmin,
-      isProfileVisible,
-      isNameVisible,
-      vnState.profileDisplayNames,
-    ]
+    [data.profiles, isProfileVisible, isNameVisible, vnState.profileDisplayNames]
   );
 
   const profileHref = useCallback((pid: string) => {
@@ -108,25 +93,15 @@ export function ProfilePanel({
   useEffect(() => {
     if (!profile || !profileId) return;
     return () => {
-      const tokens = new Set(visibleTokensAfterVisit(profile, isAdmin));
-      if (!isAdmin) {
-        if (isNameVisible(profile.id)) tokens.add("__name__");
-        if (isImageVisible(profile.id)) tokens.add("__image__");
-        for (const e of profile.entries) {
-          if (isEntryVisible(profile.id, e.id)) tokens.add(e.id);
-        }
+      const tokens = new Set(visibleTokensAfterVisit(profile));
+      if (isNameVisible(profile.id)) tokens.add("__name__");
+      if (isImageVisible(profile.id)) tokens.add("__image__");
+      for (const e of profile.entries) {
+        if (isEntryVisible(profile.id, e.id)) tokens.add(e.id);
       }
       mergeAck(profileId, [...tokens]);
     };
-  }, [
-    profileId,
-    profile,
-    isAdmin,
-    mergeAck,
-    isNameVisible,
-    isImageVisible,
-    isEntryVisible,
-  ]);
+  }, [profileId, profile, mergeAck, isNameVisible, isImageVisible, isEntryVisible]);
 
   if (!profile) {
     return (
@@ -150,7 +125,7 @@ export function ProfilePanel({
   const effectiveImageRevealed =
     profile.imageRevealed || isImageVisible(profile.id);
 
-  if (!effectiveProfileRevealed && !isAdmin) {
+  if (!effectiveProfileRevealed) {
     if (variant === "modal") {
       return (
         <div className="paper">
@@ -164,10 +139,8 @@ export function ProfilePanel({
     return <Navigate to="/?board=1" replace />;
   }
 
-  const showName =
-    isAdmin || (effectiveProfileRevealed && effectiveNameRevealed);
-  const showImage =
-    isAdmin || (effectiveProfileRevealed && effectiveImageRevealed);
+  const showName = effectiveProfileRevealed && effectiveNameRevealed;
+  const showImage = effectiveProfileRevealed && effectiveImageRevealed;
   const dossierTitle = polaroidCaptionFromCampaign(
     profile.name,
     vnState.profileDisplayNames,
@@ -175,8 +148,6 @@ export function ProfilePanel({
     {
       profileVisible: effectiveProfileRevealed,
       nameVisible: effectiveNameRevealed,
-      campaignNameRevealed: profile.nameRevealed,
-      isAdmin,
     }
   );
 
@@ -194,7 +165,7 @@ export function ProfilePanel({
           {showImage ? (
             <>
               <img src={profile.image} alt="" />
-              {!isAdmin && isImageNew(profile, ack, vnRevealGate) ? (
+              {isImageNew(profile, ack, vnRevealGate) ? (
                 <p style={{ margin: "0.35rem 0 0" }}>
                   <span className="badge-new">NEW</span>
                 </p>
@@ -219,59 +190,13 @@ export function ProfilePanel({
         <div>
           <h1 style={{ marginTop: 0 }}>
             {dossierTitle}
-            {!isAdmin && showName && isNameNew(profile, ack, vnRevealGate) ? (
+            {showName && isNameNew(profile, ack, vnRevealGate) ? (
               <>
                 {" "}
                 <span className="badge-new">NEW</span>
               </>
             ) : null}
           </h1>
-          {isAdmin ? (
-            <div className="admin-strip">
-              <strong>Admin</strong>
-              <div className="admin-controls" style={{ marginTop: "0.5rem" }}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={profile.profileRevealed}
-                    onChange={() =>
-                      setProfile(profile.id, (p) => ({
-                        ...p,
-                        profileRevealed: !p.profileRevealed,
-                      }))
-                    }
-                  />{" "}
-                  Reveal profile publicly
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={profile.nameRevealed}
-                    onChange={() =>
-                      setProfile(profile.id, (p) => ({
-                        ...p,
-                        nameRevealed: !p.nameRevealed,
-                      }))
-                    }
-                  />{" "}
-                  Reveal name
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={profile.imageRevealed}
-                    onChange={() =>
-                      setProfile(profile.id, (p) => ({
-                        ...p,
-                        imageRevealed: !p.imageRevealed,
-                      }))
-                    }
-                  />{" "}
-                  Reveal photo
-                </label>
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
 
@@ -279,48 +204,22 @@ export function ProfilePanel({
         <section style={{ marginTop: "1.25rem" }}>
           {entriesToShow.map((e) => {
             const showNew =
-              !isAdmin &&
               effectiveProfileRevealed &&
               isEntryNew(profile.id, e.id, e.revealed, ack, vnRevealGate);
 
             return (
               <article key={e.id} className="entry-block">
-                {isAdmin || showNew ? (
+                {showNew ? (
                   <div className="entry-head">
-                    {isAdmin ? (
-                      <>
-                        <span className="muted">Note #{e.id}</span>
-                        <span>
-                          {showNew ? <span className="badge-new">NEW</span> : null}
-                          <button
-                            type="button"
-                            className="btn btn-small"
-                            onClick={() =>
-                              setProfile(profile.id, (p) => ({
-                                ...p,
-                                entries: p.entries.map((x) =>
-                                  x.id === e.id
-                                    ? { ...x, revealed: !x.revealed }
-                                    : x
-                                ),
-                              }))
-                            }
-                          >
-                            {e.revealed ? "Un-reveal" : "Reveal publicly"}
-                          </button>
-                        </span>
-                      </>
-                    ) : (
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "flex-end",
-                          width: "100%",
-                        }}
-                      >
-                        <span className="badge-new">NEW</span>
-                      </div>
-                    )}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        width: "100%",
+                      }}
+                    >
+                      <span className="badge-new">NEW</span>
+                    </div>
                   </div>
                 ) : null}
                 <EntryText
@@ -333,13 +232,6 @@ export function ProfilePanel({
             );
           })}
         </section>
-      ) : null}
-
-      {isAdmin ? (
-        <p className="muted" style={{ marginTop: "1.5rem", fontSize: "0.85rem" }}>
-          Link to another dossier in text with <code>[[profile-id]]</code> (example:{" "}
-          <code>[[sarah-chen]]</code>).
-        </p>
       ) : null}
     </div>
   );

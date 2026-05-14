@@ -777,6 +777,86 @@ export function VnProvider({ children }: { children: ReactNode }) {
             );
             break;
           }
+          case "skipToNextInteraction": {
+            let st = prev;
+            for (let iter = 0; iter < 4000; iter++) {
+              const sc = scenesById.get(st.currentSceneId) ?? scenes[0];
+              if (!sc) break;
+              const curLine = sc.lines[st.lineIndex] ?? null;
+              const lkSkip = interactionKey(sc.id, st.lineIndex);
+
+              if (st.mcqWrongFeedback?.lineKey === lkSkip) {
+                const fb = st.mcqWrongFeedback;
+                const historyName =
+                  resolveSpeakerDisplayLabel(fb.speakerId, charById, {
+                    flags: st.flags,
+                    reveals: st.reveals,
+                  }) ?? "";
+                st = {
+                  ...st,
+                  history: pushHistory(
+                    st.history,
+                    sc.id,
+                    historyName,
+                    fb.text
+                  ),
+                  mcqWrongFeedback: undefined,
+                };
+                continue;
+              }
+
+              if (!curLine) break;
+              if (curLine.choices?.length || curLine.interaction) break;
+
+              const beforePos = `${st.currentSceneId}:${st.lineIndex}`;
+
+              const afterLineFlags = withSetFlags(st.flags, curLine.setFlags);
+              const afterUnlock = mergeUnlockState(
+                st.reveals,
+                st.profileDisplayNames,
+                curLine.unlocks
+              );
+
+              if (curLine.portraitOnly) {
+                st = goNextLine(
+                  {
+                    ...st,
+                    reveals: afterUnlock.reveals,
+                    profileDisplayNames: afterUnlock.profileDisplayNames,
+                  },
+                  sc,
+                  afterLineFlags
+                );
+              } else {
+                const historyName =
+                  resolveSpeakerDisplayLabel(curLine.speakerId, charById, {
+                    flags: st.flags,
+                    reveals: st.reveals,
+                  }) ?? "";
+                const history = pushHistory(
+                  st.history,
+                  sc.id,
+                  historyName,
+                  curLine.text
+                );
+                st = goNextLine(
+                  {
+                    ...st,
+                    history,
+                    reveals: afterUnlock.reveals,
+                    profileDisplayNames: afterUnlock.profileDisplayNames,
+                  },
+                  sc,
+                  afterLineFlags
+                );
+              }
+
+              const afterPos = `${st.currentSceneId}:${st.lineIndex}`;
+              if (beforePos === afterPos) break;
+            }
+            next = st;
+            break;
+          }
           case "goToScene": {
             if (!scenesById.has(intent.sceneId)) return prev;
             next = goToScene(prev, intent.sceneId, prev.flags);

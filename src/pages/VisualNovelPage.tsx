@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import { CorkboardModal } from "../components/CorkboardModal";
 import { ProfileModal } from "../components/ProfileModal";
 import { loadSfxPrefs, playSfx, saveSfxPrefs, type SfxPrefs } from "../audio/sfx";
-import { useAuth } from "../auth";
 import { useCampaign } from "../campaign";
 import { mergeProfilesWithSeed } from "../campaignSeedFallback";
 import { corkboardHasUnreadIntel } from "../newBadges";
@@ -182,7 +181,6 @@ function placeholderArt(letter: string, accent: string): string {
 }
 
 export function VisualNovelPage() {
-  const { isAdmin } = useAuth();
   const { data, ack, clearAck } = useCampaign();
   const [searchParams, setSearchParams] = useSearchParams();
   const showCorkboard = searchParams.get("board") === "1";
@@ -289,8 +287,8 @@ export function VisualNovelPage() {
 
   const corkboardHasUnread = useMemo(() => {
     const catalog = mergeProfilesWithSeed(data.profiles);
-    return corkboardHasUnreadIntel(catalog, ack, isAdmin, vnRevealGate);
-  }, [data.profiles, ack, isAdmin, vnRevealGate]);
+    return corkboardHasUnreadIntel(catalog, ack, vnRevealGate);
+  }, [data.profiles, ack, vnRevealGate]);
 
   useEffect(() => {
     if (!showHistory) return;
@@ -414,8 +412,6 @@ export function VisualNovelPage() {
           {
             profileVisible: profileOpen,
             nameVisible: nameOpen,
-            campaignNameRevealed: p.nameRevealed,
-            isAdmin: false,
           }
         );
         return caption !== "?";
@@ -448,6 +444,16 @@ export function VisualNovelPage() {
 
   const canAdvanceByClick = Boolean(
     currentLine && !hasChoices && !interaction
+  );
+
+  /** Dev / forced testing only; later gate on chapter completion (see VITE_VN_SKIP). */
+  const showDevVnSkip =
+    import.meta.env.DEV || import.meta.env.VITE_VN_SKIP === "1";
+  const showSkipToInteraction = Boolean(
+    showDevVnSkip &&
+      currentLine &&
+      !hasChoices &&
+      (!interaction || showingMcqWrongFeedback)
   );
 
   const advanceDialogueText = currentLine?.text ?? "";
@@ -574,7 +580,11 @@ export function VisualNovelPage() {
 
         <div className="vn-scene-fill" aria-hidden />
 
-        <div className="vn-dialogue-outer">
+        <div
+          className={`vn-dialogue-outer${
+            showSkipToInteraction ? " vn-dialogue-outer--has-skip" : ""
+          }`}
+        >
           <button
             type="button"
             className={`vn-corkboard-toast-anchor${
@@ -775,8 +785,6 @@ export function VisualNovelPage() {
                           profileVisible:
                             p.profileRevealed || isProfileVisible(p.id),
                           nameVisible: nameOpen,
-                          campaignNameRevealed: p.nameRevealed,
-                          isAdmin: false,
                         }
                       );
                       const isSelected = selectedProfileId === p.id;
@@ -835,8 +843,6 @@ export function VisualNovelPage() {
                             nameVisible:
                               selectedAccused.nameRevealed ||
                               isNameVisible(selectedAccused.id),
-                            campaignNameRevealed: selectedAccused.nameRevealed,
-                            isAdmin: false,
                           }
                         )}
                       </div>
@@ -857,6 +863,26 @@ export function VisualNovelPage() {
               ) : null}
             </div>
           )}
+          {showSkipToInteraction ? (
+            <button
+              type="button"
+              className="vn-dialogue-skip"
+              title="Skip to next choice, question, or scene (dev)"
+              aria-label="Skip to next interaction"
+              onClick={() => {
+                if (canAdvanceByClick && !advanceTw.isRevealComplete) {
+                  advanceTw.skipToEnd();
+                }
+                if (mcqFeedbackTypingEnabled && !mcqFbTw.isRevealComplete) {
+                  mcqFbTw.skipToEnd();
+                }
+                playSfx("advance", sfxPrefs);
+                dispatch({ type: "skipToNextInteraction" });
+              }}
+            >
+              Skip
+            </button>
+          ) : null}
         </div>
       </div>
 
