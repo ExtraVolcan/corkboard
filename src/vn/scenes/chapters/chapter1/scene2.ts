@@ -407,7 +407,13 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "We don't even need to do that much to keep the ship running. Would it kill you to just be nice?",
-      emotion: "neutral"
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "stephano",
@@ -453,13 +459,19 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "Titania. I can fix the engine if it breaks, but let's hope that doesn't happen.",
-      emotion: "neutral",//TODO make neutral-talk and replace instances of "neutral?"
+      emotion: "neutral-talk",
       setFlags: [characterNameRevealFlag("titania")],
       unlocks: [
         { type: "revealProfile", profileId: "titania" },
         { type: "revealImage", profileId: "titania" },
         { type: "revealName", profileId: "titania" },
       ],
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
@@ -474,7 +486,7 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "She cooks lunch. It's pretty good!",
-      emotion: "neutral"
+      emotion: "neutral-talk"
     },
     {
       speakerId: "titania",
@@ -483,7 +495,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "titania",
-      emotion: "squint",
+      emotion: "neutral",
       portraitOnly: true,
       text: "",
     },
@@ -514,7 +526,13 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "We have to be. Out here the mission isn't a slogan, it's the reason any of us wake up at all.",
-      emotion: "neutral"
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "stephano",
@@ -997,6 +1015,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "titania",
       text: "Because knocking would've meant admitting your fault to her face.",
+      emotion: "squint-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "squint",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
@@ -1018,6 +1043,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "titania",
       text: "She was holding them when I talked to her earlier.",
+      emotion: "think-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "think",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",
@@ -1026,6 +1058,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "titania",
       text: "Uh, like 15 minutes ago?",
+      emotion: "think-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "think",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "narrator",
@@ -1045,6 +1084,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "titania",
       text: "Why are you so interested in the cookies anyway, Cal?",
+      emotion: "squint-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "squint",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "narrator",
@@ -1057,6 +1103,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "titania",
       text: "Did you want some?",
+      emotion: "neutral-talk"//TODO make smile-talk?
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "narrator",
