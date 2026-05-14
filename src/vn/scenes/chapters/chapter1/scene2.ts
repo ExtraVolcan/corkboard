@@ -754,6 +754,13 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "Why? So you can get to know our weaknesses better?",
+      emotion: "squint-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "squint",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "narrator",

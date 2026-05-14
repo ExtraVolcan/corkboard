@@ -41,6 +41,7 @@ export const VN_PORTRAITS: Record<string, string> = {
   "titania-think": "/assets/portraits/titania-think.png",
   "titania-think-talk": "/assets/portraits/titania-think-talk.png",
   "titania-squint": "/assets/portraits/titania-squint.png",
+  "titania-squint-talk": "/assets/portraits/titania-squint-talk.png",
 };
 
 const BG_PREFIX = "bg:";
