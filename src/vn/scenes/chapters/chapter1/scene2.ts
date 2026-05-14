@@ -453,6 +453,7 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "Titania. I can fix the engine if it breaks, but let's hope that doesn't happen.",
+      emotion: "neutral",//TODO make neutral-talk and replace instances of "neutral?"
       setFlags: [characterNameRevealFlag("titania")],
       unlocks: [
         { type: "revealProfile", profileId: "titania" },

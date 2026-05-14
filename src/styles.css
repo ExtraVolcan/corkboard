@@ -793,7 +793,7 @@ a.vn-icon-btn {
   align-self: flex-end;
   border: none;
   outline: none;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  /*box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);*/
 }
 
 /* Slightly above portrait vertical center (hint box centered on that point) */
@@ -844,7 +844,7 @@ a.vn-icon-btn {
   max-height: none;
   object-fit: contain;
   object-position: center;
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
+  /*filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));*/
   user-select: none;
   -webkit-user-drag: none;
   border: none;
