@@ -307,7 +307,7 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "I walk down the corridor, around a corner until I find another set of doors.",
+      text: "I walk down the corridor, around a corner. I'm looking for another set of doors.",
     },
     {
       speakerId: "narrator",
@@ -371,6 +371,42 @@ export const shipDay2Room: VnScene = {
     // Her 'remote detonation' would have killed Cressida while she was locked inside her own room.
     {
       speakerId: "narrator",
+      text: "Something moved.",
+    },
+    {
+      speakerId: "narrator",
+      text: "My eyes dart to its position, and I instinctively brace myself, hiding my body around the corner walls like I'm taking cover from gunfire.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Luckily, it's nothing so dangerous.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It's a cat.",
+    },
+    {
+      speakerId: "narrator",
+      text: "And it's also staring at me from behind a corner, poking its tiny head out.",
+    },
+    {
+      speakerId: "narrator",
+      text: "After that awkward standoff, the cat disappears behind the corner as it scampers away.",
+    },//TODO unlock new profile: Cat (Puck but name not set to Puck yet)
+    {
+      speakerId: "detective",
+      text: "Huh.",
+    },
+    {
+      speakerId: "detective",
+      text: "Why is there a cat here?",
+    },
+    {
+      speakerId: "narrator",
+      text: "I slowly approach the corner where I saw the cat.",
+    },
+    {
+      speakerId: "narrator",
       text: "Down the corridor: voices. Low chatter threaded with tension. Not close enough to make out words.",
     },
     {
@@ -405,6 +441,10 @@ export const shipDay2Crew: VnScene = {
       text: "Three people cluster like they've rehearsed this triangle before.",
     },
     {
+      speakerId: "narrator",
+      text: "...and I see one of them has already scooped up the cat: a chick with messy orange hair.",
+    },
+    {
       speakerId: "titania",
       text: "We don't even need to do that much to keep the ship running. Would it kill you to just be nice?",
       emotion: "neutral-talk"
@@ -414,6 +454,10 @@ export const shipDay2Crew: VnScene = {
       emotion: "neutral",
       portraitOnly: true,
       text: "",
+    },
+    {
+      speakerId: "narrator",
+      text: "With the cat trapped in her arms, she scratches behind its ears. Its expression can only be described as terror & confusion.",
     },
     {
       speakerId: "stephano",
@@ -437,7 +481,7 @@ export const shipDay2Crew: VnScene = {
       emotion: "think",
       portraitOnly: true,
       text: "",
-    },//TODO use portraitOnly on all other think-talk lines
+    },//TODO use portraitOnly on all other xxx-talk lines
     {
       speakerId: "detective",
       text: "Caliban. Pretty much just woke up. I hope my hair looks okay. You are?",
@@ -524,6 +568,10 @@ export const shipDay2Crew: VnScene = {
       text: "Sounds like you're all tight on procedure.",
     },
     {
+      speakerId: "narrator",
+      text: "The orange-haired girl, Titania, strokes a delicate hand down the cat's fur.",
+    },
+    {
       speakerId: "titania",
       text: "We have to be. Out here the mission isn't a slogan, it's the reason any of us wake up at all.",
       emotion: "neutral-talk"
@@ -600,6 +648,58 @@ export const shipDay2Crew: VnScene = {
       speakerId: "narrator",
       text: "Well, they'll remember just as soon as they're resurrected.",
       emotion: "detective-think",
+    },
+    {
+      speakerId: "narrator",
+      text: "There's a lot of questions on my mind, but one has me so curious it keeps bubbling up to the surface like an intrusive thought.",
+    },
+    {
+      speakerId: "detective",
+      text: "Hey, quick question: why is there a cat here?",
+    },
+    {
+      speakerId: "titania",
+      text: "His name is Puck. And he's a proper crewmember just like us.",
+    },//TODO set name of cat to Puck in corkboard profile
+    {
+      speakerId: "narrator",
+      text: "The cat, Puck, still looks absolutely terrified. A hilarious contrast to Titania's loving embrace.",
+    },
+    {
+      speakerId: "detective",
+      text: "It's cute, but what purpose could it possibly serve?",
+    },
+    {
+      speakerId: "titania",
+      text: "Maybe his purpose IS to be cute.",
+    },
+    {
+      speakerId: "titania",
+      text: "Relaxation is an essential for mental health, y'know.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Her fingers furiously jiggle the cat's belly. I still can't tell if it's enjoying this.",
+    },
+    {
+      speakerId: "stephano",
+      text: "The cat is synthetic too."
+    },
+    {
+      speakerId: "detective",
+      text: "Really? How can you tell?",
+    },
+    {
+      speakerId: "stephano",
+      text: "It's written right here, alongside all our names."
+    },
+    {
+      speakerId: "narrator",
+      text: "So Puck really is a crewmember on this mission. Wouldn't have expected that.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Stephano is looking at a sheet as he explains.",
     },
     {
       speakerId: "stephano",
@@ -719,6 +819,11 @@ export const shipDay2Crew: VnScene = {
             id: "guess-detective",
             label: "Caliban",
             wrongFeedback: "That's me! I don't plan on being a victim today.",
+          },
+          {
+            id: "guess-puck",
+            label: "Puck",
+            wrongFeedback: "Puck is the cat! He's not the victim. He's a valuable crewmember, according to Titania at least.",
           },
         ],
       },
@@ -1237,19 +1342,89 @@ export const shipBranchMistake: VnScene = {
       speakerId: "detective",
       text: "Miranda, what mistake did you think you made?",
     },
-    //TODO change the mistake
     {
       speakerId: "miranda",
-      text: "",
+      text: "...",
     },
     {
       speakerId: "miranda",
-      text: "I wasn't—I swear—I fat-fingered the template and caught it late.",
+      text: "I wasn't- I swear- I just wanted to be nice-",
     },
+    {
+      speakerId: "detective",
+      text: "Hey, it's okay. No matter what it is, you can always make up for past mistakes. So, please tell me what happened.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I'm not lying, I do believe that, but I'm also saying it because I need her to calm down so she can open up.",
+    },
+    {
+      speakerId: "miranda",
+      text: "I- ",
+    },
+    {
+      speakerId: "miranda",
+      text: "I-I gave the cat a bite of my cooking.",
+    },//TODO unlock new entry: Miranda fed Puck food that she cooked.
     {
       speakerId: "titania",
       text: "...",
       emotion: "think"
+    },
+    {
+      speakerId: "miranda",
+      text: "Cressida saw me, and-and she scolded me.",
+    },
+    {
+      speakerId: "titania",
+      text: "Go on.",
+      emotion: "squint-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "miranda",
+      text: "I- Cressida said that cats don't digest in the same way we do, and-.",
+    },
+    {
+      speakerId: "miranda",
+      text: "-and that I could've killed it.",
+    },
+    {
+      speakerId: "miranda",
+      text: "...",
+    },
+    {
+      speakerId: "titania",
+      text: "...",
+      emotion: "neutral"
+    },
+    {
+      speakerId: "titania",
+      text: "She's still leaving out one part.",
+      emotion: "squint-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "miranda",
+      text: "Well... I-I- I didn't know what to do, so-",
+    },
+    {
+      speakerId: "miranda",
+      text: "The tears started flowing, and- I couldn't spit the words out. I heard Cressida run away after that.",
+    },//TODO unlock new entry about Miranda's mistake & encounter with Cressida.
+    {
+      speakerId: "detective",
+      text: "I see.",
     },
     {
       speakerId: "detective",
@@ -1264,8 +1439,86 @@ export const shipBranchMistake: VnScene = {
       text: "Biochemically sentimental. Interesting.",
     },
     {
+      speakerId: "detective",
+      text: "Hey Stephano, what's up with that cat anyway? It's synthetic, right? Would it be poisoned by our food?",
+    },
+    {
+      speakerId: "stephano",
+      text: "I'm more focused on the human synthetic process, not felines, but...",
+    },
+    {
+      speakerId: "stephano",
+      text: "Human synthetic bodies are made to be exact copies of the original body. Anytime we tried to alter parts, it didn't work well.",
+    },
+    {
+      speakerId: "stephano",
+      text: "I would've preferred if we could've removed base urges like hunger & sex, but improvising new forms of life is far more difficult than just copying the old.",
+    },
+    {
+      speakerId: "stephano",
+      text: "So, I think the cat is a perfect replica of an original cat back home.",
+    },
+    {
+      speakerId: "detective",
+      text: "In other words, Puck is susceptible to the same problems as any other cat.",
+    },
+    {
+      speakerId: "titania",
+      text: "Cress was right to yell at you.",
+      emotion: "squint-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "squint",
+      portraitOnly: true,
+      text: "",
+    },
+    {
       speakerId: "narrator",
-      text: "Miranda shrinks under his tone anyway.",
+      text: "Titania stares intently at Miranda.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Miranda shrinks under her tone.",
+    },
+    {
+      speakerId: "titania",
+      text: "But...",
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      text: "...She felt bad for making you cry like that.",
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "narrator",
+      text: "Hah, so Titania does have a heart.",
+    },
+    {
+      speakerId: "titania",
+      text: "Cress was crying too, y'know? So I'm staying mad at you until I see you two make up face to face, got it?",
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "narrator",
+      text: "Miranda nods wordlessly.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Good, I've learned more about what happened while I was asleep.",
       choices: [
         {
           id: "leave-mist-hub-c",

@@ -164,12 +164,12 @@
         },
         {
           "id": "day-1-active",
-          "text": "[TODO: finalize schedule + add puck] Day 1 highlights Miranda, Titania, Stephano, Cressida, and Ariel as active.",
+          "text": "[TODO: finalize schedule] Day 1 highlights Miranda, Titania, Stephano, Cressida, Puck, and Ariel as active.",
           "revealed": false
         },
         {
           "id": "day-2-active",
-          "text": "[TODO: finalize schedule + add puck] Day 2 highlights Miranda, Titania, Stephano, Cressida, and Caliban as active.",
+          "text": "Day 2 highlights Miranda, Titania, Stephano, Cressida, Puck, and Caliban as active.",
           "revealed": false
         },
         {
@@ -180,6 +180,11 @@
         {
           "id": "day-4-active",
           "text": "[TODO: finalize schedule] Day 4 highlights Stephano, Cressida, Caliban, Bianca, and Ariel as active.",
+          "revealed": false
+        },
+        {
+          "id": "day-5-active",
+          "text": "[TODO: finalize schedule] Day 5 highlights Stephano, Cressida, Caliban, Bianca, and Ariel as active.",
           "revealed": false
         }
       ]
