@@ -76,6 +76,10 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
+      text: "This reeks of foul play, and I won't let anyone compromise the success of the mission.",
+    },
+    {
+      speakerId: "narrator",
       text: "There's a small puddle of purple liquid surrounding the body.",
     },
     {

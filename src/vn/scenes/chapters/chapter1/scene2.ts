@@ -846,7 +846,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Maintenance slots her rebuild two days out.",
+      text: "Maintenance slots her rebuild two days out, so she should wake up on Day 5.",
     },
     {
       speakerId: "narrator",
@@ -872,7 +872,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "So… what abilities does everyone have?",
+      text: "So... what abilities does everyone have?",
     },
     {
       speakerId: "titania",
