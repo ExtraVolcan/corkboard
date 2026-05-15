@@ -7,13 +7,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type {
-  VnCharacter,
-  VnHistoryEntry,
-  VnIntent,
-  VnRevealAction,
-  VnScene,
-  VnState,
+import {
+  CORKBOARD_TUTORIAL_OPENED_FLAG,
+  isCorkboardTutorialGateActive,
+  type VnCharacter,
+  type VnHistoryEntry,
+  type VnIntent,
+  type VnRevealAction,
+  type VnScene,
+  type VnState,
 } from "./types";
 import { loadStoryBundle, STORY_RELOAD_EVENT } from "./storySource";
 import {
@@ -499,6 +501,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
             }
             if (line.choices?.length) return prev;
             if (line.interaction) return prev;
+            if (isCorkboardTutorialGateActive(line, prev.flags)) return prev;
 
             const afterLineFlags = withSetFlags(prev.flags, line.setFlags);
             const afterUnlock = mergeUnlockState(
@@ -807,6 +810,7 @@ export function VnProvider({ children }: { children: ReactNode }) {
 
               if (!curLine) break;
               if (curLine.choices?.length || curLine.interaction) break;
+              if (isCorkboardTutorialGateActive(curLine, st.flags)) break;
 
               const beforePos = `${st.currentSceneId}:${st.lineIndex}`;
 
@@ -855,6 +859,17 @@ export function VnProvider({ children }: { children: ReactNode }) {
               if (beforePos === afterPos) break;
             }
             next = st;
+            break;
+          }
+          case "acknowledgeCorkboardTutorial": {
+            if (!isCorkboardTutorialGateActive(line, prev.flags)) return prev;
+            next = {
+              ...prev,
+              flags: {
+                ...prev.flags,
+                [CORKBOARD_TUTORIAL_OPENED_FLAG]: true,
+              },
+            };
             break;
           }
           case "goToScene": {

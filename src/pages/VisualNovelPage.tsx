@@ -26,7 +26,11 @@ import { mcqEliminatedFlagKey, useVn } from "../vn/state";
 import { useTypewriterLine } from "../vn/useTypewriterLine";
 import type { PortraitSlot } from "../vn/portraitLayout";
 import type { SpeakerLabelContext } from "../vn/speakerLabel";
-import type { VnCharacter, VnState } from "../vn/types";
+import {
+  isCorkboardTutorialGateActive,
+  type VnCharacter,
+  type VnState,
+} from "../vn/types";
 import type { Profile } from "../types";
 
 function revealsIncreased(
@@ -175,6 +179,13 @@ function IconClose() {
   );
 }
 
+function vnLineClassName(speakerId?: string): string {
+  let cn = "vn-line";
+  if (speakerId === "narrator") cn += " vn-line--narrator";
+  if (speakerId === "tutorial") cn += " vn-line--tutorial";
+  return cn;
+}
+
 function placeholderArt(letter: string, accent: string): string {
   const body = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="480" viewBox="0 0 360 480"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a2018"/><stop offset="100%" stop-color="#0f0c0a"/></linearGradient></defs><rect width="360" height="480" fill="url(#g)" rx="20"/><text x="180" y="268" text-anchor="middle" font-size="120" font-family="Georgia,serif" fill="${accent}">${letter}</text></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(body)}`;
@@ -221,6 +232,9 @@ export function VisualNovelPage() {
 
   function openCorkboard() {
     playSfx("panel", sfxPrefs);
+    if (isCorkboardTutorialGateActive(currentLine, state.flags)) {
+      dispatch({ type: "acknowledgeCorkboardTutorial" });
+    }
     setSearchParams(
       (p) => {
         const n = new URLSearchParams(p);
@@ -442,8 +456,16 @@ export function VisualNovelPage() {
     [currentScene, state.lineIndex]
   );
 
+  const corkboardTutorialSpotlight = isCorkboardTutorialGateActive(
+    currentLine,
+    state.flags
+  );
+
   const canAdvanceByClick = Boolean(
-    currentLine && !hasChoices && !interaction
+    currentLine &&
+      !hasChoices &&
+      !interaction &&
+      !corkboardTutorialSpotlight
   );
 
   /** Dev / forced testing only; later gate on chapter completion (see VITE_VN_SKIP). */
@@ -453,6 +475,7 @@ export function VisualNovelPage() {
     showDevVnSkip &&
       currentLine &&
       !hasChoices &&
+      !corkboardTutorialSpotlight &&
       (!interaction || showingMcqWrongFeedback)
   );
 
@@ -480,7 +503,15 @@ export function VisualNovelPage() {
 
   return (
     <div className="vn-shell">
-      <div className="vn-scene" style={{ background: effectiveSceneBackground }}>
+      <div
+        className={`vn-scene${
+          corkboardTutorialSpotlight ? " vn-scene--corkboard-tutorial" : ""
+        }`}
+        style={{ background: effectiveSceneBackground }}
+      >
+        {corkboardTutorialSpotlight ? (
+          <div className="vn-tutorial-dim" aria-hidden />
+        ) : null}
         <div className="vn-scene-hud" aria-hidden={false}>
           <div className="vn-scene-title">
             Points: {state.points}
@@ -489,6 +520,7 @@ export function VisualNovelPage() {
             <button
               type="button"
               className="vn-icon-btn"
+              disabled={corkboardTutorialSpotlight}
               onClick={() => {
                 playSfx("panel", sfxPrefs);
                 setShowHistory((v) => !v);
@@ -500,15 +532,27 @@ export function VisualNovelPage() {
             </button>
             <button
               type="button"
-              className={`vn-icon-btn${corkboardHasUnread ? " vn-icon-btn--has-badge" : ""}`}
+              className={`vn-icon-btn${
+                corkboardHasUnread ? " vn-icon-btn--has-badge" : ""
+              }${
+                corkboardTutorialSpotlight
+                  ? " vn-icon-btn--corkboard-spotlight"
+                  : ""
+              }`}
               onClick={() => openCorkboard()}
               title={
-                corkboardHasUnread ? "Corkboard (new intel)" : "Corkboard"
+                corkboardTutorialSpotlight
+                  ? "Open the corkboard to continue"
+                  : corkboardHasUnread
+                    ? "Corkboard (new intel)"
+                    : "Corkboard"
               }
               aria-label={
-                corkboardHasUnread
-                  ? "Open corkboard, new intel to review"
-                  : "Open corkboard"
+                corkboardTutorialSpotlight
+                  ? "Open corkboard to continue the story"
+                  : corkboardHasUnread
+                    ? "Open corkboard, new intel to review"
+                    : "Open corkboard"
               }
             >
               <IconCorkboard />
@@ -519,6 +563,7 @@ export function VisualNovelPage() {
             <button
               type="button"
               className="vn-icon-btn"
+              disabled={corkboardTutorialSpotlight}
               onClick={() => {
                 playSfx("panel", sfxPrefs);
                 setShowSettings((v) => !v);
@@ -633,11 +678,7 @@ export function VisualNovelPage() {
                   {dialogueSpeakerLabel}
                 </div>
               ) : null}
-              <p
-                className={`vn-line${
-                  currentLine?.speakerId === "narrator" ? " vn-line--narrator" : ""
-                }`}
-              >
+              <p className={vnLineClassName(currentLine?.speakerId)}>
                 {advanceTw.visibleText}
               </p>
               <span className="vn-continue-hint">
@@ -659,13 +700,14 @@ export function VisualNovelPage() {
                   {dialogueSpeakerLabel}
                 </div>
               ) : null}
-              <p
-                className={`vn-line${
-                  currentLine?.speakerId === "narrator" ? " vn-line--narrator" : ""
-                }`}
-              >
+              <p className={vnLineClassName(currentLine?.speakerId)}>
                 {currentLine?.text ?? "No dialogue loaded."}
               </p>
+              {corkboardTutorialSpotlight ? (
+                <p className="vn-corkboard-tutorial-hint" role="status">
+                  Open the corkboard icon (top right) to continue.
+                </p>
+              ) : null}
 
               {hasChoices ? (
                 <div className="vn-choices">
@@ -709,11 +751,7 @@ export function VisualNovelPage() {
                         {mcqFbSpeakerLabel}
                       </div>
                     ) : null}
-                    <p
-                      className={`vn-line${
-                        mcqFbSpeakerId === "narrator" ? " vn-line--narrator" : ""
-                      }`}
-                    >
+                    <p className={vnLineClassName(mcqFbSpeakerId)}>
                       {mcqFbTw.visibleText}
                     </p>
                     <span className="vn-continue-hint">

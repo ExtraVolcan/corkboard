@@ -72,6 +72,10 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
+      text: "Hell of a thing to wake up to, even for me.",
+    },
+    {
+      speakerId: "narrator",
       text: "There's a small puddle of purple liquid surrounding the body.",
     },
     {
@@ -104,8 +108,20 @@ export const scene1: VnScene = {
       text: "Of course there's blood inside the body."
     },
     {
-      speakerId: "narrator",
+      speakerId: "detective",
       text: "I really need to focus."
+    },
+    {
+      speakerId: "detective",
+      text: "To be fair, I did JUST wake up."
+    },
+    {
+      speakerId: "detective",
+      text: "Investigating a murder scene is basically a morning routine for me anyway, so let's get warmed up."
+    },
+    {
+      speakerId: "narrator",
+      text: "I slap myself lightly on both cheeks."
     },
     {
       speakerId: "narrator",
@@ -175,8 +191,13 @@ export const scene1: VnScene = {
       ],
     },
     {
+      speakerId: "tutorial",
+      text: "That face and a new note just landed on the corkboard: a collection of evidence you can consult at any time.",
+      corkboardTutorial: true,
+    },
+    {
       speakerId: "narrator",
-      text: "I don't know who this is.",
+      text: "...I don't know who this is.",
     },
     {
       speakerId: "narrator",

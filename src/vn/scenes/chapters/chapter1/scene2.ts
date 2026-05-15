@@ -1248,7 +1248,8 @@ export const shipBranchMistake: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "Cressida didn't care about intent. She cared about face.",
+      text: "...",
+      emotion: "think"
     },
     {
       speakerId: "detective",

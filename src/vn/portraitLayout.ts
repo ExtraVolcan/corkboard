@@ -7,6 +7,9 @@ export const PROTAGONIST_SPEAKER_IDS = new Set<string>(["detective"]);
 /** Narrator lines with `emotion` update the detective portrait (inner monologue). */
 export const INNER_MONOLOGUE_PORTRAIT_SPEAKER_ID = "detective";
 
+/** Speakers that never occupy a portrait slot (e.g. tutorial tips). */
+export const PORTRAIT_HIDDEN_SPEAKER_IDS = new Set<string>(["tutorial"]);
+
 /**
  * Fixed NPC portrait columns (spatial order left → right: “D … C … B”).
  * 1st NPC by scene appearance → right column; 2nd → middle; 3rd → left. Columns stay reserved so
@@ -45,6 +48,7 @@ function skipPortraitForSpeaker(line: VnLine): boolean {
   const sid = line.speakerId;
   if (!sid) return true;
   const base = canonicalSpeakerId(sid);
+  if (PORTRAIT_HIDDEN_SPEAKER_IDS.has(base)) return true;
   if (base === "narrator") {
     return !line.emotion?.trim();
   }
@@ -58,6 +62,7 @@ export function resolvePortraitHighlightSpeakerId(
   if (line?.portraitOnly) return undefined;
   if (!line?.speakerId) return undefined;
   const base = canonicalSpeakerId(line.speakerId);
+  if (PORTRAIT_HIDDEN_SPEAKER_IDS.has(base)) return undefined;
   if (base === "narrator") {
     return line.emotion?.trim() ? INNER_MONOLOGUE_PORTRAIT_SPEAKER_ID : undefined;
   }

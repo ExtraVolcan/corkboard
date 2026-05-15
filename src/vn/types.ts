@@ -93,6 +93,11 @@ export type VnLine = {
   unlocks?: VnRevealAction[];
   requireFlags?: string[];
   setFlags?: string[];
+  /**
+   * Spotlight the corkboard toolbar icon and block advance until the player opens
+   * the corkboard once (sets {@link CORKBOARD_TUTORIAL_OPENED_FLAG}).
+   */
+  corkboardTutorial?: boolean;
 };
 
 export type VnScene = {
@@ -146,8 +151,21 @@ export type VnState = {
   };
 };
 
+/** Set when the player opens the corkboard during a `corkboardTutorial` line. */
+export const CORKBOARD_TUTORIAL_OPENED_FLAG = "tutorial_corkboard_opened";
+
+export function isCorkboardTutorialGateActive(
+  line: Pick<VnLine, "corkboardTutorial"> | null | undefined,
+  flags: Record<string, true>
+): boolean {
+  return Boolean(
+    line?.corkboardTutorial && !flags[CORKBOARD_TUTORIAL_OPENED_FLAG]
+  );
+}
+
 export type VnIntent =
   | { type: "advanceDialogue" }
+  | { type: "acknowledgeCorkboardTutorial" }
   | { type: "skipToNextInteraction" }
   | { type: "chooseOption"; optionId: string }
   | { type: "selectInteractionOption"; optionId: string }

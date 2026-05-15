@@ -10,6 +10,11 @@ export const VN_CHARACTERS: VnCharacter[] = [
     hideSpeakerLabel: true,
   },
   {
+    id: "tutorial",
+    name: "Tip",
+    accent: "#86efac",
+  },
+  {
     id: "detective",
     name: "Caliban",
     accent: "#7c2d12",
