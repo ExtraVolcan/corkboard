@@ -660,7 +660,14 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "His name is Puck. And he's a proper crewmember just like us.",
+      emotion: "neutral-talk"
     },//TODO set name of cat to Puck in corkboard profile
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
     {
       speakerId: "narrator",
       text: "The cat, Puck, still looks absolutely terrified. A hilarious contrast to Titania's loving embrace.",
@@ -672,10 +679,18 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "Maybe his purpose IS to be cute.",
+      emotion: "neutral-talk"
     },
     {
       speakerId: "titania",
       text: "Relaxation is an essential for mental health, y'know.",
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      text: "",
+      emotion: "neutral",
+      portraitOnly: true,
     },
     {
       speakerId: "narrator",
