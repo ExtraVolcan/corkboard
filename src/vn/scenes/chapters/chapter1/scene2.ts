@@ -36,6 +36,8 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 // [DONE] Caliban commenting on similarity to Puck, and Titania responds "Uh, what? You look nothing alike."
 //  ^ play it off like it's a joke, but Caliban actually notices how the cat is like a twin brother (it's actually what was supposed to be his original synth body!)
 //    my nose looks a little weird, guess they didn't get that quite right.
+// TODO - possibility: Cat's current form is a shrunk-down version of Caliban's OG body.
+//  ^ to make this twist more guessable, maybe Ariel or Bianca is a cat-person of human stature?
 // -
 // A catastrophe is a physical ability: it can only be activated while the host body is alive/online.
 // But its effects stay while the body is offline. (EX: burns, holes, swapped consciousnesses)
@@ -422,6 +424,22 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
+      text: "An old-school house cat, by the looks of it. Not that I'd ever seen one in person before; it's before my time.",
+    },
+    {
+      speakerId: "narrator",
+      text: "For a moment, we're both just staring at each other, hiding behind our corners.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It's like we're mimicking each other, in a way.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Heh, it's like a mini version of me.",
+    },
+    {
+      speakerId: "narrator",
       text: "After that awkward standoff, the cat disappears behind the corner as it scampers away.",
       unlocks: [
         { type: "revealProfile", profileId: "puck" },
@@ -456,7 +474,7 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Do they know about this yet?",
+      text: "Do they know about the corpse yet?",
     },
     {
       speakerId: "narrator",
@@ -623,12 +641,28 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "The hell? I better be close in the rankings at least. Puck here could basically be my little brother!",
+      text: "The hell? I better be close in the rankings at least. It could basically be my little brother!",
     },
     {
       speakerId: "titania",
-      text: "Uh, what? No way. You look nothing alike! Puck is the cutest, end of story.",
+      text: "Uh, what? No way. You look nothing alike!",
       emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "titania",
+      text: "His name is Puck, I'll have you know. And he's a proper crewmember just like us.",
+      emotion: "neutral-talk",
+      setFlags: [characterNameRevealFlag("puck")],
+      unlocks: [
+        { type: "revealName", profileId: "puck" },
+        { type: "setProfileDisplayName", profileId: "puck", displayName: "" },
+      ],
     },
     {
       speakerId: "titania",
@@ -639,6 +673,17 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "detective",
       text: "...",
+    },
+    {
+      speakerId: "titania",
+      text: "Puck is the cutest, end of story.",
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "narrator",
@@ -765,22 +810,6 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "detective",
       text: "Hey, quick question: why is there a cat here?",
-    },
-    {
-      speakerId: "titania",
-      text: "His name is Puck. And he's a proper crewmember just like us.",
-      emotion: "neutral-talk",
-      setFlags: [characterNameRevealFlag("puck")],
-      unlocks: [
-        { type: "revealName", profileId: "puck" },
-        { type: "setProfileDisplayName", profileId: "puck", displayName: "" },
-      ],
-    },
-    {
-      speakerId: "titania",
-      emotion: "neutral",
-      portraitOnly: true,
-      text: "",
     },
     {
       speakerId: "narrator",
