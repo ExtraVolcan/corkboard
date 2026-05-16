@@ -2,7 +2,7 @@ import type { VnScene } from "../../../types";
 import { characterNameRevealFlag } from "../../../nameReveal";
 
 //TODO add a cat "Puck" to the scene! ppl will pet it, it'll jump around.
-// BUT a much later reveal is that not only is the cat also a biomaton, but,
+// BUT a later reveal is that not only is the cat also a synth, but,
 //  the cat can host consciousness, so
 //  The Snatcher had been using it to swap consciousnesses in and out of the cat.
 //  endgame challenge is to plot every swap that The Snatcher made.
@@ -14,8 +14,6 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 // ^ then the player chooses the proof: the barren room. if they cared about caressing the mental health of the biomata, they would've decorated.
 
 //TODO: introduce "rampancy" like biomata going insane but in actuality it's The Snatcher swapping consciousness.
-
-//TODO: add in suspicion of stephano (for knowing about biomata) & of titania?
 
 //TODO: scene where Cal notices roundness of cookies?
 // ^ like, he sees the baking sheet with holes in it & is like "There's no way..."
@@ -34,8 +32,8 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 // The Snatcher swaps consciousnesses with Caliban (and kills him immediately, leaving no memory backup),
 // setting up for Day 1's events, with Snatcher in Caliban's original body: the cat!
 // TODO write Caliban's headaches, confusion, difficulty walking (taller than usual), wonder at why he's wearing a helmet.
-// TODO write lack of mirrors while not drawing too much attention to it (something about not being able to wash up?)
-// TODO Caliban commenting on similarity to Puck, and Titania responds "Uh, what? You look nothing alike."
+// TODO-[kinda done] write lack of mirrors while not drawing too much attention to it (something about not being able to wash up?)
+// [DONE] Caliban commenting on similarity to Puck, and Titania responds "Uh, what? You look nothing alike."
 //  ^ play it off like it's a joke, but Caliban actually notices how the cat is like a twin brother (it's actually what was supposed to be his original synth body!)
 //    my nose looks a little weird, guess they didn't get that quite right.
 // -

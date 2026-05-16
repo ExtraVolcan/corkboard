@@ -78,7 +78,7 @@ export const scene1: VnScene = {
     {
       speakerId: "narrator",
       text: "This reeks of foul play, and I won't let anyone compromise the success of the mission.",
-    },
+    },//TODO describe the rooms here so the reader isn't lost?
     {
       speakerId: "narrator",
       text: "There's a small puddle of purple liquid surrounding the body.",
@@ -130,6 +130,22 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
+      text: "...or, I tried to, but my hand hit something hard instead."
+    },
+    {
+      speakerId: "detective",
+      text: "Ow."
+    },
+    {
+      speakerId: "narrator",
+      text: "Ah, is this, a helmet on my head?"
+    },
+    {
+      speakerId: "narrator",
+      text: "Not my usual fashion, and not something you typically wake up with. Must be part of the mission."
+    },
+    {
+      speakerId: "narrator",
       text: "My eyes focus, but my head still hurts. I'm groggy & disoriented & my nose looks weird & maybe I have a fever?"
     },
     {
@@ -143,6 +159,14 @@ export const scene1: VnScene = {
     {
       speakerId: "narrator",
       text: "It doesn't help much, but I get back on task anyway."
+    },
+    {
+      speakerId: "narrator",
+      text: "I need to. I cannot allow this mission to be sabotaged."
+    },
+    {
+      speakerId: "narrator",
+      text: "Especially on my first day on the job."
     },
     {
       speakerId: "narrator",
