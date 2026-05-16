@@ -440,6 +440,10 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "narrator",
+      text: "...not that I'd ever be such a scaredy-cat.",
+    },
+    {
+      speakerId: "narrator",
       text: "After that awkward standoff, the cat disappears behind the corner as it scampers away.",
       unlocks: [
         { type: "revealProfile", profileId: "puck" },
@@ -462,7 +466,7 @@ export const shipDay2Room: VnScene = {
     },
     {
       speakerId: "detective",
-      text: "Why is there a cat here?",
+      text: "Why is there a cat here anyway?",
     },
     {
       speakerId: "narrator",
@@ -2174,7 +2178,7 @@ export const shipMirandaHubDone: VnScene = {
       text: "Okay, now we're getting somewhere. Is it time to tell them about Cressida's death?",
     },
     
-    {
+    /*{
       speakerId: "narrator",
       text: "",
       choices: [
@@ -2184,7 +2188,7 @@ export const shipMirandaHubDone: VnScene = {
           nextSceneId: "briefing",
         },
       ],
-    },
+    },*/
   ],
 };
 
