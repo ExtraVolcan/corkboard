@@ -67,8 +67,9 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Because even my armpits smell nicer than the body I'm staring at.",
-      //TODO: change background to show pixelated body
+      text: "Because even my armpits smell nicer than the corpse I'm staring at.",
+      //TODO: change background to show pixelated body?
+      //TODO: or, have Caliban do a quick sketch with X eyes and tongue out (funny)
     },
     {
       speakerId: "narrator",
@@ -126,6 +127,26 @@ export const scene1: VnScene = {
     {
       speakerId: "narrator",
       text: "I slap myself lightly on both cheeks."
+    },
+    {
+      speakerId: "narrator",
+      text: "My eyes focus, but my head still hurts. I'm groggy & disoriented & my nose looks weird & maybe I have a fever?"
+    },
+    {
+      speakerId: "narrator",
+      text: "Can we even get fevers?"
+    },
+    {
+      speakerId: "narrator",
+      text: "I shake my head to try and clear the fog from my mind."
+    },
+    {
+      speakerId: "narrator",
+      text: "It doesn't help much, but I get back on task anyway."
+    },
+    {
+      speakerId: "narrator",
+      text: "The body lays quietly on the floor in front of me."
     },
     {
       speakerId: "narrator",
@@ -204,7 +225,7 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Makes sense; I don't know anyone in this place.",
+      text: "Makes sense; I don't think I've met any of the crew yet.",
     },
     {
       speakerId: "narrator",

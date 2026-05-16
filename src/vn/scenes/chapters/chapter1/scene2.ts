@@ -37,6 +37,7 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 // TODO write lack of mirrors while not drawing too much attention to it (something about not being able to wash up?)
 // TODO Caliban commenting on similarity to Puck, and Titania responds "Uh, what? You look nothing alike."
 //  ^ play it off like it's a joke, but Caliban actually notices how the cat is like a twin brother (it's actually what was supposed to be his original synth body!)
+//    my nose looks a little weird, guess they didn't get that quite right.
 // -
 // A catastrophe is a physical ability: it can only be activated while the host body is alive/online.
 // But its effects stay while the body is offline. (EX: burns, holes, swapped consciousnesses)
@@ -52,8 +53,10 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 // "This... isn't right..." "No... no no no no no no"
 // "Something's wrong with this liquid... It has to be..."
 // "Why is it showing me this?"
+// (maybe) "Titania, this isn't how I normally look, right?"
 // Titania tries to calm him down, commenting how his face looks the same as it always has.
 // "No, no, it's wrong, it's all wrong!"
+// "This isn't how I'm supposed to look!"
 // T: "Cal, what's going on? You're scaring me!"
 // "This face... isn't mine!"
 // (Maybe?) Narrator: Worse yet, it's a face I've seen before...
@@ -535,21 +538,7 @@ export const shipDay2Crew: VnScene = {
     },//TODO use portraitOnly on all other xxx-talk lines
     {
       speakerId: "detective",
-      text: "Caliban. Pretty much just woke up. I hope my hair looks okay. You are?",
-    },
-    {
-      speakerId: "stephano",
-      text: "Stephano. I worked on the synthetic systems before this mission got off the ground.",
-      setFlags: [characterNameRevealFlag("stephano")],
-      unlocks: [
-        { type: "revealProfile", profileId: "stephano" },
-        { type: "revealImage", profileId: "stephano" },
-        { type: "revealName", profileId: "stephano" },
-      ],
-    },
-    {
-      speakerId: "stephano",
-      text: "And your hair will be just fine. It's designed that way.",
+      text: "Caliban. Pretty much just woke up. I hope my face looks okay; I didn't get to wash up. You are?",
     },
     {
       speakerId: "titania",
@@ -600,6 +589,70 @@ export const shipDay2Crew: VnScene = {
       emotion: "neutral",
       portraitOnly: true,
       text: "",
+    },
+    {
+      speakerId: "stephano",
+      text: "My name's Stephano. I worked on the synthetic systems before this mission got off the ground.",
+      setFlags: [characterNameRevealFlag("stephano")],
+      unlocks: [
+        { type: "revealProfile", profileId: "stephano" },
+        { type: "revealImage", profileId: "stephano" },
+        { type: "revealName", profileId: "stephano" },
+      ],
+    },
+    {
+      speakerId: "stephano",
+      text: "And, Caliban? Your face looks just fine. It's designed to stay that way.",
+    },
+    {
+      speakerId: "stephano",
+      text: "You'll have to do without wash rooms, because, well, you won't find any on the ship.",
+    },
+    {
+      speakerId: "titania",
+      text: "I'd say new-guy looks cute enough. This kitty wins the cuteness war though!",
+      emotion: "neutral-talk"//TODO replace with smile-talk?
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "narrator",
+      text: "She snuggles her chin into the cat's fur. It still looks so scared.",
+    },
+    {
+      speakerId: "detective",
+      text: "The hell? I better be close in the rankings at least. Puck here could basically be my little brother!",
+    },
+    {
+      speakerId: "titania",
+      text: "Uh, what? No way. You look nothing alike! Puck is the cutest, end of story.",
+      emotion: "neutral-talk"
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "detective",
+      text: "...",
+    },
+    {
+      speakerId: "narrator",
+      text: "...Maybe she doesn't think so, but I'd like to think Puck and I bear a resemblance.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Or maybe I just want cuddles.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Grr, focus! There's a saboteur on board, and it's my responsibility to stop them.",
     },
     {
       speakerId: "narrator",
