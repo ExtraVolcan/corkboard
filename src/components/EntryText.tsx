@@ -8,9 +8,17 @@ type Props = {
   linkLabel?: (profileId: string) => string;
   /** When set, dossier links use this URL (e.g. stay on story with query params). */
   profileHref?: (profileId: string) => string;
+  /** Keep mention styling but do not navigate (e.g. locked evidence challenge). */
+  suppressProfileLinks?: boolean;
 };
 
-export function EntryText({ text, knownProfileIds, linkLabel, profileHref }: Props) {
+export function EntryText({
+  text,
+  knownProfileIds,
+  linkLabel,
+  profileHref,
+  suppressProfileLinks,
+}: Props) {
   const segments = parseEntryText(text);
   return (
     <p className="entry-text">
@@ -21,6 +29,17 @@ export function EntryText({ text, knownProfileIds, linkLabel, profileHref }: Pro
         const to = profileHref
           ? profileHref(seg.profileId)
           : `/profile/${seg.profileId}`;
+        if (suppressProfileLinks) {
+          return (
+            <span
+              key={i}
+              className="profile-link profile-link--static"
+              style={{ opacity: known ? 1 : 0.55 }}
+            >
+              {known ? display : `${display}?`}
+            </span>
+          );
+        }
         return (
           <Link
             key={i}

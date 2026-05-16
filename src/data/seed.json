@@ -51,6 +51,31 @@
           "id": "cookies-left-at-door",
           "text": "Miranda says she left the cookies outside [[cressida]]'s door; no answer, and she wasn't brave enough to knock twice.",
           "revealed": false
+        },
+        {
+          "id": "fed-puck-cooking",
+          "text": "Miranda slipped [[puck]] a bite of her cooking. [[cressida]] caught her and scolded her.",
+          "revealed": false
+        },
+        {
+          "id": "cressida-fled-after-sobbing",
+          "text": "When Miranda seized up crying, she heard [[cressida]] leave with hurried footsteps down the corridor before Miranda could choke out an apology.",
+          "revealed": false
+        }
+      ]
+    },
+    {
+      "id": "puck",
+      "name": "Puck",
+      "image": "https://picsum.photos/seed/puck-cat/320/400",
+      "nameRevealed": false,
+      "imageRevealed": false,
+      "profileRevealed": false,
+      "entries": [
+        {
+          "id": "cat-first-sighting-corridor",
+          "text": "Small cat spotted in the corridors of the ship; It looked confused and terrified, to be honest.",
+          "revealed": false
         }
       ]
     },

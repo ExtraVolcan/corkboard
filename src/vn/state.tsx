@@ -601,6 +601,31 @@ export function VnProvider({ children }: { children: ReactNode }) {
             };
             break;
           }
+          case "selectEvidenceEntry": {
+            if (
+              !line?.interaction ||
+              line.interaction.kind !== "corkboardEntry"
+            )
+              return prev;
+            if (intent.profileId !== line.interaction.profileId)
+              return prev;
+            const lkEv = interactionKey(scene.id, prev.lineIndex);
+            const cur =
+              prev.interaction.lineKey === lkEv
+                ? prev.interaction.selectedOptionIds?.[0]
+                : undefined;
+            const toggled =
+              cur === intent.entryId ? ([] as string[]) : [intent.entryId];
+            next = {
+              ...prev,
+              interaction: {
+                lineKey: lkEv,
+                selectedOptionIds: toggled,
+                selectedProfileId: prev.interaction.selectedProfileId,
+              },
+            };
+            break;
+          }
           case "selectAccusedProfile": {
             if (!line?.interaction || line.interaction.kind !== "accuse")
               return prev;
@@ -727,22 +752,108 @@ export function VnProvider({ children }: { children: ReactNode }) {
               break;
             }
 
+            if (line.interaction.kind === "corkboardEntry") {
+              const selId = selectedOptions[0];
+              if (!selId) return prev;
+              const lkEv = interactionKey(scene.id, prev.lineIndex);
+              const isCorrect = selId === line.interaction.correctEntryId;
+              const outcome = isCorrect
+                ? line.interaction.onCorrect
+                : line.interaction.onIncorrect;
+              const nextPoints = Math.max(
+                0,
+                prev.points +
+                  (isCorrect ? POINTS_CORRECT : -POINTS_INCORRECT)
+              );
+              const flagsAfterLineSet = withSetFlags(prev.flags, line.setFlags);
+              const afterUnlock = mergeUnlockState(
+                prev.reveals,
+                prev.profileDisplayNames,
+                line.unlocks
+              );
+
+              if (!isCorrect && !outcome?.nextSceneId) {
+                const fbMap = line.interaction.wrongFeedbackByEntryId ?? {};
+                const wrongFbRaw =
+                  fbMap[selId]?.trim() ||
+                  line.interaction.wrongFeedbackDefault?.trim() ||
+                  "Not quite—try another angle.";
+                const wrongFbSpeaker =
+                  line.interaction.wrongFeedbackSpeakerId ?? "narrator";
+                const flagsAfterWrong = withSetFlags(
+                  flagsAfterLineSet,
+                  outcome?.setFlags
+                );
+                next = {
+                  ...prev,
+                  points: nextPoints,
+                  flags: flagsAfterWrong,
+                  mcqWrongFeedback: {
+                    lineKey: lkEv,
+                    text: wrongFbRaw,
+                    speakerId: wrongFbSpeaker,
+                  },
+                  interaction: {
+                    lineKey: lkEv,
+                    selectedOptionIds: [],
+                    selectedProfileId: prev.interaction.selectedProfileId,
+                  },
+                };
+                break;
+              }
+
+              const withFlags = withSetFlags(flagsAfterLineSet, outcome?.setFlags);
+              const withHistory = pushHistory(
+                prev.history,
+                scene.id,
+                "Evidence",
+                `${line.interaction.question} -> ${selId}`
+              );
+              if (outcome?.nextSceneId) {
+                next = goToScene(
+                  {
+                    ...prev,
+                    history: withHistory,
+                    points: nextPoints,
+                    reveals: afterUnlock.reveals,
+                    profileDisplayNames: afterUnlock.profileDisplayNames,
+                  },
+                  outcome.nextSceneId,
+                  withFlags
+                );
+                break;
+              }
+              next = goNextLine(
+                {
+                  ...prev,
+                  history: withHistory,
+                  points: nextPoints,
+                  reveals: afterUnlock.reveals,
+                  profileDisplayNames: afterUnlock.profileDisplayNames,
+                },
+                scene,
+                withFlags
+              );
+              break;
+            }
+
+            if (line.interaction.kind !== "accuse") return prev;
             if (!selectedProfile) return prev;
-            const isCorrect =
+            const isCorrectAccuse =
               selectedProfile === line.interaction.correctProfileId;
-            const outcome = isCorrect
+            const outcomeAccuse = isCorrectAccuse
               ? line.interaction.onCorrect
               : line.interaction.onIncorrect;
-            const nextPoints = Math.max(
+            const nextPointsAccuse = Math.max(
               0,
               prev.points +
-                (isCorrect ? POINTS_CORRECT : -POINTS_INCORRECT)
+                (isCorrectAccuse ? POINTS_CORRECT : -POINTS_INCORRECT)
             );
-            const withFlags = withSetFlags(
+            const withFlagsAccuse = withSetFlags(
               withSetFlags(prev.flags, line.setFlags),
-              outcome?.setFlags
+              outcomeAccuse?.setFlags
             );
-            const withHistory = pushHistory(
+            const withHistoryAccuse = pushHistory(
               prev.history,
               scene.id,
               "Accusation",
@@ -753,30 +864,30 @@ export function VnProvider({ children }: { children: ReactNode }) {
               prev.profileDisplayNames,
               line.unlocks
             );
-            if (outcome?.nextSceneId) {
+            if (outcomeAccuse?.nextSceneId) {
               next = goToScene(
                 {
                   ...prev,
-                  history: withHistory,
-                  points: nextPoints,
+                  history: withHistoryAccuse,
+                  points: nextPointsAccuse,
                   reveals: afterUnlockAccuse.reveals,
                   profileDisplayNames: afterUnlockAccuse.profileDisplayNames,
                 },
-                outcome.nextSceneId,
-                withFlags
+                outcomeAccuse.nextSceneId,
+                withFlagsAccuse
               );
               break;
             }
             next = goNextLine(
               {
                 ...prev,
-                history: withHistory,
-                points: nextPoints,
+                history: withHistoryAccuse,
+                points: nextPointsAccuse,
                 reveals: afterUnlockAccuse.reveals,
                 profileDisplayNames: afterUnlockAccuse.profileDisplayNames,
               },
               scene,
-              withFlags
+              withFlagsAccuse
             );
             break;
           }

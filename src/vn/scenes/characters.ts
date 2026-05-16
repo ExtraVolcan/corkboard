@@ -56,6 +56,7 @@ export const VN_CHARACTERS: VnCharacter[] = [
     accent: "#e7e2da",
     unknownName: "???",
     nameRevealFlag: characterNameRevealFlag("puck"),
+    linkedProfileId: "puck",
   },
   {
     id: "portia",

@@ -57,7 +57,34 @@ export type VnAccuseInteraction = {
   onIncorrect?: VnInteractionOutcome;
 };
 
-export type VnLineInteraction = VnMcqInteraction | VnAccuseInteraction;
+/**
+ * Player opens the corkboard on a fixed profile, selects one intel entry, and submits.
+ * Wrong answers use the same brief overlay as MCQ (`mcqWrongFeedback`).
+ */
+export type VnCorkboardEntryInteraction = {
+  kind: "corkboardEntry";
+  /** Shown in the dialogue box above the open-corkboard button. */
+  prompt?: string;
+  /** Large persistent banner (VN + corkboard + profile). */
+  question: string;
+  /** Only this dossier is available; player cannot leave it until correct or dimiss wrong feedback. */
+  profileId: string;
+  correctEntryId: string;
+  openBoardButtonLabel?: string;
+  submitLabel?: string;
+  /** Fallback when the chosen entry has no `wrongFeedbackByEntryId` entry. */
+  wrongFeedbackDefault?: string;
+  wrongFeedbackSpeakerId?: string;
+  /** Per wrong entry id (seed `entries[].id`). */
+  wrongFeedbackByEntryId?: Record<string, string>;
+  onCorrect?: VnInteractionOutcome;
+  onIncorrect?: VnInteractionOutcome;
+};
+
+export type VnLineInteraction =
+  | VnMcqInteraction
+  | VnAccuseInteraction
+  | VnCorkboardEntryInteraction;
 
 export type VnRevealAction =
   | { type: "revealProfile"; profileId: string }
@@ -169,6 +196,7 @@ export type VnIntent =
   | { type: "skipToNextInteraction" }
   | { type: "chooseOption"; optionId: string }
   | { type: "selectInteractionOption"; optionId: string }
+  | { type: "selectEvidenceEntry"; profileId: string; entryId: string }
   | { type: "selectAccusedProfile"; profileId: string }
   | { type: "submitInteraction" }
   | { type: "goToScene"; sceneId: string }

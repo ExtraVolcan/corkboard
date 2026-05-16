@@ -392,7 +392,21 @@ export const shipDay2Room: VnScene = {
     {
       speakerId: "narrator",
       text: "After that awkward standoff, the cat disappears behind the corner as it scampers away.",
-    },//TODO unlock new profile: Cat (Puck but name not set to Puck yet)
+      unlocks: [
+        { type: "revealProfile", profileId: "puck" },
+        { type: "revealImage", profileId: "puck" },
+        {
+          type: "setProfileDisplayName",
+          profileId: "puck",
+          displayName: "Cat",
+        },
+        {
+          type: "revealEntry",
+          profileId: "puck",
+          entryId: "cat-first-sighting-corridor",
+        },
+      ],
+    },
     {
       speakerId: "detective",
       text: "Huh.",
@@ -660,8 +674,13 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "titania",
       text: "His name is Puck. And he's a proper crewmember just like us.",
-      emotion: "neutral-talk"
-    },//TODO set name of cat to Puck in corkboard profile
+      emotion: "neutral-talk",
+      setFlags: [characterNameRevealFlag("puck")],
+      unlocks: [
+        { type: "revealName", profileId: "puck" },
+        { type: "setProfileDisplayName", profileId: "puck", displayName: "" },
+      ],
+    },
     {
       speakerId: "titania",
       emotion: "neutral",
@@ -829,6 +848,16 @@ export const shipDay2Crew: VnScene = {
             id: "guess-cressida",
             label: "Cressida",
             correct: true,
+          },
+          {
+            id: "guess-ariel",
+            label: "Ariel",
+            wrongFeedback: "I don't know an Ariel, but that name doesn't appear as active on Day 1 or 2.",
+          },
+          {
+            id: "guess-bianca",
+            label: "Bianca",
+            wrongFeedback: "I don't know a Bianca, but that name doesn't appear as active on Day 1 or 2.",
           },
           {
             id: "guess-detective",
@@ -1282,10 +1311,29 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "narrator",
       text: "Miranda left the cookies outside Cressida's door, huh?",
-    
+      emotion: "detective-think",
+      interaction: {
+        kind: "corkboardEntry",
+        prompt:
+          "Select the dossier clue that puts Miranda's claim into question.",
+        question:
+          "Miranda says she left the cookies outside Cressida's door. Why is that suspicious?",
+        profileId: "ship-doors",
+        correctEntryId: "noDoorLabels",
+        openBoardButtonLabel: "Open corkboard dossier",
+        submitLabel: "This is it!",
+        wrongFeedbackDefault:
+          "That tidbit doesn't collide with Miranda's claim. Her claim sounds plausible, but from what I know so far, it should be nigh-impossible.",
+        wrongFeedbackByEntryId: {
+          "uniform-design":
+            "Every door looks and acts the same... That relates to the point I want to make, but we can be more specific.",
+          "sensor-walkthrough":
+            "No, knowing how the doors open and close doesn't make Miranda suspicious. According to her, she knocked on a closed door. But to get there, there's a crucial point that I believe she couldn't have known.",
+          "occupant-bound":
+            "No, my theory that the doors only respond to their occupants doesn't make Miranda suspicious. It matches up with her statement, because she says she knocked on a closed door she believed was occupied. But to get there, there's crucial information that I believe only the occupant would know.",
+        },
+      },
     },
-    //TODO here put player choice of having to select the profile & entry that shows why this is suspicious.
-    // ^ the correct entry is the one that says there are no labels on the doors
     {
       speakerId: "narrator",
       text: "How did she know where Cressida's room was?",
@@ -1380,7 +1428,14 @@ export const shipBranchMistake: VnScene = {
     {
       speakerId: "miranda",
       text: "I-I gave the cat a bite of my cooking.",
-    },//TODO unlock new entry: Miranda fed Puck food that she cooked.
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "miranda",
+          entryId: "fed-puck-cooking",
+        },
+      ],
+    },
     {
       speakerId: "titania",
       text: "...",
@@ -1436,7 +1491,14 @@ export const shipBranchMistake: VnScene = {
     {
       speakerId: "miranda",
       text: "The tears started flowing, and- I couldn't spit the words out. I heard Cressida run away after that.",
-    },//TODO unlock new entry about Miranda's mistake & encounter with Cressida.
+      unlocks: [
+        {
+          type: "revealEntry",
+          profileId: "miranda",
+          entryId: "cressida-fled-after-sobbing",
+        },
+      ],
+    },
     {
       speakerId: "detective",
       text: "I see.",

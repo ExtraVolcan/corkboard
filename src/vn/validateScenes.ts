@@ -200,6 +200,41 @@ export function validateScenes(
             );
           }
         }
+      } else if (line.interaction?.kind === "corkboardEntry") {
+        const ic = line.interaction;
+        if (!ic.question?.trim()) {
+          push(errors, `${lp}.interaction.question`, "question text is required");
+        }
+        if (!ic.profileId?.trim()) {
+          push(errors, `${lp}.interaction.profileId`, "profileId is required");
+        }
+        if (!ic.correctEntryId?.trim()) {
+          push(
+            errors,
+            `${lp}.interaction.correctEntryId`,
+            "correctEntryId is required"
+          );
+        }
+        if (
+          ic.wrongFeedbackSpeakerId &&
+          !speakerExists(charSet, ic.wrongFeedbackSpeakerId)
+        ) {
+          push(
+            errors,
+            `${lp}.interaction.wrongFeedbackSpeakerId`,
+            `Unknown character "${ic.wrongFeedbackSpeakerId}"`
+          );
+        }
+        for (const key of ["onCorrect", "onIncorrect"] as const) {
+          const o = ic[key];
+          if (o?.nextSceneId && !set.has(o.nextSceneId)) {
+            push(
+              errors,
+              `${lp}.interaction.${key}.nextSceneId`,
+              `Unknown scene id "${o.nextSceneId}"`
+            );
+          }
+        }
       }
     }
   }

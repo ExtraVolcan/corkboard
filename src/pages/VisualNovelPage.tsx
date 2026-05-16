@@ -217,6 +217,7 @@ export function VisualNovelPage() {
   const [sfxPrefs, setSfxPrefs] = useState<SfxPrefs>(() => loadSfxPrefs());
   const prevRevealsRef = useRef<VnState["reveals"] | null>(null);
   const historyListRef = useRef<HTMLDivElement>(null);
+  const openedEvidenceChallengeLineKeyRef = useRef<string | null>(null);
 
   const profileImageUrls = useMemo(
     () =>
@@ -229,33 +230,6 @@ export function VisualNovelPage() {
   useEffect(() => {
     void preloadPortraitUrls(profileImageUrls);
   }, [profileImageUrls]);
-
-  function openCorkboard() {
-    playSfx("panel", sfxPrefs);
-    if (isCorkboardTutorialGateActive(currentLine, state.flags)) {
-      dispatch({ type: "acknowledgeCorkboardTutorial" });
-    }
-    setSearchParams(
-      (p) => {
-        const n = new URLSearchParams(p);
-        n.set("board", "1");
-        return n;
-      },
-      { replace: true }
-    );
-  }
-
-  function closeCorkboard() {
-    playSfx("panel", sfxPrefs);
-    setSearchParams(
-      (p) => {
-        const n = new URLSearchParams(p);
-        n.delete("board");
-        return n;
-      },
-      { replace: true }
-    );
-  }
 
   const stripProfileParam = useCallback(() => {
     setSearchParams(
@@ -313,46 +287,6 @@ export function VisualNovelPage() {
     });
   }, [showHistory, state.history.length]);
 
-  useEffect(() => {
-    if (
-      !showHistory &&
-      !showSettings &&
-      !showCorkboard &&
-      !profileModalId
-    ) {
-      return;
-    }
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setShowHistory(false);
-      setShowSettings(false);
-      if (profileModalId) {
-        stripProfileParam();
-        return;
-      }
-      if (showCorkboard) {
-        setSearchParams(
-          (p) => {
-            const n = new URLSearchParams(p);
-            n.delete("board");
-            return n;
-          },
-          { replace: true }
-        );
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [
-    showHistory,
-    showSettings,
-    showCorkboard,
-    profileModalId,
-    stripProfileParam,
-    setSearchParams,
-  ]);
-
-  const speaker = getSpeaker(currentLine?.speakerId);
   const charById = useMemo(
     () => new Map(characters.map((c) => [c.id, c])),
     [characters]
@@ -373,6 +307,7 @@ export function VisualNovelPage() {
     }),
     [state.flags, state.reveals, campaignProfileMeta]
   );
+  const speaker = getSpeaker(currentLine?.speakerId);
   const speakerDisplayLabel = useMemo(
     () =>
       resolveSpeakerDisplayLabel(
@@ -402,15 +337,16 @@ export function VisualNovelPage() {
       : undefined;
 
   const mcqWrongFeedback = state.mcqWrongFeedback;
-  const showingMcqWrongFeedback = Boolean(
-    interaction?.kind === "mcq" &&
+  const showingInteractionWrongFeedback = Boolean(
+    (interaction?.kind === "mcq" ||
+      interaction?.kind === "corkboardEntry") &&
       mcqWrongFeedback?.lineKey === interactionLineKey
   );
   const mcqFbSpeakerId = mcqWrongFeedback?.speakerId ?? "narrator";
-  const mcqFbSpeakerLabel = showingMcqWrongFeedback
+  const mcqFbSpeakerLabel = showingInteractionWrongFeedback
     ? resolveSpeakerDisplayLabel(mcqFbSpeakerId, charById, speakerLabelCtx)
     : null;
-  const mcqFbSpeakerStyle = showingMcqWrongFeedback
+  const mcqFbSpeakerStyle = showingInteractionWrongFeedback
     ? getSpeaker(mcqFbSpeakerId)
     : undefined;
 
@@ -476,7 +412,7 @@ export function VisualNovelPage() {
       currentLine &&
       !hasChoices &&
       !corkboardTutorialSpotlight &&
-      (!interaction || showingMcqWrongFeedback)
+      (!interaction || showingInteractionWrongFeedback)
   );
 
   const advanceDialogueText = currentLine?.text ?? "";
@@ -487,7 +423,7 @@ export function VisualNovelPage() {
   );
 
   const mcqFeedbackTypingEnabled = Boolean(
-    showingMcqWrongFeedback && mcqWrongFeedback
+    showingInteractionWrongFeedback && mcqWrongFeedback
   );
   const mcqFeedbackText = mcqWrongFeedback?.text ?? "";
   const mcqFbTw = useTypewriterLine(
@@ -495,6 +431,135 @@ export function VisualNovelPage() {
     mcqFeedbackTypingEnabled,
     state.settings.textSpeed
   );
+
+  const openCorkboard = useCallback(() => {
+    playSfx("panel", sfxPrefs);
+    if (isCorkboardTutorialGateActive(currentLine, state.flags)) {
+      dispatch({ type: "acknowledgeCorkboardTutorial" });
+    }
+    setSearchParams(
+      (p) => {
+        const n = new URLSearchParams(p);
+        n.set("board", "1");
+        n.delete("profile");
+        const lockedEvidence =
+          interaction?.kind === "corkboardEntry" &&
+          state.interaction.lineKey === interactionLineKey;
+        openedEvidenceChallengeLineKeyRef.current = lockedEvidence
+          ? interactionLineKey
+          : null;
+        return n;
+      },
+      { replace: true }
+    );
+  }, [
+    sfxPrefs,
+    currentLine,
+    state.flags,
+    dispatch,
+    interaction?.kind,
+    state.interaction.lineKey,
+    interactionLineKey,
+    setSearchParams,
+  ]);
+
+  const closeCorkboard = useCallback(() => {
+    if (
+      interaction?.kind === "corkboardEntry" &&
+      state.interaction.lineKey === interactionLineKey &&
+      !state.mcqWrongFeedback
+    ) {
+      return;
+    }
+    openedEvidenceChallengeLineKeyRef.current = null;
+    playSfx("panel", sfxPrefs);
+    setSearchParams(
+      (p) => {
+        const n = new URLSearchParams(p);
+        n.delete("board");
+        n.delete("profile");
+        return n;
+      },
+      { replace: true }
+    );
+  }, [
+    interaction?.kind,
+    state.interaction.lineKey,
+    interactionLineKey,
+    state.mcqWrongFeedback,
+    sfxPrefs,
+    setSearchParams,
+  ]);
+
+  useEffect(() => {
+    const fb = state.mcqWrongFeedback;
+    if (!fb?.lineKey || !showCorkboard) return;
+    if (interaction?.kind !== "corkboardEntry") return;
+    if (fb.lineKey !== interactionLineKey) return;
+    openedEvidenceChallengeLineKeyRef.current = null;
+    setSearchParams(
+      (p) => {
+        const n = new URLSearchParams(p);
+        n.delete("board");
+        n.delete("profile");
+        return n;
+      },
+      { replace: true }
+    );
+  }, [
+    state.mcqWrongFeedback,
+    showCorkboard,
+    interaction?.kind,
+    interactionLineKey,
+    setSearchParams,
+    interaction,
+  ]);
+
+  useEffect(() => {
+    const openKey = openedEvidenceChallengeLineKeyRef.current;
+    if (!openKey || !showCorkboard) return;
+    if (interactionLineKey === openKey) return;
+    openedEvidenceChallengeLineKeyRef.current = null;
+    setSearchParams(
+      (p) => {
+        const n = new URLSearchParams(p);
+        n.delete("board");
+        n.delete("profile");
+        return n;
+      },
+      { replace: true }
+    );
+  }, [interactionLineKey, showCorkboard, setSearchParams]);
+
+  useEffect(() => {
+    if (
+      !showHistory &&
+      !showSettings &&
+      !showCorkboard &&
+      !profileModalId
+    ) {
+      return;
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setShowHistory(false);
+      setShowSettings(false);
+      if (profileModalId) {
+        stripProfileParam();
+        return;
+      }
+      if (showCorkboard) closeCorkboard();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    showHistory,
+    showSettings,
+    showCorkboard,
+    profileModalId,
+    stripProfileParam,
+    closeCorkboard,
+  ]);
 
   function updateSfxPrefs(next: SfxPrefs) {
     const saved = saveSfxPrefs(next);
@@ -726,7 +791,7 @@ export function VisualNovelPage() {
                   ))}
                 </div>
               ) : interaction?.kind === "mcq" ? (
-                showingMcqWrongFeedback && mcqWrongFeedback ? (
+                showingInteractionWrongFeedback && mcqWrongFeedback ? (
                   <button
                     type="button"
                     className="vn-dialogue-frame vn-dialogue-frame--advance"
@@ -803,6 +868,59 @@ export function VisualNovelPage() {
                       }}
                     >
                       Submit answer
+                    </button>
+                  </div>
+                )
+              ) : interaction?.kind === "corkboardEntry" ? (
+                showingInteractionWrongFeedback && mcqWrongFeedback ? (
+                  <button
+                    type="button"
+                    className="vn-dialogue-frame vn-dialogue-frame--advance"
+                    onClick={() => {
+                      if (!mcqFbTw.isRevealComplete) {
+                        mcqFbTw.skipToEnd();
+                        return;
+                      }
+                      playSfx("advance", sfxPrefs);
+                      dispatch({ type: "advanceDialogue" });
+                    }}
+                  >
+                    {mcqFbSpeakerLabel ? (
+                      <div
+                        className="vn-speaker"
+                        style={{
+                          color:
+                            mcqFbSpeakerStyle?.accent ||
+                            "rgba(253, 230, 200, 0.95)",
+                        }}
+                      >
+                        {mcqFbSpeakerLabel}
+                      </div>
+                    ) : null}
+                    <p className={vnLineClassName(mcqFbSpeakerId)}>
+                      {mcqFbTw.visibleText}
+                    </p>
+                    <span className="vn-continue-hint">
+                      {"Click to continue"}
+                    </span>
+                  </button>
+                ) : (
+                  <div className="vn-interaction-box vn-interaction-evidence-entry">
+                    <p className="vn-evidence-question-banner" role="presentation">
+                      {interaction.question}
+                    </p>
+                    {interaction.prompt ? (
+                      <p className="vn-interaction-prompt">{interaction.prompt}</p>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="vn-pill vn-pill--primary"
+                      onClick={() => {
+                        playSfx("panel", sfxPrefs);
+                        openCorkboard();
+                      }}
+                    >
+                      {interaction.openBoardButtonLabel ?? "Review evidence dossier"}
                     </button>
                   </div>
                 )

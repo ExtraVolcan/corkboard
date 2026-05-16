@@ -15,14 +15,24 @@ import {
 import { polaroidCaptionFromCampaign } from "../vn/boardProfileLabel";
 import { useVn } from "../vn/state";
 
+export type EvidenceChallengeSelectionProps = {
+  selectedEntryIds?: string[];
+  submitLabel?: string;
+  onToggleEntrySelection: (profileId: string, entryId: string) => void;
+  onSubmit: () => void;
+};
+
 export function ProfilePanel({
   profileId,
   variant,
   onCloseModal,
+  evidenceChallengeSelection,
 }: {
   profileId: string;
   variant: "page" | "modal";
   onCloseModal?: () => void;
+  /** One intel entry chosen from this dossier; used by VN corkboard evidence challenges. */
+  evidenceChallengeSelection?: EvidenceChallengeSelectionProps;
 }) {
   const { data, ack, mergeAck } = useCampaign();
   const {
@@ -118,6 +128,7 @@ export function ProfilePanel({
     );
   }
 
+  const evidencePick = Boolean(evidenceChallengeSelection);
   const effectiveProfileRevealed =
     profile.profileRevealed || isProfileVisible(profile.id);
   const effectiveNameRevealed =
@@ -150,6 +161,8 @@ export function ProfilePanel({
       nameVisible: effectiveNameRevealed,
     }
   );
+
+  const evidenceCtl = evidencePick ? evidenceChallengeSelection : null;
 
   return (
     <div className="paper profile-panel">
@@ -201,14 +214,59 @@ export function ProfilePanel({
       </div>
 
       {showEntriesSection ? (
-        <section style={{ marginTop: "1.25rem" }}>
+        <section
+          style={{ marginTop: "1.25rem" }}
+          className={evidencePick ? "profile-entries-evidence-pick" : undefined}
+        >
           {entriesToShow.map((e) => {
             const showNew =
               effectiveProfileRevealed &&
               isEntryNew(profile.id, e.id, e.revealed, ack, vnRevealGate);
+            const selId = evidenceCtl?.selectedEntryIds?.[0];
+            const isSelected = selId === e.id;
 
             return (
-              <article key={e.id} className="entry-block">
+              <article
+                key={e.id}
+                role={evidencePick ? "button" : undefined}
+                tabIndex={evidencePick ? 0 : undefined}
+                aria-pressed={evidencePick ? isSelected : undefined}
+                aria-label={
+                  evidencePick
+                    ? isSelected
+                      ? `${e.id}: selected intel`
+                      : `${e.id}: select this intel`
+                    : undefined
+                }
+                className={`entry-block${
+                  evidencePick ? " entry-block--evidence-pickable" : ""
+                }${isSelected ? " entry-block--selected" : ""}`}
+                onClick={
+                  evidencePick && evidenceCtl
+                    ? () =>
+                        evidenceCtl.onToggleEntrySelection(
+                          profile.id,
+                          e.id
+                        )
+                    : undefined
+                }
+                onKeyDown={
+                  evidencePick && evidenceCtl
+                    ? (evt) => {
+                        if (
+                          evt.key !== "Enter" &&
+                          evt.key !== " "
+                        )
+                          return;
+                        evt.preventDefault();
+                        evidenceCtl.onToggleEntrySelection(
+                          profile.id,
+                          e.id
+                        );
+                      }
+                    : undefined
+                }
+              >
                 {showNew ? (
                   <div className="entry-head">
                     <div
@@ -227,11 +285,24 @@ export function ProfilePanel({
                   knownProfileIds={knownIds}
                   linkLabel={entryLinkLabel}
                   profileHref={variant === "modal" ? profileHref : undefined}
+                  suppressProfileLinks={evidencePick}
                 />
               </article>
             );
           })}
         </section>
+      ) : null}
+      {evidencePick && evidenceCtl ? (
+        <div className="evidence-challenge-submit-wrap">
+          <button
+            type="button"
+            className="btn btn-primary evidence-challenge-submit"
+            disabled={!evidenceCtl.selectedEntryIds?.length}
+            onClick={() => evidenceCtl.onSubmit()}
+          >
+            {evidenceCtl.submitLabel ?? "Submit evidence"}
+          </button>
+        </div>
       ) : null}
     </div>
   );
