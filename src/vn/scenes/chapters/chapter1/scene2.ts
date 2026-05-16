@@ -755,6 +755,31 @@ export const shipDay2Crew: VnScene = {
           profileId: "maintenance-schedule",
           entryId: "rotation-columns",
         },
+        {
+          type: "revealEntry",
+          profileId: "maintenance-schedule",
+          entryId: "day-1-active",
+        },
+        {
+          type: "revealEntry",
+          profileId: "maintenance-schedule",
+          entryId: "day-2-active",
+        },
+        {
+          type: "revealEntry",
+          profileId: "maintenance-schedule",
+          entryId: "day-3-active",
+        },
+        {
+          type: "revealEntry",
+          profileId: "maintenance-schedule",
+          entryId: "day-4-active",
+        },
+        {
+          type: "revealEntry",
+          profileId: "maintenance-schedule",
+          entryId: "day-5-active",
+        },
       ],
     },
     {
@@ -769,31 +794,28 @@ export const shipDay2Crew: VnScene = {
       speakerId: "narrator",
       text: "First, let's get our bearings. I have enough info to make a deduction.",
       interaction: {
-        kind: "mcq",
-        prompt: "Which column is today?",
-        options: [
-          {
-            id: "col-1",
-            label: "First column (Day 1)",
-            wrongFeedback:
-              "Day one would be the first column; I'm not listed on that day.",
-          },
-          {
-            id: "col-2",
-            label: "Second column (Day 2)",
-            correct: true,
-          },
-          {
-            id: "col-3",
-            label: "Third column (Day 3)",
-            wrongFeedback: "No, Day 3 doesn't make sense, the people listed for Day 3 don't match up with the people I've seen today.",
-          },
-          {
-            id: "col-4",
-            label: "Fourth column (Day 4)",
-            wrongFeedback: "Too far forward; the people listed for Day 4 don't match up with who I'm talking to.",
-          },
-        ],
+        kind: "corkboardEntry",
+        prompt:
+          "On the Maintenance Schedule dossier, tap the day note that tells me which day is today.",
+        question: "Which day is today?",
+        profileId: "maintenance-schedule",
+        correctEntryId: "day-2-active",
+        openBoardButtonLabel: "Open Maintenance Schedule",
+        submitLabel: "This is it!",
+        wrongFeedbackDefault:
+          "That doesn't tell me which day is today.",
+        wrongFeedbackByEntryId: {
+          "rotation-columns":
+            "That's the overview of the grid, not the day-by-day roster. I can figure out which day is today from the maintenance schedule & the names of everyone I've met today.",
+          "day-1-active":
+            "Day 1 would be the first column; I'm not listed on that day.",
+          "day-3-active":
+            "Day 3 doesn't line up; who's active today doesn't match that list.",
+          "day-4-active":
+            "Too far forward; the Day 4 roster doesn't match who's in front of me.",
+          "day-5-active":
+            "That day's roster doesn't fit what I've seen today.",
+        },
       },
     },
     {

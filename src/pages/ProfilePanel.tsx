@@ -218,6 +218,12 @@ export function ProfilePanel({
           style={{ marginTop: "1.25rem" }}
           className={evidencePick ? "profile-entries-evidence-pick" : undefined}
         >
+          {evidencePick ? (
+            <p className="profile-evidence-hint-copy" role="status">
+              Each note below is selectable. Tap one to highlight it, then use{" "}
+              <strong>{evidenceCtl?.submitLabel ?? "Submit"}</strong> at the bottom.
+            </p>
+          ) : null}
           {entriesToShow.map((e) => {
             const showNew =
               effectiveProfileRevealed &&
