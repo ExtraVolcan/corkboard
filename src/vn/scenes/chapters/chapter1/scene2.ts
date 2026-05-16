@@ -1195,7 +1195,7 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "titania",
-      text: "Because knocking would've meant admitting your fault to her face.",
+      text: "Because waiting would've meant admitting your fault to her face.",
       emotion: "squint-talk"
     },
     {
@@ -1373,16 +1373,70 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "How did she know where Cressida's room was?",
+      text: "Yeah, that's it! There are no labels on the doors, so...",
     },
-    //TODO questioning after realizing that Miranda knew where Cressida's room was
-    //TODO Stephano actually bails Miranda out, saying
-    // "I showed her"
-    // Detective: "Okay, well how did you know, Stephano?"
-    // "It's a funny story, actually."
-    // "Yesterday morning, Cressida & I opened our doors at the same time."
-    // "So the first thing we saw was each other's faces!"
-    // "So you see, Cressida's room is directly across from mine."
+    {
+      speakerId: "narrator",
+      text: "How did she know where Cressida's room was?",
+      emotion: "detective-think",
+    },
+    {
+      speakerId: "detective",
+      text: "Miranda...",
+    },
+    {
+      speakerId: "miranda",
+      text: "Y-yes?",
+    },
+    {
+      speakerId: "detective",
+      text: "You said you left the cookies outside Cressida's door.",
+    },
+    {
+      speakerId: "detective",
+      text: "But none of the doors I've seen have any labels on them.",
+    },
+    {
+      speakerId: "detective",
+      text: "In fact, they all look the same.",
+    },
+    {
+      speakerId: "detective",
+      text: "So how did you know which door was Cressida's?",
+    },
+    {
+      speakerId: "miranda",
+      text: "Well...I-",
+    },
+    {
+      speakerId: "stephano",
+      text: "I showed her.",
+    },
+    {
+      speakerId: "narrator",
+      text: "He's covering for her?",
+      emotion: "detective-think",
+    },
+    {
+      speakerId: "detective",
+      text: "Okay, well how did you know, Stephano?",
+    },
+    {
+      speakerId: "stephano",
+      text: "It's a funny story, actually.",
+    },
+    {
+      speakerId: "stephano",
+      text: "Yesterday morning, Cressida & I opened our doors at the same time.",
+    },
+    {
+      speakerId: "stephano",
+      text: "The first thing we saw was each other's faces!",
+    },
+    {
+      speakerId: "stephano",
+      text: "So you see, Cressida's room is directly across from mine.",
+    },
     {
       speakerId: "narrator",
       text: "what.",
@@ -1393,11 +1447,15 @@ export const shipBranchcookies: VnScene = {
     },
     {
       speakerId: "narrator",
+      text: "Hold up.",
+    },
+    {
+      speakerId: "narrator",
       text: "Stephano's statement doesn't line up with what I know.",
     },
     {
       speakerId: "narrator",
-      text: "Stephano's room can't be directly across from Cressida's",
+      text: "Stephano's room can't be directly across from Cressida's...",
     },
     {
       speakerId: "narrator",
@@ -1407,11 +1465,191 @@ export const shipBranchcookies: VnScene = {
       speakerId: "narrator",
       text: "It's impossible for both of those to be true!",
     },
-    //TODO: player question: 
-    // "I'm sure Stephano is lying."
-    // "I can't be sure that Stephano is lying."
-
-    //-
+    {
+      speakerId: "narrator",
+      text: "My spotlight is on Stephano now. Is he lying to me? Maybe to cover for Miranda?",
+    },
+    {
+      speakerId: "narrator",
+      text: "",
+      emotion: "detective-think",
+      interaction: {
+        kind: "mcq",
+        prompt: "Is Stephano lying?",
+        options: [
+          {
+            id: "stephano-lie",
+            label: "I'm sure Stephano is lying.",
+            wrongFeedback:
+              "No, hold on... I know there's a contradiction, but that doesn't necessarily mean he's lying.",
+          },
+          {
+            id: "stephano-truth",
+            label: "I can't be sure that Stephano is lying.",
+            correct: true,
+          },
+        ],
+      },
+    },
+    {
+      speakerId: "narrator",
+      text: "I'm not sure if Stephano is lying yet, but I am sure there's a contradiction here.",
+      emotion: "detective-think",
+    },
+    {
+      speakerId: "narrator",
+      text: "Cressida's room can't be in two places at once.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Two possibilities: either Stephano's room is across from Cressida's, or mine is.",
+    },
+    {
+      speakerId: "narrator",
+      text: "And I was pretty damn sure my room was across from Cressida's until just a second ago.",
+    },
+    {
+      speakerId: "narrator",
+      text: "But I need to explore every possiblity to find the truth.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Is it even possible that Stephano is right about this?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Let's think this through step by step.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I need to examine all my assumptions.",
+    },
+    {
+      speakerId: "narrator",
+      text: "The room I walked out of this morning is where I woke up, and the door responded to my presence unlike any other door.",
+    },
+    {
+      speakerId: "narrator",
+      text: "When I walked inside that room, the door closed behind me.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I think it's still safe to assume that it's my room.",
+    },
+    {
+      speakerId: "narrator",
+      text: "What about across the hallway, the room where I found Cressida's corpse?",
+    },
+    {
+      speakerId: "narrator",
+      text: "That door didn't respond to my presence, and it was open when I walked out of my room. That's why I saw the corpse immediately.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Earlier I walked past a closed door, which actually proves something to me.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Since I've seen everyone on the maintenance schedule today, that means the closed door must belong to a crewmember who's offline today.",
+    },
+    {
+      speakerId: "narrator",
+      text: "That tracks with what I know, it seems my door was closed until I woke up & walked towards it.",
+    },
+    {
+      speakerId: "narrator",
+      text: "So, a door remains closed if someone is offline inside their room?",
+    },
+    {
+      speakerId: "narrator",
+      text: "That does make sense with what I already know about how the doors work. Simple logic: if the occupant enters then the door closes, and if the occupant leaves, it stays open.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Just one problem: Cressida's door is open despite her being inside.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Even when she was alive, her door should've closed behind her when she entered, and her going offline shouldn't have made the door open.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Ah... I get it now.",
+    },
+    {
+      speakerId: "narrator",
+      text: "So I AM right about how the doors work...",
+    },
+    {
+      speakerId: "narrator",
+      text: "...but there's an assumption I made early on that I can't prove.",
+    },
+    {
+      speakerId: "narrator",
+      text: "",
+      emotion: "detective-think",
+      interaction: {
+        kind: "mcq",
+        prompt: "Which assumption isn't supported by the evidence?",
+        options: [
+          {
+            id: "assumption-no-proof-corpse",
+            label: "That the corpse belongs to Cressida",
+            wrongFeedback:
+              "No, everything I have still points at the body being Cressida's: She was listed on the roster for today.",
+          },
+          {
+            id: "assumption-no-proof-room",
+            label: "That the room belongs to Cressida",
+            correct: true,
+          },
+          {
+            id: "assumption-no-proof-day1",
+            label: "That Cressida was active on Day 1",
+            wrongFeedback:
+              "Cressida was active on Day 1: The maintenance schedule backs that one up, plus everyone talked about her.",
+          },
+          {
+            id: "assumption-no-proof-my-room",
+            label: "That the room that responds to my presence is mine",
+            wrongFeedback:
+              "No, that assumption has backing. No other door responds to my presence.",
+          },
+        ],
+      },
+    },
+    {
+      speakerId: "narrator",
+      text: "I assumed the room belonged to Cressida because that's where her body was.",
+    },
+    {
+      speakerId: "narrator",
+      text: "There's no evidence to show that the room belongs to Cressida.",
+    },
+    {
+      speakerId: "narrator",
+      text: "But there is evidence to show that the room DOESN'T belong to Cressida.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It's the damn door.",
+    },
+    {
+      speakerId: "narrator",
+      text: "It makes total sense why the door is open if its occupant isn't inside.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Cressida died in someone else's room.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Well, I guess that means Stephano wasn't lying: his room really could be directly across from Cressida's actual room.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I'd rather not draw attention to the room with a corpse in it right now, so I think I can end my line of questioning here.",
+    },
     {
       speakerId: "narrator",
       text: "Okay, I think I've pulled on that thread enough.",
@@ -1664,17 +1902,10 @@ export const shipMirandaHubDone: VnScene = {
       speakerId: "narrator",
       text: "Okay, now we're getting somewhere. Is it time to tell them about Cressida's death?",
     },
-    {
-      speakerId: "detective",
-      text: "Thanks for the patience. I'll stay out of engine gossip.",
-    },
-    {
-      speakerId: "titania",
-      text: "See that you do.",
-    },
+    
     {
       speakerId: "narrator",
-      text: "Whatever yesterday was, it's written on them tighter than the maintenance grid.",
+      text: "",
       choices: [
         {
           id: "ship-to-briefing",
