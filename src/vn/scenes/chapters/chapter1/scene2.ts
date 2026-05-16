@@ -28,6 +28,36 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 // They have a heart-to-heart for the rest of the day?
 // ^ maybe they come up with nicknames for each other & the others
 
+//TODO endgame twist: 
+// Snatcher's original body is what Caliban has been inside all this time!
+// On "Day 0" (far in the past) (add a black row right before Day 1 on schedule),
+// The Snatcher swaps consciousnesses with Caliban (and kills him immediately, leaving no memory backup),
+// setting up for Day 1's events, with Snatcher in Caliban's original body: the cat!
+// TODO write Caliban's headaches, confusion, difficulty walking (taller than usual), wonder at why he's wearing a helmet.
+// TODO write lack of mirrors while not drawing too much attention to it (something about not being able to wash up?)
+// TODO Caliban commenting on similarity to Puck, and Titania responds "Uh, what? You look nothing alike."
+//  ^ play it off like it's a joke, but Caliban actually notices how the cat is like a twin brother (it's actually what was supposed to be his original synth body!)
+// -
+// A catastrophe is a physical ability: it can only be activated while the host body is alive/online.
+// But its effects stay while the body is offline. (EX: burns, holes, swapped consciousnesses)
+// This explains why Snatcher can use other people's abilities while inhabiting them.
+//   (But, despite being in Snatcher's original body, Caliban can't use the swap ability)
+//   (Because Snatcher also uses his catastrophe while inhabiting another body, as long as the host is online ("Caliban's portrait"))
+// Effectively leaving Caliban without access to a catastrophe: why Caliban fails to use his catastrophe in this first chapter when fighting Miranda
+// ^ TODO write that scene
+// - 
+// At some point, Caliban does get to see his face, and freaks out.
+//  (in a previously closed-off area with a pool of reflective liquid?)
+// Instigated by Titania running up to the liquid and fixing her hair in the reflection.
+// "This... isn't right..." "No... no no no no no no"
+// "Something's wrong with this liquid... It has to be..."
+// "Why is it showing me this?"
+// Titania tries to calm him down, commenting how his face looks the same as it always has.
+// "No, no, it's wrong, it's all wrong!"
+// T: "Cal, what's going on? You're scaring me!"
+// "This face... isn't mine!"
+// (Maybe?) Narrator: Worse yet, it's a face I've seen before...
+
 /** Picks up immediately after scene1’s closing beat; branches resolve via path flags (see hub scenes). */
 export const shipDay2Room: VnScene = {
   id: "ship-day2-room",
