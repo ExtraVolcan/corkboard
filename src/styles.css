@@ -527,6 +527,7 @@ a {
   --vn-portrait-row-inset-end: clamp(1.25rem, 11vw, 0rem);
   --vn-portrait-slot-overlap: 11rem;
   --vn-portrait-fixed-gap: 0;
+  --vn-portrait-speaking-z: 100;
 }
 
 /* Scene meta + icon toolbar */
@@ -825,6 +826,17 @@ a.vn-icon-btn {
   pointer-events: none;
 }
 
+/* Active speaker above overlapping NPC columns (overrides nth-child z-index below) */
+.vn-portrait-fixed-slot--speaking {
+  z-index: var(--vn-portrait-speaking-z, 100);
+}
+
+/* Detective / left cluster above the NPC rail when they are speaking */
+.vn-portrait-cluster--speaking {
+  position: relative;
+  z-index: var(--vn-portrait-speaking-z, 100);
+}
+
 .vn-portrait-slot {
   display: flex;
   flex-direction: column;
@@ -833,6 +845,10 @@ a.vn-icon-btn {
   flex-shrink: 0;
   max-width: none;
   position: relative;
+}
+
+.vn-portrait-slot--speaking {
+  z-index: var(--vn-portrait-speaking-z, 100);
 }
 
 /* Square frame for 600×600 (and similar) art — shorter than old bust crop; no cropping */

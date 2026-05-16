@@ -17,6 +17,9 @@ export const PORTRAIT_HIDDEN_SPEAKER_IDS = new Set<string>(["tutorial"]);
  */
 export const NPC_FIXED_SLOT_COUNT = 3;
 
+/** Active speaker paints above all other portrait slots (see styles + VisualNovelPage). */
+export const ACTIVE_PORTRAIT_Z_INDEX = 100;
+
 export type SpeakerPortraitSnapshot = {
   speakerId: string;
   lineIndex: number;
@@ -147,10 +150,7 @@ function buildSlot(
   );
   const baseZ = s.lineIndex * 4;
   const z =
-    (layout.stackZIndex ?? baseZ) +
-    (emotionLine ? 5000 : 0) +
-    /** Speaking portrait must paint above overlapping neighbors */
-    (highlightSpeakerId === speakerId ? 12000 : 0);
+    (layout.stackZIndex ?? baseZ) + (emotionLine ? 5000 : 0);
 
   return {
     speakerId,

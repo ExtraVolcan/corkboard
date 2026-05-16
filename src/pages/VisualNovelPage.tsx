@@ -14,6 +14,7 @@ import {
   resolvePortraitForSnapshot,
 } from "../vn/assets";
 import {
+  ACTIVE_PORTRAIT_Z_INDEX,
   buildPortraitLayout,
   resolvePortraitHighlightSpeakerId,
 } from "../vn/portraitLayout";
@@ -108,11 +109,15 @@ function PortraitFigure({
   return (
     <div
       className={`vn-portrait-slot${
-        slot.isSpeaking ? "" : " vn-portrait-slot--inactive"
+        slot.isSpeaking
+          ? " vn-portrait-slot--speaking"
+          : " vn-portrait-slot--inactive"
       }`}
       style={{
         position: "relative",
-        zIndex: slot.stackZIndex ?? 0,
+        zIndex: slot.isSpeaking
+          ? ACTIVE_PORTRAIT_Z_INDEX
+          : slot.stackZIndex ?? 0,
         ...(slot.overlapMarginLeftPx !== undefined &&
         slot.overlapMarginLeftPx !== 0
           ? { marginLeft: `${slot.overlapMarginLeftPx}px` }
@@ -382,6 +387,10 @@ export function VisualNovelPage() {
     () =>
       buildPortraitLayout(currentScene, state.lineIndex, portraitHighlightId),
     [currentScene, state.lineIndex, portraitHighlightId]
+  );
+
+  const protagonistPortraitSpeaking = portraitLayout.left.some(
+    (s) => s.isSpeaking
   );
 
   const effectiveSceneBackground = useMemo(
@@ -661,7 +670,13 @@ export function VisualNovelPage() {
           <div className="vn-portrait-column">
             <div className="vn-portrait-area">
               <div className="vn-portrait-row">
-                <div className="vn-portrait-cluster vn-portrait-cluster--left">
+                <div
+                  className={`vn-portrait-cluster vn-portrait-cluster--left${
+                    protagonistPortraitSpeaking
+                      ? " vn-portrait-cluster--speaking"
+                      : ""
+                  }`}
+                >
                   {portraitLayout.left.map((slot) => (
                     <PortraitFigure
                       key={slot.speakerId}
@@ -682,7 +697,12 @@ export function VisualNovelPage() {
                           key={`npc-slot-${slotIdx}`}
                           className={`vn-portrait-fixed-slot${
                             slot ? "" : " vn-portrait-fixed-slot--empty"
-                          }`}
+                          }${slot?.isSpeaking ? " vn-portrait-fixed-slot--speaking" : ""}`}
+                          style={
+                            slot?.isSpeaking
+                              ? { zIndex: ACTIVE_PORTRAIT_Z_INDEX }
+                              : undefined
+                          }
                           aria-hidden={!slot}
                         >
                           {slot ? (
