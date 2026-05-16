@@ -480,6 +480,13 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "miranda",
       text: "P-please don't fight… we're all on the same mission.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",
@@ -534,12 +541,19 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "miranda",
       text: "Miranda. I-I handle food prep.",
+      emotion: "neutral-talk",
       setFlags: [characterNameRevealFlag("miranda")],
       unlocks: [
         { type: "revealProfile", profileId: "miranda" },
         { type: "revealImage", profileId: "miranda" },
         { type: "revealName", profileId: "miranda" },
       ],
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "titania",
@@ -993,6 +1007,13 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "miranda",
       text: "W-well… there was a bit of arguing.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "titania",
@@ -1043,10 +1064,24 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "miranda",
       text: "Y-yes, and I didn't want us to fight, so...",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
       text: "...so I made her cookies.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",
@@ -1070,10 +1105,24 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "miranda",
       text: "Th-that's right. It was a peace offering.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
       text: "I was the one who made the mistake anyway, so...",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "narrator",
@@ -1185,6 +1234,7 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "miranda",
       text: "I… I left them outside her door. She didn't answer and I wasn't brave enough to knock twice.",
+      emotion: "neutral-talk",
       unlocks: [
         {
           type: "revealEntry",
@@ -1192,6 +1242,12 @@ export const shipBranchcookies: VnScene = {
           entryId: "cookies-left-at-door",
         },
       ],
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "titania",
@@ -1207,6 +1263,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "miranda",
       text: "Because I didn't want another scene!",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "narrator",
@@ -1326,6 +1389,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "miranda",
       text: "I h-hope you like them. They're the same batch I left outside Cressida's door.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",
@@ -1387,6 +1457,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "miranda",
       text: "Y-yes?",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",
@@ -1407,6 +1484,13 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "miranda",
       text: "Well...I-",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "stephano",
@@ -1683,10 +1767,24 @@ export const shipBranchMistake: VnScene = {
     {
       speakerId: "miranda",
       text: "...",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
       text: "I wasn't- I swear- I just wanted to be nice-",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",
@@ -1699,10 +1797,18 @@ export const shipBranchMistake: VnScene = {
     {
       speakerId: "miranda",
       text: "I- ",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
       text: "I-I gave the cat a bite of my cooking.",
+      emotion: "neutral-talk",
       unlocks: [
         {
           type: "revealEntry",
@@ -1712,6 +1818,12 @@ export const shipBranchMistake: VnScene = {
       ],
     },
     {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
       speakerId: "titania",
       text: "...",
       emotion: "think"
@@ -1719,6 +1831,13 @@ export const shipBranchMistake: VnScene = {
     {
       speakerId: "miranda",
       text: "Cressida saw me, and-and she scolded me.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "titania",
@@ -1734,14 +1853,35 @@ export const shipBranchMistake: VnScene = {
     {
       speakerId: "miranda",
       text: "I- Cressida said that cats don't digest in the same way we do, and-.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
       text: "-and that I could've killed it.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
       text: "...",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "titania",
@@ -1762,10 +1902,18 @@ export const shipBranchMistake: VnScene = {
     {
       speakerId: "miranda",
       text: "Well... I-I- I didn't know what to do, so-",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "miranda",
       text: "The tears started flowing, and- I couldn't spit the words out. I heard Cressida run away after that.",
+      emotion: "neutral-talk",
       unlocks: [
         {
           type: "revealEntry",
@@ -1773,6 +1921,12 @@ export const shipBranchMistake: VnScene = {
           entryId: "cressida-fled-after-sobbing",
         },
       ],
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "detective",
@@ -1785,6 +1939,13 @@ export const shipBranchMistake: VnScene = {
     {
       speakerId: "miranda",
       text: "It's… it's how my family always cooled fights. Sweet first, talk second.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
     },
     {
       speakerId: "stephano",
