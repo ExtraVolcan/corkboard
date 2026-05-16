@@ -568,6 +568,22 @@ export function VisualNovelPage() {
 
   return (
     <div className="vn-shell">
+      <svg className="vn-portrait-filters" aria-hidden width={0} height={0}>
+        <defs>
+          <filter
+            id="vn-portrait-inactive-dim"
+            colorInterpolationFilters="sRGB"
+          >
+            <feColorMatrix
+              type="matrix"
+              values="0.48 0 0 0 0
+                      0 0.46 0 0 0
+                      0 0 0.44 0 0
+                      0 0 0 1 0"
+            />
+          </filter>
+        </defs>
+      </svg>
       <div
         className={`vn-scene${
           corkboardTutorialSpotlight ? " vn-scene--corkboard-tutorial" : ""

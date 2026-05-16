@@ -678,6 +678,14 @@ a.vn-icon-btn {
 }
 
 /* Grounded portraits — bottom-aligned, behind the dialogue box */
+.vn-portrait-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .vn-portrait-layer {
   position: absolute;
   left: 0;
@@ -856,6 +864,7 @@ a.vn-icon-btn {
   background: rgba(10, 8, 6, 0.82);
   border: none;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  z-index: 2;
 }
 
 .vn-portrait-emotion-hint-label {
@@ -868,8 +877,9 @@ a.vn-icon-btn {
   word-break: break-word;
 }
 
-.vn-portrait-slot--inactive {
-  opacity: 0.62;
+/* Dim only opaque portrait pixels (PNG alpha preserved via SVG filter) */
+.vn-portrait-slot--inactive .vn-portrait {
+  filter: url(#vn-portrait-inactive-dim);
 }
 
 .vn-emotion-outline {
@@ -896,6 +906,11 @@ a.vn-icon-btn {
   -webkit-user-drag: none;
   border: none;
   outline: none;
+  transition: filter 0.45s ease;
+}
+
+.vn-portrait-slot--inactive .vn-emotion-outline {
+  color: rgba(255, 250, 245, 0.38);
 }
 
 /* Dialogue + controls at bottom of scene (in front of portraits) */
