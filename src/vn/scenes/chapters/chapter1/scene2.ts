@@ -2177,7 +2177,30 @@ export const shipMirandaHubDone: VnScene = {
       speakerId: "narrator",
       text: "Okay, now we're getting somewhere. Is it time to tell them about Cressida's death?",
     },
-    
+    {
+      speakerId: "narrator",
+      text: "No, it's still too dangerous while I don't know anyone's abilities.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I'm wary, I'm almost certain someone here used their catastrophe to kill Cressida.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Only something as strange as a catastrophe could explain the wound I saw.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Traditional methods don't punch holes in people like that.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Titania got defensive when I asked about everyone's abilities directly.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I'll need to come up with a way to figure out everyone's abilities, without tipping off the killer, and without placing suspicion on me.",
+    },
     /*{
       speakerId: "narrator",
       text: "",

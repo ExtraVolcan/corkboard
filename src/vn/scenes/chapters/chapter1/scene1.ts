@@ -166,7 +166,7 @@ export const scene1: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Especially on my first day on the job."
+      text: "I feel anything but normal, so maybe the most normal thing I can do is investigate a murder scene."
     },
     {
       speakerId: "narrator",
