@@ -793,6 +793,12 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "narrator",
       text: "First, let's get our bearings. I have enough info to make a deduction.",
+      emotion: "detective-think",
+    },
+    {
+      speakerId: "narrator",
+      text: "",
+      emotion: "detective-think",
       interaction: {
         kind: "corkboardEntry",
         prompt:
@@ -842,11 +848,15 @@ export const shipDay2Crew: VnScene = {
     {
       speakerId: "narrator",
       text: "In fact, I know the victim's name now.",
+      emotion: "detective-think",
+    },
+    {
+      speakerId: "narrator",
+      text: "",
+      emotion: "detective-think",
       interaction: {
         kind: "mcq",
         prompt: "What is the victim's name?",
-        //TODO: include other characters as guesses,
-        // OR, change to a text input field
         options: [
           {
             id: "guess-miranda",
@@ -1333,6 +1343,11 @@ export const shipBranchcookies: VnScene = {
     {
       speakerId: "narrator",
       text: "Miranda left the cookies outside Cressida's door, huh?",
+      emotion: "detective-think",
+    },
+    {
+      speakerId: "narrator",
+      text: "",
       emotion: "detective-think",
       interaction: {
         kind: "corkboardEntry",
