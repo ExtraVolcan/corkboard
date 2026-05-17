@@ -689,7 +689,155 @@ export const kitchenScene: VnScene = {
       portraitOnly: true,
       text: "",
     },
-    //TODO caliban tries and fails to use his catastrophe to stop her. (or earlier in the story)
+    {
+      speakerId: "narrator",
+      text: "Miranda lunges forward, tray in hand, towards us.",
+    },
+    {
+      speakerId: "detective",
+      text: "Titania! Shoot the tray!",
+    },
+    {
+      speakerId: "titania",
+      text: "What? I was gonna go for the head!",
+    },
+    {
+      speakerId: "detective",
+      text: "We'd die before she does! Just trust me! Burn the cookies!",
+    },
+    {
+      speakerId: "titania",
+      text: "Aw, fine! Screw your cookies, you maniac!",
+    },
+    {
+      speakerId: "narrator",
+      text: "The spark shoots from Titania's palm.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Miranda swings the tray, sending the cookies flying towards us.",
+    },
+    {
+      speakerId: "narrator",
+      text: "I brace myself for the worst.",
+    },
+    {
+      speakerId: "narrator",
+      text: "A torrent of flame bursts forth, engulfing the cookies in a bright light.",
+    },
+    {
+      speakerId: "narrator",
+      text: "The shockwave of heat sends the cookies right into the floor as they melt.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Spherical holes appear where the cookies landed, cutting chunks out of the floor.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Miranda still stands, but so do we.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Ashes and smoke waft past as we stare at each other.",
+    },
+    {
+      speakerId: "titania",
+      text: "You, you were right!",
+    },
+    {
+      speakerId: "titania",
+      text: "Take that, you bitch!",
+    },
+    {
+      speakerId: "miranda",
+      text: "Well played, detective.",
+      emotion: "crazy-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "crazy",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "narrator",
+      text: "I can't even see her eyes through the smoke.",
+    },
+    {
+      speakerId: "miranda",
+      text: "My success is inevitable.",
+      emotion: "crazy-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "crazy",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "detective",
+      text: "What the hell even is success to you?",
+    },
+    {
+      speakerId: "narrator",
+      text: "She smiles.",
+    },
+    {
+      speakerId: "miranda",
+      text: "Hey, lady. Did he mention how I killed your little girl?",
+      emotion: "crazy-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "crazy",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "titania",
+      text: "...",
+    },
+    {
+      speakerId: "titania",
+      text: "What?",
+    },
+    {
+      speakerId: "narrator",
+      text: "Titania's expression turns from gloating to confusion to anger.",
+    },
+    {
+      speakerId: "titania",
+      text: "I'm searing your psycho face off!",
+    },
+    {
+      speakerId: "detective",
+      text: "No, wait!",
+    },
+    {
+      speakerId: "narrator",
+      text: "Miranda goaded Titania into this.",
+    },
+    {
+      speakerId: "narrator",
+      text: "She didn't even care for her own life.",
+    },
+    {
+      speakerId: "narrator",
+      text: "In an instant, the top half of her body is covered in a powerful yellow flash, consumed by flames.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Titania is breathing heavily.",
+    },
+    {
+      speakerId: "narrator",
+      text: "She lowers her arm.",
+    },
+    //TODO titania runs to mourn Cressida
+    //TODO they wonder if Miranda will be crazy when she resurrects
+
+    //TODO caliban tries and fails to use his catastrophe earlier in the story
     
   ],
 };
