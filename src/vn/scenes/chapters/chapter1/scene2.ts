@@ -2199,7 +2199,7 @@ export const shipMirandaHubDone: VnScene = {
     },
     {
       speakerId: "miranda",
-      text: "Umm, I need to go to the kitchen now... if that's okay.",
+      text: "Umm, I should go to the kitchen now... if that's okay.",
       emotion: "neutral-talk",
     },
     {

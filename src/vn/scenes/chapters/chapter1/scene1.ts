@@ -391,6 +391,7 @@ export const scene1: VnScene = {
       speakerId: "narrator",
       text: "If I screw this up, I'll be the one with a hole in my chest.",
     },
+    //TODO explain catastrophes here?
     {
       speakerId: "narrator",
       text: "So, onto my third question:",
