@@ -2169,10 +2169,6 @@ export const shipMirandaHubDone: VnScene = {
   title: "Moving on",
   background: "bg:ship-meeting",
   lines: [
-    //TODO continue writing this scene. 
-    //TODO: Titania expands on her story about talking to Cressida, 
-    // ^ and taking Cressida to Titania's room!
-    // ^ then Titania left & went back to the meeting room.
     {
       speakerId: "narrator",
       text: "Okay, now we're getting somewhere. Is it time to tell them about Cressida's death?",
@@ -2201,17 +2197,53 @@ export const shipMirandaHubDone: VnScene = {
       speakerId: "narrator",
       text: "I'll need to come up with a way to figure out everyone's abilities, without tipping off the killer, and without placing suspicion on me.",
     },
-    /*{
+    {
+      speakerId: "miranda",
+      text: "Umm, I need to go to the kitchen now... if that's okay.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "titania",
+      text: "Go ahead, Miranda! Just think about what you're gonna tell Cress in your apology.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "titania",
+      text: "I think I'll go check on her, actually. She hasn't come back yet.",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    //TODO detective grimaces
+    {
+      speakerId: "narrator",
+      text: "Not good...",
+    },
+    {
+      speakerId: "narrator",
+      text: "This could get messy real quick. I need to keep everyone together, even if it means taking a risk.",
+    },
+    {
       speakerId: "narrator",
       text: "",
       choices: [
         {
           id: "ship-to-briefing",
-          label: "Continue",
+          label: "Hold it!",
           nextSceneId: "briefing",
         },
       ],
-    },*/
+    },
   ],
 };
 

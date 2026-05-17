@@ -1,7 +1,7 @@
 import type { VnScene } from "../../../types";
 
 export const scene3: VnScene = {
-  id: "briefing",
+  id: "example_briefing",
   title: "First Lead",
   background: "bg:office-briefing",
   lines: [
