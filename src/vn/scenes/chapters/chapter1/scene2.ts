@@ -1078,6 +1078,9 @@ export const shipDay2Crew: VnScene = {
       speakerId: "detective",
       text: "So... what abilities does everyone have?",
     },
+    //TODO explain catastrophes and have everyone say their general ability here?
+    //TODO or just Miranda speaks up before Titania says to hush
+    //TODO add profile and entry for "Catastrophes" in general.
     {
       speakerId: "titania",
       text: "Why? So you can get to know our weaknesses better?",

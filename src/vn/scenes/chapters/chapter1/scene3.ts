@@ -517,6 +517,32 @@ export const kitchenScene: VnScene = {
       text: "",
     },
     {
+      speakerId: "titania",
+      text: "Hey, Stephano, I haven't tried one yet! Don't finish them all!",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "titania",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
+      speakerId: "narrator",
+      text: "Stephano doesn't stop chewing, and points to the counter, where there are some more of Miranda's professionally wrapped cookies.",
+    },
+    {
+      speakerId: "miranda",
+      text: "...",
+      emotion: "neutral-talk",
+    },
+    {
+      speakerId: "miranda",
+      emotion: "neutral",
+      portraitOnly: true,
+      text: "",
+    },
+    {
       speakerId: "narrator",
       text: "Miranda is staring downward.",
     },
@@ -534,7 +560,7 @@ export const kitchenScene: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "I hear Stephano loudly crunching on his cookie.",
+      text: "I hear Stephano loudly crunching on his cookie. Titania reaches for one of the untouched cookies on the counter.",
     },
     {
       speakerId: "narrator",
@@ -560,13 +586,22 @@ export const kitchenScene: VnScene = {
       speakerId: "detective",
       text: "There's no way...",
     },
+    //TODO miranda crazy face and "Shh..."
+    //TODO scene where Caliban tries to cry out to Titania, but Miranda lunges at him and shuts him up with her mouth.
+    // TODO nickname Snatcher always uses for the Detective:
+    //    "Detective Dearest"? "No-Good Detective"?
+    //"Don't worry, detective, I won't hurt you..."
+    //"I really do want to keep you alive, you know?"
+    //"Try not to get in my way."
+    // Cal tries to use his catastrophe, but fails.
+    //"Aww, maybe if you had your catastrophe, you would've stood a chance."
+    //"You understand so little..."
+    //"It's almost cute how pathetic you are."
+    //-
+    //
     {
       speakerId: "narrator",
       text: "I look up, but it's too late.",
-    },
-    {
-      speakerId: "narrator",
-      text: "If only I'd realized sooner... We could've had one more ally on our side.",
     },
     {
       speakerId: "narrator",
@@ -587,7 +622,7 @@ export const kitchenScene: VnScene = {
     {
       speakerId: "narrator",
       text: "Titania screams.",
-    },
+    },//TODO maybe Titania's hand got severed as well?
     {
       speakerId: "narrator",
       text: "One thing is clear to me: I know who the real threat is now.",
@@ -613,7 +648,7 @@ export const kitchenScene: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "Her demeanor is completely different now. Her sweetness is gone, & she's not tripping over a single word.",
+      text: "Her demeanor is completely different from before. Her sweetness is gone, & she's not tripping over a single word.",
     },
     {
       speakerId: "narrator",
@@ -751,7 +786,7 @@ export const kitchenScene: VnScene = {
     },
     {
       speakerId: "miranda",
-      text: "Well played, detective.",
+      text: "Well played, detective... You adapted better than I expected to losing your catastrophe.",
       emotion: "crazy-talk",
     },
     {
@@ -825,6 +860,18 @@ export const kitchenScene: VnScene = {
     {
       speakerId: "narrator",
       text: "In an instant, the top half of her body is covered in a powerful yellow flash, consumed by flames.",
+    },
+    {
+      speakerId: "narrator",
+      text: "Smoke hides the brutality for a moment, but soon my eyes confirm the death...",
+    },
+    {
+      speakerId: "narrator",
+      text: "...A charred corpse, brought to its knees & blackened.",
+    },
+    {
+      speakerId: "narrator",
+      text: "No getting up from that. And no chance for interrogation.",
     },
     {
       speakerId: "narrator",
