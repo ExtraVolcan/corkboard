@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   catastropheCellStrength,
   catastropheCycleAlpha,
+  catastropheCycleProgress,
   catastropheIsDensePhase,
-  CATASTROPHE_CYCLE_MS,
   computeCatastropheCellMetrics,
   vignetteHoleAxes,
   type CatastropheCellMetrics,
@@ -14,12 +14,14 @@ const RENDER_SCALE = 0.62;
 
 type Props = {
   active: boolean;
+  loop?: boolean;
   paused?: boolean;
   intensity?: number;
 };
 
 export function VnCatastropheOverlay({
   active,
+  loop = true,
   paused = false,
   intensity = 1,
 }: Props) {
@@ -30,9 +32,14 @@ export function VnCatastropheOverlay({
   const sizeRef = useRef({ displayW: 1, displayH: 1, renderW: 1, renderH: 1 });
   const rafRef = useRef(0);
   const frameRef = useRef(0);
+  const cycleDoneRef = useRef(false);
+  const [cycleDone, setCycleDone] = useState(false);
 
   useEffect(() => {
-    if (active) cycleStartRef.current = performance.now();
+    if (!active) return;
+    cycleStartRef.current = performance.now();
+    cycleDoneRef.current = false;
+    setCycleDone(false);
   }, [active]);
 
   useEffect(() => {
@@ -90,11 +97,26 @@ export function VnCatastropheOverlay({
       const intens = Math.max(0, Math.min(1, intensity));
       if (intens <= 0) return;
 
-      const { renderW, renderH } = sizeRef.current;
       const elapsed = now - cycleStartRef.current;
+      if (
+        !loop &&
+        !paused &&
+        !reducedMotion &&
+        catastropheCycleProgress(elapsed, false) >= 1
+      ) {
+        if (!cycleDoneRef.current) {
+          cycleDoneRef.current = true;
+          setCycleDone(true);
+        }
+        return;
+      }
+
+      if (paused) return;
+
+      const { renderW, renderH } = sizeRef.current;
       const cycleProgress = reducedMotion
         ? 0.3
-        : (elapsed % CATASTROPHE_CYCLE_MS) / CATASTROPHE_CYCLE_MS;
+        : catastropheCycleProgress(elapsed, loop);
       const hole = vignetteHoleAxes(cycleProgress);
       const globalAlpha =
         catastropheCycleAlpha(cycleProgress) *
@@ -147,9 +169,9 @@ export function VnCatastropheOverlay({
       metricsRef.current = null;
       frameRef.current = 0;
     };
-  }, [active, paused, intensity]);
+  }, [active, loop, paused, intensity]);
 
-  if (!active) return null;
+  if (!active || (!loop && cycleDone)) return null;
 
   return (
     <div

@@ -33,3 +33,25 @@ export function resolveEffectiveScreenEffectIntensity(
   }
   return intensity;
 }
+
+/** Line index where the current screen effect was last turned on (after clear or type change). */
+export function resolveScreenEffectActivationLine(
+  scene: VnScene,
+  lineIndex: number
+): number {
+  if (!scene.lines.length || lineIndex < 0) return 0;
+  const end = Math.min(lineIndex, scene.lines.length - 1);
+  let effect: VnScreenEffect | null = null;
+  let activation = 0;
+  for (let i = 0; i <= end; i++) {
+    const line = scene.lines[i]!;
+    if (line.screenEffect === null) {
+      effect = null;
+      activation = i;
+    } else if (line.screenEffect) {
+      if (line.screenEffect !== effect) activation = i;
+      effect = line.screenEffect;
+    }
+  }
+  return activation;
+}

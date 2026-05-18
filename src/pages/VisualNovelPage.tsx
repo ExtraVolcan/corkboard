@@ -28,8 +28,13 @@ import { DialogueLine } from "../vn/components/DialogueLine";
 import {
   resolveEffectiveScreenEffect,
   resolveEffectiveScreenEffectIntensity,
+  resolveScreenEffectActivationLine,
 } from "../vn/effects/resolveEffectiveScreenEffect";
 import { VnCatastropheOverlay } from "../vn/effects/VnCatastropheOverlay";
+import {
+  catastropheVignetteLoops,
+  isCatastropheVignetteEffect,
+} from "../vn/effects/types";
 import { useTypewriterLine } from "../vn/useTypewriterLine";
 import type { PortraitSlot } from "../vn/portraitLayout";
 import type { SpeakerLabelContext } from "../vn/speakerLabel";
@@ -421,6 +426,12 @@ export function VisualNovelPage() {
     [currentScene, state.lineIndex]
   );
 
+  const screenEffectActivationLine = useMemo(
+    () =>
+      resolveScreenEffectActivationLine(currentScene, state.lineIndex),
+    [currentScene, state.lineIndex]
+  );
+
   const screenEffectPaused = Boolean(
     showCorkboard || showSettings || profileModalId || showHistory
   );
@@ -626,10 +637,11 @@ export function VisualNovelPage() {
         {corkboardTutorialSpotlight ? (
           <div className="vn-tutorial-dim" aria-hidden />
         ) : null}
-        {effectiveScreenEffect === "catastrophe-vignette" ? (
+        {isCatastropheVignetteEffect(effectiveScreenEffect) ? (
           <VnCatastropheOverlay
-            key={`${currentScene.id}-${state.lineIndex}`}
+            key={`${currentScene.id}-${screenEffectActivationLine}-${effectiveScreenEffect}`}
             active
+            loop={catastropheVignetteLoops(effectiveScreenEffect)}
             paused={screenEffectPaused}
             intensity={screenEffectIntensity}
           />

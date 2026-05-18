@@ -66,7 +66,7 @@ export const scene3: VnScene = {
     },
     // Effects authoring reference (optional dev lines):
     // { speakerId: "narrator", text: "…", textEffect: "jitter" },
-    // { speakerId: "narrator", text: "…", screenEffect: "catastrophe-vignette", screenEffectIntensity: 0.85 },
+    // { speakerId: "narrator", text: "…", screenEffect: "catastrophe-vignette-once", screenEffectIntensity: 0.85 },
     // { speakerId: "narrator", text: "…", screenEffect: null },
   ],
 };

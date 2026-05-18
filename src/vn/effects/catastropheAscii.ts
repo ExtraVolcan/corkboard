@@ -34,6 +34,9 @@ import { prepareWithSegments } from "@chenglou/pretext";
  * CATASTROPHE_CYCLE_MS      Cycle length.
  * VIGNETTE_SHRINK_PHASE_END   Fraction of cycle for the shrink phase (rest = grow).
  *
+ * Scene lines: `screenEffect: "catastrophe-vignette"` loops; `"catastrophe-vignette-once"`
+ * plays a single cycle then hides until cleared with `screenEffect: null`.
+ *
  * CSS rim wash: `.vn-screen-effect--catastrophe::before` in styles.css
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -156,7 +159,7 @@ export function vignetteHoleAxes(cycleProgress: number): VignetteHoleAxes {
   const minR = VIGNETTE_HOLE_MIN_SCREEN_FRAC;
   const overR = VIGNETTE_HOLE_OVERSHOOT_FRAC;
 
-  const p = cycleProgress % 1;
+  const p = Math.min(1, Math.max(0, cycleProgress));
 
   if (p < VIGNETTE_SHRINK_PHASE_END) {
     const u = p / VIGNETTE_SHRINK_PHASE_END;
@@ -172,9 +175,17 @@ export function vignetteHoleAxes(cycleProgress: number): VignetteHoleAxes {
 }
 
 export function catastropheCycleAlpha(cycleProgress: number): number {
-  const p = cycleProgress % 1;
+  const p = Math.min(1, Math.max(0, cycleProgress));
   if (p < 0.9) return 1;
   return 1 - smoothstep(0.9, 1, p);
+}
+
+export function catastropheCycleProgress(
+  elapsedMs: number,
+  loop: boolean
+): number {
+  const raw = elapsedMs / CATASTROPHE_CYCLE_MS;
+  return loop ? raw % 1 : Math.min(1, raw);
 }
 
 /**

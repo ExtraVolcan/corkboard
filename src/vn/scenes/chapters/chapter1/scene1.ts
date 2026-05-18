@@ -69,7 +69,7 @@ export const scene1: VnScene = {
       speakerId: "narrator",
       text: "Because even my armpits smell nicer than the corpse I'm staring at.",
       textEffect: "jitter",
-      screenEffect: "catastrophe-vignette",
+      screenEffect: "catastrophe-vignette-once",
       screenEffectIntensity: 0.92,
       //TODO: change background to show pixelated body?
       //TODO: or, have Caliban do a quick sketch with X eyes and tongue out (funny)
