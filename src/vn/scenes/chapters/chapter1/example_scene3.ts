@@ -64,6 +64,10 @@ export const scene3: VnScene = {
       requireFlags: ["reviewed-board-once"],
       text: "Since you've already reviewed the board once, you're spotting links faster.",
     },
+    // Effects authoring reference (optional dev lines):
+    // { speakerId: "narrator", text: "…", textEffect: "jitter" },
+    // { speakerId: "narrator", text: "…", screenEffect: "catastrophe-vignette", screenEffectIntensity: 0.85 },
+    // { speakerId: "narrator", text: "…", screenEffect: null },
   ],
 };
 

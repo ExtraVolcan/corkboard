@@ -24,6 +24,12 @@ import {
 } from "../vn/speakerLabel";
 import { polaroidCaptionFromCampaign } from "../vn/boardProfileLabel";
 import { mcqEliminatedFlagKey, useVn } from "../vn/state";
+import { DialogueLine } from "../vn/components/DialogueLine";
+import {
+  resolveEffectiveScreenEffect,
+  resolveEffectiveScreenEffectIntensity,
+} from "../vn/effects/resolveEffectiveScreenEffect";
+import { VnCatastropheOverlay } from "../vn/effects/VnCatastropheOverlay";
 import { useTypewriterLine } from "../vn/useTypewriterLine";
 import type { PortraitSlot } from "../vn/portraitLayout";
 import type { SpeakerLabelContext } from "../vn/speakerLabel";
@@ -401,6 +407,24 @@ export function VisualNovelPage() {
     [currentScene, state.lineIndex]
   );
 
+  const effectsPreview =
+    import.meta.env.DEV && import.meta.env.VITE_VN_EFFECTS_PREVIEW === "1";
+
+  const effectiveScreenEffect = useMemo(() => {
+    if (effectsPreview) return "catastrophe-vignette" as const;
+    return resolveEffectiveScreenEffect(currentScene, state.lineIndex);
+  }, [currentScene, state.lineIndex, effectsPreview]);
+
+  const screenEffectIntensity = useMemo(
+    () =>
+      resolveEffectiveScreenEffectIntensity(currentScene, state.lineIndex),
+    [currentScene, state.lineIndex]
+  );
+
+  const screenEffectPaused = Boolean(
+    showCorkboard || showSettings || profileModalId || showHistory
+  );
+
   const corkboardTutorialSpotlight = isCorkboardTutorialGateActive(
     currentLine,
     state.flags
@@ -602,6 +626,13 @@ export function VisualNovelPage() {
         {corkboardTutorialSpotlight ? (
           <div className="vn-tutorial-dim" aria-hidden />
         ) : null}
+        {effectiveScreenEffect === "catastrophe-vignette" ? (
+          <VnCatastropheOverlay
+            active
+            paused={screenEffectPaused}
+            intensity={screenEffectIntensity}
+          />
+        ) : null}
         <div className="vn-scene-hud" aria-hidden={false}>
           <div className="vn-scene-title">
             Points: {state.points}
@@ -779,9 +810,11 @@ export function VisualNovelPage() {
                   {dialogueSpeakerLabel}
                 </div>
               ) : null}
-              <p className={vnLineClassName(currentLine?.speakerId)}>
-                {advanceTw.visibleText}
-              </p>
+              <DialogueLine
+                className={vnLineClassName(currentLine?.speakerId)}
+                text={advanceTw.visibleText}
+                textEffect={currentLine?.textEffect}
+              />
               <span className="vn-continue-hint">
                 {"Click to continue"}
               </span>
@@ -801,9 +834,11 @@ export function VisualNovelPage() {
                   {dialogueSpeakerLabel}
                 </div>
               ) : null}
-              <p className={vnLineClassName(currentLine?.speakerId)}>
-                {currentLine?.text ?? "No dialogue loaded."}
-              </p>
+              <DialogueLine
+                className={vnLineClassName(currentLine?.speakerId)}
+                text={currentLine?.text ?? "No dialogue loaded."}
+                textEffect={currentLine?.textEffect}
+              />
               {corkboardTutorialSpotlight ? (
                 <p className="vn-corkboard-tutorial-hint" role="status">
                   Open the corkboard icon (top right) to continue.
@@ -852,9 +887,10 @@ export function VisualNovelPage() {
                         {mcqFbSpeakerLabel}
                       </div>
                     ) : null}
-                    <p className={vnLineClassName(mcqFbSpeakerId)}>
-                      {mcqFbTw.visibleText}
-                    </p>
+                    <DialogueLine
+                      className={vnLineClassName(mcqFbSpeakerId)}
+                      text={mcqFbTw.visibleText}
+                    />
                     <span className="vn-continue-hint">
                       {"Click to continue"}
                     </span>
@@ -933,9 +969,10 @@ export function VisualNovelPage() {
                         {mcqFbSpeakerLabel}
                       </div>
                     ) : null}
-                    <p className={vnLineClassName(mcqFbSpeakerId)}>
-                      {mcqFbTw.visibleText}
-                    </p>
+                    <DialogueLine
+                      className={vnLineClassName(mcqFbSpeakerId)}
+                      text={mcqFbTw.visibleText}
+                    />
                     <span className="vn-continue-hint">
                       {"Click to continue"}
                     </span>

@@ -1,6 +1,4 @@
 import type { VnScene } from "../../../types";
-import { characterNameRevealFlag } from "../../../nameReveal";
-
 
 export const holdItScene: VnScene = {
   id: "hold-it",

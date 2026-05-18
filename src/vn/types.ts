@@ -97,6 +97,10 @@ export type VnRevealAction =
    */
   | { type: "setProfileDisplayName"; profileId: string; displayName: string };
 
+import type { VnScreenEffect, VnTextEffect } from "./effects/types";
+
+export type { VnScreenEffect, VnTextEffect } from "./effects/types";
+
 export type VnLine = {
   speakerId?: string;
   /** Optional author-facing portrait id, e.g. "portrait:detective-default" */
@@ -125,6 +129,12 @@ export type VnLine = {
    * the corkboard once (sets {@link CORKBOARD_TUTORIAL_OPENED_FLAG}).
    */
   corkboardTutorial?: boolean;
+  /** Full-screen effect from this line until overridden or cleared with `null`. */
+  screenEffect?: VnScreenEffect | null;
+  /** 0–1 strength for {@link screenEffect} (default 1). */
+  screenEffectIntensity?: number;
+  /** Dialogue presentation, e.g. jittering letters. */
+  textEffect?: VnTextEffect;
 };
 
 export type VnScene = {
