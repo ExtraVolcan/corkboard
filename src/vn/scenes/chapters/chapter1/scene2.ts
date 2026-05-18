@@ -1059,7 +1059,7 @@ export const shipDay2Crew: VnScene = {
     },
     {
       speakerId: "narrator",
-      text: "I can't believe I didn't think of this earlier...",
+      text: "I didn't think of this earlier...",
     },
     {
       speakerId: "narrator",

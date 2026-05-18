@@ -883,8 +883,6 @@ export const kitchenScene: VnScene = {
     },
     //TODO titania runs to mourn Cressida
     //TODO they wonder if Miranda will be crazy when she resurrects
-
-    //TODO caliban tries and fails to use his catastrophe earlier in the story
     
   ],
 };
