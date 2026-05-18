@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   catastropheCellStrength,
   catastropheCycleAlpha,
   catastropheCycleProgress,
   catastropheIsDensePhase,
+  catastropheTintEnvelope,
+  catastropheTintExitComplete,
   computeCatastropheCellMetrics,
   vignetteHoleAxes,
   type CatastropheCellMetrics,
@@ -13,37 +15,48 @@ import {
 const RENDER_SCALE = 0.62;
 
 type Props = {
-  active: boolean;
+  /** Scene still has the catastrophe screen effect active. */
+  visible: boolean;
   loop?: boolean;
   paused?: boolean;
   intensity?: number;
+  onDismiss?: () => void;
 };
 
 export function VnCatastropheOverlay({
-  active,
+  visible,
   loop = true,
   paused = false,
   intensity = 1,
+  onDismiss,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cycleStartRef = useRef(0);
+  const mountStartRef = useRef(0);
+  const exitStartRef = useRef<number | null>(null);
   const metricsRef = useRef<CatastropheCellMetrics | null>(null);
   const sizeRef = useRef({ displayW: 1, displayH: 1, renderW: 1, renderH: 1 });
   const rafRef = useRef(0);
   const frameRef = useRef(0);
-  const cycleDoneRef = useRef(false);
-  const [cycleDone, setCycleDone] = useState(false);
+  const [exiting, setExiting] = useState(false);
+
+  const beginExit = () => {
+    if (exitStartRef.current != null) return;
+    exitStartRef.current = performance.now();
+    setExiting(true);
+  };
+
+  useLayoutEffect(() => {
+    if (visible) {
+      mountStartRef.current = performance.now();
+      exitStartRef.current = null;
+      setExiting(false);
+      return;
+    }
+    beginExit();
+  }, [visible]);
 
   useEffect(() => {
-    if (!active) return;
-    cycleStartRef.current = performance.now();
-    cycleDoneRef.current = false;
-    setCycleDone(false);
-  }, [active]);
-
-  useEffect(() => {
-    if (!active) return;
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
     if (!wrap || !canvas) return;
@@ -89,7 +102,6 @@ export function VnCatastropheOverlay({
 
     function render(now: number) {
       rafRef.current = requestAnimationFrame(render);
-      if (paused) return;
 
       const metrics = metricsRef.current;
       if (!metrics) return;
@@ -97,42 +109,62 @@ export function VnCatastropheOverlay({
       const intens = Math.max(0, Math.min(1, intensity));
       if (intens <= 0) return;
 
-      const elapsed = now - cycleStartRef.current;
+      const mountElapsed = now - mountStartRef.current;
+      const exitElapsed =
+        exitStartRef.current == null ? null : now - exitStartRef.current;
+
       if (
-        !loop &&
-        !paused &&
-        !reducedMotion &&
-        catastropheCycleProgress(elapsed, false) >= 1
+        exitElapsed != null &&
+        catastropheTintExitComplete(exitElapsed)
       ) {
-        if (!cycleDoneRef.current) {
-          cycleDoneRef.current = true;
-          setCycleDone(true);
-        }
+        onDismiss?.();
         return;
       }
 
       if (paused) return;
 
-      const { renderW, renderH } = sizeRef.current;
-      const cycleProgress = reducedMotion
-        ? 0.3
-        : catastropheCycleProgress(elapsed, loop);
-      const hole = vignetteHoleAxes(cycleProgress);
-      const globalAlpha =
-        catastropheCycleAlpha(cycleProgress) *
+      const cycleProgress = exiting
+        ? 1
+        : reducedMotion
+          ? 0.3
+          : catastropheCycleProgress(mountElapsed, loop);
+
+      if (
+        !loop &&
+        !exiting &&
+        !reducedMotion &&
+        catastropheCycleProgress(mountElapsed, false) >= 1
+      ) {
+        beginExit();
+        return;
+      }
+
+      const tintAlpha =
+        catastropheTintEnvelope(mountElapsed, exitElapsed) *
         intens *
         (reducedMotion ? 0.65 : 1);
 
+      if (tintAlpha <= 0.001 && exitElapsed != null) {
+        onDismiss?.();
+        return;
+      }
+
+      const hole = vignetteHoleAxes(cycleProgress);
+      const letterAlpha =
+        tintAlpha * catastropheCycleAlpha(cycleProgress);
+
       if (
         !reducedMotion &&
+        !exiting &&
         catastropheIsDensePhase(hole) &&
         frameRef.current++ % 2 === 1
       ) {
         return;
       }
 
-      const wobble = reducedMotion ? 0 : elapsed * 0.001;
+      const wobble = reducedMotion ? 0 : mountElapsed * 0.001;
 
+      const { renderW, renderH } = sizeRef.current;
       context.clearRect(0, 0, renderW, renderH);
       context.font = metrics.primaryFont;
       context.textBaseline = "top";
@@ -155,12 +187,15 @@ export function VnCatastropheOverlay({
           const x = offsetX + col * cellW + driftX;
           const y = offsetY + row * lineH + driftY;
 
-          context.globalAlpha = Math.min(1, strength * globalAlpha * 0.88);
+          context.globalAlpha = Math.min(1, strength * letterAlpha * 0.88);
           context.fillText(chars[row * cols + col]!, x, y);
         }
       }
 
       context.globalAlpha = 1;
+
+      const root = wrapRef.current;
+      if (root) root.style.opacity = String(tintAlpha);
     }
 
     return () => {
@@ -169,15 +204,14 @@ export function VnCatastropheOverlay({
       metricsRef.current = null;
       frameRef.current = 0;
     };
-  }, [active, loop, paused, intensity]);
-
-  if (!active || (!loop && cycleDone)) return null;
+  }, [loop, paused, intensity, exiting, onDismiss]);
 
   return (
     <div
       className="vn-screen-effect vn-screen-effect--catastrophe"
       ref={wrapRef}
       aria-hidden
+      style={{ opacity: 0 }}
     >
       <canvas ref={canvasRef} className="vn-screen-effect-canvas" />
     </div>

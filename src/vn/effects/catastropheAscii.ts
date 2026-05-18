@@ -37,6 +37,7 @@ import { prepareWithSegments } from "@chenglou/pretext";
  * Scene lines: `screenEffect: "catastrophe-vignette"` loops; `"catastrophe-vignette-once"`
  * plays a single cycle then hides until cleared with `screenEffect: null`.
  *
+ * CATASTROPHE_TINT_FADE_IN_MS / _OUT_MS  Red rim fade when effect starts/ends.
  * CSS rim wash: `.vn-screen-effect--catastrophe::before` in styles.css
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -74,6 +75,12 @@ export const CATASTROPHE_FONT_FAMILY =
 const PRIMARY_FONT = `700 ${CATASTROPHE_FONT_SIZE}px ${CATASTROPHE_FONT_FAMILY}`;
 
 export const CATASTROPHE_CYCLE_MS = 1800;
+
+/** Red rim / overlay opacity ramp when the screen effect turns on. */
+export const CATASTROPHE_TINT_FADE_IN_MS = 500;
+
+/** Red rim / overlay opacity ramp when the screen effect turns off. */
+export const CATASTROPHE_TINT_FADE_OUT_MS = 600;
 
 const MAX_COLS = 58;
 const MAX_ROWS = 34;
@@ -186,6 +193,31 @@ export function catastropheCycleProgress(
 ): number {
   const raw = elapsedMs / CATASTROPHE_CYCLE_MS;
   return loop ? raw % 1 : Math.min(1, raw);
+}
+
+/** 0→1 while the effect is appearing (rim + canvas wrapper). */
+export function catastropheTintFadeIn(mountElapsedMs: number): number {
+  return smoothstep(0, CATASTROPHE_TINT_FADE_IN_MS, mountElapsedMs);
+}
+
+/** 1→0 while the effect is leaving. */
+export function catastropheTintFadeOut(exitElapsedMs: number): number {
+  return 1 - smoothstep(0, CATASTROPHE_TINT_FADE_OUT_MS, exitElapsedMs);
+}
+
+/** Combined mount / unmount tint envelope (independent of vignette hole cycle). */
+export function catastropheTintEnvelope(
+  mountElapsedMs: number,
+  exitElapsedMs: number | null
+): number {
+  const fadeIn = catastropheTintFadeIn(mountElapsedMs);
+  const fadeOut =
+    exitElapsedMs == null ? 1 : catastropheTintFadeOut(exitElapsedMs);
+  return fadeIn * fadeOut;
+}
+
+export function catastropheTintExitComplete(exitElapsedMs: number): boolean {
+  return exitElapsedMs >= CATASTROPHE_TINT_FADE_OUT_MS;
 }
 
 /**

@@ -432,6 +432,20 @@ export function VisualNovelPage() {
     [currentScene, state.lineIndex]
   );
 
+  const catastropheEffectActive = isCatastropheVignetteEffect(
+    effectiveScreenEffect
+  );
+  const [catastropheOverlayMounted, setCatastropheOverlayMounted] =
+    useState(false);
+
+  useEffect(() => {
+    if (catastropheEffectActive) setCatastropheOverlayMounted(true);
+  }, [
+    catastropheEffectActive,
+    screenEffectActivationLine,
+    effectiveScreenEffect,
+  ]);
+
   const screenEffectPaused = Boolean(
     showCorkboard || showSettings || profileModalId || showHistory
   );
@@ -637,13 +651,14 @@ export function VisualNovelPage() {
         {corkboardTutorialSpotlight ? (
           <div className="vn-tutorial-dim" aria-hidden />
         ) : null}
-        {isCatastropheVignetteEffect(effectiveScreenEffect) ? (
+        {catastropheOverlayMounted && effectiveScreenEffect ? (
           <VnCatastropheOverlay
             key={`${currentScene.id}-${screenEffectActivationLine}-${effectiveScreenEffect}`}
-            active
+            visible={catastropheEffectActive}
             loop={catastropheVignetteLoops(effectiveScreenEffect)}
             paused={screenEffectPaused}
             intensity={screenEffectIntensity}
+            onDismiss={() => setCatastropheOverlayMounted(false)}
           />
         ) : null}
         <div className="vn-scene-hud" aria-hidden={false}>

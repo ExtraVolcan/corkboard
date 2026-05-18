@@ -569,6 +569,7 @@ a {
 
 .vn-screen-effect--catastrophe {
   background: transparent;
+  /* Opacity driven from VnCatastropheOverlay (tint fade in/out). */
 }
 
 /* Scene meta + icon toolbar */
