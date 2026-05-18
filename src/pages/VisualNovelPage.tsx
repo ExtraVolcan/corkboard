@@ -628,6 +628,7 @@ export function VisualNovelPage() {
         ) : null}
         {effectiveScreenEffect === "catastrophe-vignette" ? (
           <VnCatastropheOverlay
+            key={`${currentScene.id}-${state.lineIndex}`}
             active
             paused={screenEffectPaused}
             intensity={screenEffectIntensity}

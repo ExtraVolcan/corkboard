@@ -7,7 +7,7 @@ import { characterNameRevealFlag } from "../../../nameReveal";
 //  The Snatcher had been using it to swap consciousnesses in and out of the cat.
 //  endgame challenge is to plot every swap that The Snatcher made.
 //  maybe the cat was the original host of the Snatcher's consciousness (and therefore, his catastrophe, because it turns out all catastrophes are physical, requiring the body to be used, which is how The Snatcher used other ppl's catastrophes)
-//TODO: add the cat profile & add to maintenance schedule?
+//TODO: add the cat profile
 //TODO: scene where Cal wonders what possible purpose a cat could serve,
 // Titania says that relaxation is an essential for mental healthtoo!
 // But, Cal thinks "No, mental health was not a priority for the ship, and I can prove it"

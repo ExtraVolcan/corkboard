@@ -1,246 +1,233 @@
 import { prepareWithSegments } from "@chenglou/pretext";
 
-const WORD = "CATASTROPHE";
-const CHARSET = [...new Set(WORD.split(""))].filter((c) => c !== " ").join("");
-const WEIGHTS = [400, 600, 800] as const;
-const FONT_SIZE = 11;
-const FONT_FAMILY = '"Special Elite", Georgia, "Times New Roman", serif';
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CATASTROPHE VIGNETTE — tuning guide
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * The clear center is an axis-aligned ellipse in normalized screen space
+ * (nx, ny ∈ 0–1). Letters draw OUTSIDE that oval only.
+ *
+ * ANIMATION (one cycle)
+ * ─────────────────────
+ * 1. Start: hole tiny → text covers the whole screen (encroachment from off-screen).
+ * 2. Shrink (ease-out / decelerate): hole grows to minimum → ring tightens toward center.
+ * 3. Grow (ease-in / accelerate): hole expands past the frame → text vanishes.
+ *
+ * HOLE SIZE (fraction of full screen width / height)
+ * ────────────────────────────────────────────────
+ * VIGNETTE_HOLE_ENTRY_FRAC   Starting clear hole (tiny → full-screen text).
+ * VIGNETTE_HOLE_MIN_SCREEN_FRAC  Minimum clear hole half-axis (0.30 ≈ 60% of screen
+ *                            width/height across the oval). ↑ = larger clear center.
+ * VIGNETTE_HOLE_OVERSHOOT_FRAC   End hole (>0.5) → entire frame clear, effect gone.
+ *
+ * SHAPE & POSITION (matches device aspect)
+ * ───────────────────────────────────────
+ * VIGNETTE_CENTER_X, VIGNETTE_CENTER_Y   Oval center (0–1).
+ * Hole half-axes scale with aspect ratio: on tall phones holeRy > holeRx so the
+ * cutout is taller than wide in pixel space (encroach equally from all edges).
+ *   holeRy = holeRx / aspectRatio   (aspectRatio = width / height)
+ *
+ * VIGNETTE_FEATHER          Soft edge of the oval boundary.
+ * VIGNETTE_EDGE_FLOOR       Keeps corners filled with letters.
+ * VIGNETTE_BREATHE_AMOUNT   Letter shimmer.
+ * CATASTROPHE_CYCLE_MS      Cycle length.
+ * VIGNETTE_SHRINK_PHASE_END   Fraction of cycle for the shrink phase (rest = grow).
+ *
+ * CSS rim wash: `.vn-screen-effect--catastrophe::before` in styles.css
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
 
-export type CatastrophePaletteEntry = {
-  char: string;
-  font: string;
-  width: number;
-  brightness: number;
+/** Starting clear hole (tiny); text initially covers the full screen. */
+export const VIGNETTE_HOLE_ENTRY_FRAC = 1.00;
+
+/**
+ * Minimum clear oval: half-axis as fraction of half-screen (0.5 from center to edge).
+ * 0.30 → clear oval spans ~60% of screen width and ~60% of screen height.
+ */
+export const VIGNETTE_HOLE_MIN_SCREEN_FRAC = 0.7;
+
+/** Hole larger than the frame → effect fully off. */
+export const VIGNETTE_HOLE_OVERSHOOT_FRAC = 0.82;
+
+export const VIGNETTE_CENTER_X = 0.5;
+export const VIGNETTE_CENTER_Y = 0.5;
+
+export const VIGNETTE_FEATHER = 0.14;
+
+export const VIGNETTE_EDGE_FLOOR = 0.72;
+
+export const VIGNETTE_BREATHE_AMOUNT = 0.1;
+
+/** 0–1: shrink phase ends here; remainder is grow (ease-in). */
+export const VIGNETTE_SHRINK_PHASE_END = 0.38;
+
+export const CATASTROPHE_WORD = "CATASTROPHE";
+
+export const CATASTROPHE_FONT_SIZE = 11;
+export const CATASTROPHE_FONT_FAMILY =
+  '"Special Elite", Georgia, "Times New Roman", serif';
+
+const PRIMARY_FONT = `700 ${CATASTROPHE_FONT_SIZE}px ${CATASTROPHE_FONT_FAMILY}`;
+
+export const CATASTROPHE_CYCLE_MS = 5800;
+
+const MAX_COLS = 58;
+const MAX_ROWS = 34;
+
+export type VignetteHoleAxes = {
+  holeRx: number;
+  holeRy: number;
 };
 
-export type CatastropheGlyph = {
-  char: string;
-  font: string;
+export type CatastropheCellMetrics = {
+  cellW: number;
+  lineH: number;
+  offsetX: number;
+  offsetY: number;
+  cols: number;
+  rows: number;
+  primaryFont: string;
+  chars: string[];
 };
 
-const brightnessCanvas =
-  typeof document !== "undefined" ? document.createElement("canvas") : null;
-if (brightnessCanvas) {
-  brightnessCanvas.width = 24;
-  brightnessCanvas.height = 24;
-}
-const brightnessCtx = brightnessCanvas?.getContext("2d", {
-  willReadFrequently: true,
-});
-
-function estimateBrightness(ch: string, font: string): number {
-  if (!brightnessCtx || !brightnessCanvas) return 0.5;
-  const size = 24;
-  brightnessCtx.clearRect(0, 0, size, size);
-  brightnessCtx.font = font;
-  brightnessCtx.fillStyle = "#fff";
-  brightnessCtx.textBaseline = "middle";
-  brightnessCtx.fillText(ch, 1, size / 2);
-  const data = brightnessCtx.getImageData(0, 0, size, size).data;
-  let sum = 0;
-  for (let i = 3; i < data.length; i += 4) sum += data[i]!;
-  return sum / (255 * size * size);
-}
+let cachedCellW: number | null = null;
 
 function measureWidth(ch: string, font: string): number {
   const prepared = prepareWithSegments(ch, font);
-  return prepared.widths.length > 0 ? prepared.widths[0]! : 0;
+  return prepared.widths.length > 0 ? prepared.widths[0]! : CATASTROPHE_FONT_SIZE * 0.6;
 }
 
-let paletteCache: CatastrophePaletteEntry[] | null = null;
-
-export function clearCatastrophePaletteCache(): void {
-  paletteCache = null;
-}
-
-export function getCatastrophePalette(): CatastrophePaletteEntry[] {
-  if (paletteCache) return paletteCache;
-  const palette: CatastrophePaletteEntry[] = [];
-  for (const weight of WEIGHTS) {
-    const font = `${weight} ${FONT_SIZE}px ${FONT_FAMILY}`;
-    for (const ch of CHARSET) {
-      const width = measureWidth(ch, font);
-      if (width <= 0) continue;
-      palette.push({
-        char: ch,
-        font,
-        width,
-        brightness: estimateBrightness(ch, font),
-      });
-    }
-  }
-  const maxB = Math.max(...palette.map((e) => e.brightness), 1e-6);
-  for (const entry of palette) entry.brightness /= maxB;
-  palette.sort((a, b) => a.brightness - b.brightness);
-  paletteCache = palette;
-  return palette;
-}
-
-export function buildCatastropheGlyphLookup(
-  targetCellW: number
-): CatastropheGlyph[] {
-  const palette = getCatastrophePalette();
-  const lookup: CatastropheGlyph[] = new Array(256);
-
-  function findBest(targetBrightness: number): CatastrophePaletteEntry {
-    let lo = 0;
-    let hi = palette.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (palette[mid]!.brightness < targetBrightness) lo = mid + 1;
-      else hi = mid;
-    }
-    let bestScore = Infinity;
-    let best = palette[lo]!;
-    const start = Math.max(0, lo - 12);
-    const end = Math.min(palette.length, lo + 12);
-    for (let i = start; i < end; i++) {
-      const entry = palette[i]!;
-      const brightnessError = Math.abs(entry.brightness - targetBrightness) * 2.5;
-      const widthError = Math.abs(entry.width - targetCellW) / targetCellW;
-      const score = brightnessError + widthError;
-      if (score < bestScore) {
-        bestScore = score;
-        best = entry;
-      }
-    }
-    return best;
-  }
-
-  for (let byte = 0; byte < 256; byte++) {
-    const brightness = byte / 255;
-    if (brightness < 0.04) {
-      lookup[byte] = { char: " ", font: `400 ${FONT_SIZE}px ${FONT_FAMILY}` };
-      continue;
-    }
-    const match = findBest(brightness);
-    lookup[byte] = { char: match.char, font: match.font };
-  }
-  return lookup;
-}
-
-export type CatastropheParticle = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-};
-
-export function createCatastropheParticles(
-  count: number,
+export function computeCatastropheCellMetrics(
   width: number,
   height: number
-): CatastropheParticle[] {
-  const particles: CatastropheParticle[] = [];
-  for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const radius = Math.random() * Math.min(width, height) * 0.35;
-    particles.push({
-      x: width / 2 + Math.cos(angle) * radius,
-      y: height / 2 + Math.sin(angle) * radius,
-      vx: (Math.random() - 0.5) * 0.6,
-      vy: (Math.random() - 0.5) * 0.6,
-    });
+): CatastropheCellMetrics {
+  if (cachedCellW == null) {
+    cachedCellW = measureWidth("C", PRIMARY_FONT) * 1.02;
   }
-  return particles;
-}
-
-export type FieldStamp = {
-  radiusX: number;
-  radiusY: number;
-  sizeX: number;
-  sizeY: number;
-  values: Float32Array;
-};
-
-function spriteAlphaAt(normalizedDistance: number): number {
-  if (normalizedDistance >= 1) return 0;
-  if (normalizedDistance <= 0.35) {
-    return 0.45 + (0.15 - 0.45) * (normalizedDistance / 0.35);
-  }
-  return 0.15 * (1 - (normalizedDistance - 0.35) / 0.65);
-}
-
-export function createFieldStamp(
-  radiusPx: number,
-  fieldScaleX: number,
-  fieldScaleY: number
-): FieldStamp {
-  const fieldRadiusX = radiusPx * fieldScaleX;
-  const fieldRadiusY = radiusPx * fieldScaleY;
-  const radiusX = Math.ceil(fieldRadiusX);
-  const radiusY = Math.ceil(fieldRadiusY);
-  const sizeX = radiusX * 2 + 1;
-  const sizeY = radiusY * 2 + 1;
-  const values = new Float32Array(sizeX * sizeY);
-  for (let y = -radiusY; y <= radiusY; y++) {
-    for (let x = -radiusX; x <= radiusX; x++) {
-      const normalizedDistance = Math.sqrt(
-        (x / fieldRadiusX) ** 2 + (y / fieldRadiusY) ** 2
-      );
-      values[(y + radiusY) * sizeX + x + radiusX] =
-        spriteAlphaAt(normalizedDistance);
+  let cols = Math.max(8, Math.ceil(width / cachedCellW));
+  let rows = Math.max(8, Math.ceil(height / (CATASTROPHE_FONT_SIZE * 1.12)));
+  if (cols > MAX_COLS) cols = MAX_COLS;
+  if (rows > MAX_ROWS) rows = MAX_ROWS;
+  const cellW = width / cols;
+  const lineH = height / rows;
+  const chars: string[] = new Array(cols * rows);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      chars[row * cols + col] =
+        CATASTROPHE_WORD[(row * cols + col) % CATASTROPHE_WORD.length]!;
     }
   }
-  return { radiusX, radiusY, sizeX, sizeY, values };
+  return {
+    cellW,
+    lineH,
+    offsetX: 0,
+    offsetY: 0,
+    cols,
+    rows,
+    primaryFont: PRIMARY_FONT,
+    chars,
+  };
 }
 
-export function splatFieldStamp(
-  field: Float32Array,
-  fieldCols: number,
-  fieldRows: number,
-  centerX: number,
-  centerY: number,
-  fieldScaleX: number,
-  fieldScaleY: number,
-  stamp: FieldStamp
-): void {
-  const gridCenterX = Math.round(centerX * fieldScaleX);
-  const gridCenterY = Math.round(centerY * fieldScaleY);
-  for (let y = -stamp.radiusY; y <= stamp.radiusY; y++) {
-    const gridY = gridCenterY + y;
-    if (gridY < 0 || gridY >= fieldRows) continue;
-    const fieldRowOffset = gridY * fieldCols;
-    const stampRowOffset = (y + stamp.radiusY) * stamp.sizeX;
-    for (let x = -stamp.radiusX; x <= stamp.radiusX; x++) {
-      const gridX = gridCenterX + x;
-      if (gridX < 0 || gridX >= fieldCols) continue;
-      const stampValue = stamp.values[stampRowOffset + x + stamp.radiusX]!;
-      if (stampValue === 0) continue;
-      const fieldIndex = fieldRowOffset + gridX;
-      field[fieldIndex] = Math.min(1, field[fieldIndex]! + stampValue);
-    }
+function smoothstep(edge0: number, edge1: number, x: number): number {
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
+function easeOutCubic(t: number): number {
+  return 1 - (1 - t) ** 3;
+}
+
+function easeInCubic(t: number): number {
+  return t ** 3;
+}
+
+function clampAspect(aspectRatio: number): number {
+  return Math.max(0.45, Math.min(2.25, aspectRatio));
+}
+
+/** Aspect-correct hole half-axes (ny axis stretches on tall screens). */
+export function holeAxesForScreen(
+  holeRx: number,
+  aspectRatio: number
+): VignetteHoleAxes {
+  const aspect = clampAspect(aspectRatio);
+  return {
+    holeRx,
+    holeRy: holeRx / aspect,
+  };
+}
+
+/**
+ * Animated clear oval: full-screen text → tighten to min → expand off-screen.
+ */
+export function vignetteHoleAxes(
+  cycleProgress: number,
+  aspectRatio: number
+): VignetteHoleAxes {
+  const aspect = clampAspect(aspectRatio);
+  const entryRx = VIGNETTE_HOLE_ENTRY_FRAC;
+  const minRx = VIGNETTE_HOLE_MIN_SCREEN_FRAC;
+  const overRx = VIGNETTE_HOLE_OVERSHOOT_FRAC;
+  const entryRy = entryRx / aspect;
+  const minRy = minRx / aspect;
+  const overRy = overRx / aspect;
+
+  const p = cycleProgress % 1;
+
+  if (p < VIGNETTE_SHRINK_PHASE_END) {
+    const u = p / VIGNETTE_SHRINK_PHASE_END;
+    const t = easeOutCubic(u);
+    return {
+      holeRx: entryRx + (minRx - entryRx) * t,
+      holeRy: entryRy + (minRy - entryRy) * t,
+    };
   }
+
+  const u = (p - VIGNETTE_SHRINK_PHASE_END) / (1 - VIGNETTE_SHRINK_PHASE_END);
+  const t = easeInCubic(u);
+  return {
+    holeRx: minRx + (overRx - minRx) * t,
+    holeRy: minRy + (overRy - minRy) * t,
+  };
 }
 
-export function applyVignetteBase(
-  field: Float32Array,
-  fieldCols: number,
-  fieldRows: number,
-  intensity: number,
-  timeMs: number
-): void {
-  const cx = fieldCols * 0.5;
-  const cy = fieldRows * 0.42;
-  for (let row = 0; row < fieldRows; row++) {
-    for (let col = 0; col < fieldCols; col++) {
-      const dx = (col - cx) / (fieldCols * 0.48);
-      const dy = (row - cy) / (fieldRows * 0.48);
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const pulse = 0.9 + 0.1 * Math.sin(timeMs * 0.0009 + dist * 3.2);
-      const edge = Math.min(1, Math.max(0, (dist - 0.28) * 1.45));
-      const v = edge * intensity * pulse;
-      const idx = row * fieldCols + col;
-      field[idx] = Math.max(field[idx]!, v);
-    }
-  }
+export function catastropheCycleAlpha(cycleProgress: number): number {
+  const p = cycleProgress % 1;
+  if (p < 0.9) return 1;
+  return 1 - smoothstep(0.9, 1, p);
 }
 
-export const CATASTROPHE_GRID = {
-  fontSize: FONT_SIZE,
-  lineHeight: 13,
-  fieldOversample: 2,
-  particleCount: 48,
-  spriteRadius: 12,
-  fieldDecay: 0.86,
-} as const;
+/**
+ * Letter strength outside the clear ellipse (center = transparent).
+ */
+export function catastropheCellStrength(
+  nx: number,
+  ny: number,
+  hole: VignetteHoleAxes,
+  wobble: number
+): number {
+  const dx = (nx - VIGNETTE_CENTER_X) / Math.max(hole.holeRx, 0.02);
+  const dy = (ny - VIGNETTE_CENTER_Y) / Math.max(hole.holeRy, 0.02);
+  const ellDistSq = dx * dx + dy * dy;
+
+  if (ellDistSq < 1) return 0;
+
+  const edgeDist = Math.sqrt(ellDistSq);
+  const ring = smoothstep(1, 1 + VIGNETTE_FEATHER, edgeDist);
+
+  const rim =
+    VIGNETTE_EDGE_FLOOR * smoothstep(1.02, 1.5, edgeDist);
+
+  const breathe =
+    1 -
+    VIGNETTE_BREATHE_AMOUNT +
+    VIGNETTE_BREATHE_AMOUNT * Math.sin(wobble * 0.9 + edgeDist * 3.2);
+
+  return Math.max(0, Math.min(1, Math.max(ring, rim) * breathe));
+}
+
+export function catastropheIsDensePhase(hole: VignetteHoleAxes): boolean {
+  return hole.holeRx < VIGNETTE_HOLE_MIN_SCREEN_FRAC * 1.12;
+}
