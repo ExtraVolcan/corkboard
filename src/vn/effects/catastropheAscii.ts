@@ -24,9 +24,9 @@ import { prepareWithSegments } from "@chenglou/pretext";
  * SHAPE & POSITION (matches device aspect)
  * ───────────────────────────────────────
  * VIGNETTE_CENTER_X, VIGNETTE_CENTER_Y   Oval center (0–1).
- * Hole half-axes scale with aspect ratio: on tall phones holeRy > holeRx so the
- * cutout is taller than wide in pixel space (encroach equally from all edges).
- *   holeRy = holeRx / aspectRatio   (aspectRatio = width / height)
+ * Use the same normalized half-axis for X and Y (holeRy = holeRx). nx and ny already
+ * span the full width and height, so in pixels the clear oval is (r·W) × (r·H) and
+ * matches the screen’s width:height ratio.
  *
  * VIGNETTE_FEATHER          Soft edge of the oval boundary.
  * VIGNETTE_EDGE_FLOOR       Keeps corners filled with letters.
@@ -38,20 +38,20 @@ import { prepareWithSegments } from "@chenglou/pretext";
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-/** Starting clear hole (tiny); text initially covers the full screen. */
+/** Starting clear hole (whole screen); initially covers the full screen. */
 export const VIGNETTE_HOLE_ENTRY_FRAC = 1.00;
 
 /**
  * Minimum clear oval: half-axis as fraction of half-screen (0.5 from center to edge).
  * 0.30 → clear oval spans ~60% of screen width and ~60% of screen height.
  */
-export const VIGNETTE_HOLE_MIN_SCREEN_FRAC = 0.7;
+export const VIGNETTE_HOLE_MIN_SCREEN_FRAC = 0.4;
 
 /** Hole larger than the frame → effect fully off. */
 export const VIGNETTE_HOLE_OVERSHOOT_FRAC = 0.82;
 
 export const VIGNETTE_CENTER_X = 0.5;
-export const VIGNETTE_CENTER_Y = 0.5;
+export const VIGNETTE_CENTER_Y = 0.5;//lower value = higher
 
 export const VIGNETTE_FEATHER = 0.14;
 
@@ -70,7 +70,7 @@ export const CATASTROPHE_FONT_FAMILY =
 
 const PRIMARY_FONT = `700 ${CATASTROPHE_FONT_SIZE}px ${CATASTROPHE_FONT_FAMILY}`;
 
-export const CATASTROPHE_CYCLE_MS = 5800;
+export const CATASTROPHE_CYCLE_MS = 1800;
 
 const MAX_COLS = 58;
 const MAX_ROWS = 34;
@@ -143,54 +143,32 @@ function easeInCubic(t: number): number {
   return t ** 3;
 }
 
-function clampAspect(aspectRatio: number): number {
-  return Math.max(0.45, Math.min(2.25, aspectRatio));
-}
-
-/** Aspect-correct hole half-axes (ny axis stretches on tall screens). */
-export function holeAxesForScreen(
-  holeRx: number,
-  aspectRatio: number
-): VignetteHoleAxes {
-  const aspect = clampAspect(aspectRatio);
-  return {
-    holeRx,
-    holeRy: holeRx / aspect,
-  };
+/** Equal normalized half-axes → pixel oval matches screen aspect. */
+export function holeAxesForScreen(holeRx: number): VignetteHoleAxes {
+  return { holeRx, holeRy: holeRx };
 }
 
 /**
  * Animated clear oval: full-screen text → tighten to min → expand off-screen.
  */
-export function vignetteHoleAxes(
-  cycleProgress: number,
-  aspectRatio: number
-): VignetteHoleAxes {
-  const aspect = clampAspect(aspectRatio);
-  const entryRx = VIGNETTE_HOLE_ENTRY_FRAC;
-  const minRx = VIGNETTE_HOLE_MIN_SCREEN_FRAC;
-  const overRx = VIGNETTE_HOLE_OVERSHOOT_FRAC;
-  const entryRy = entryRx / aspect;
-  const minRy = minRx / aspect;
-  const overRy = overRx / aspect;
+export function vignetteHoleAxes(cycleProgress: number): VignetteHoleAxes {
+  const entryR = VIGNETTE_HOLE_ENTRY_FRAC;
+  const minR = VIGNETTE_HOLE_MIN_SCREEN_FRAC;
+  const overR = VIGNETTE_HOLE_OVERSHOOT_FRAC;
 
   const p = cycleProgress % 1;
 
   if (p < VIGNETTE_SHRINK_PHASE_END) {
     const u = p / VIGNETTE_SHRINK_PHASE_END;
     const t = easeOutCubic(u);
-    return {
-      holeRx: entryRx + (minRx - entryRx) * t,
-      holeRy: entryRy + (minRy - entryRy) * t,
-    };
+    const holeR = entryR + (minR - entryR) * t;
+    return { holeRx: holeR, holeRy: holeR };
   }
 
   const u = (p - VIGNETTE_SHRINK_PHASE_END) / (1 - VIGNETTE_SHRINK_PHASE_END);
   const t = easeInCubic(u);
-  return {
-    holeRx: minRx + (overRx - minRx) * t,
-    holeRy: minRy + (overRy - minRy) * t,
-  };
+  const holeR = minR + (overR - minR) * t;
+  return { holeRx: holeR, holeRy: holeR };
 }
 
 export function catastropheCycleAlpha(cycleProgress: number): number {

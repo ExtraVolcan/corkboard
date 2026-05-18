@@ -91,12 +91,11 @@ export function VnCatastropheOverlay({
       if (intens <= 0) return;
 
       const { renderW, renderH } = sizeRef.current;
-      const aspectRatio = renderW / renderH;
       const elapsed = now - cycleStartRef.current;
       const cycleProgress = reducedMotion
         ? 0.3
         : (elapsed % CATASTROPHE_CYCLE_MS) / CATASTROPHE_CYCLE_MS;
-      const hole = vignetteHoleAxes(cycleProgress, aspectRatio);
+      const hole = vignetteHoleAxes(cycleProgress);
       const globalAlpha =
         catastropheCycleAlpha(cycleProgress) *
         intens *
